@@ -7,7 +7,8 @@ info:
     name: Kelompok C6
 
 servers:
-  - url: /api
+  - url: http://localhost:3000/api
+    description: Local Development Server
 
 tags:
   - name: Auth
