@@ -49,3 +49,6 @@ app.*.map.json
 
 # Trash & Random Artifact
 .ignore/
+
+*.g.dart
+*.freezed.dart
