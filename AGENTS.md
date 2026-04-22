@@ -83,6 +83,7 @@ All design documents live in `.docs/` (tracked in git):
 | `md/spesifikasi-topik.md`     | Use cases, ER diagram, event lifecycle, sync sequence                                  |
 | `md/transkrip-meeting.md`     | Stakeholder meeting transcript (raw)                                                   |
 | `md/timeline-legacy.md`       | Legacy timeline (superseded by sprint-plan.md)                                         |
+| `openapi.yaml`                | OpenAPI 3.0.3 spec - source of truth for all API endpoints                             |
 | `brand/persis.json`           | Material Theme Builder export (seed: #068A50)                                          |
 
 ## Gotchas
