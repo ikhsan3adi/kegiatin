@@ -372,6 +372,7 @@ erDiagram
         Time WaktuMulai
         Time WaktuSelesai
         String Lokasi
+        Int Kapasitas "Nullable, null = unlimited"
         String Status "Enum: scheduled/ongoing/completed/postponed"
     }
     
@@ -420,7 +421,7 @@ erDiagram
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
 | **User**         | Pengguna aplikasi (Admin atau Peserta). Peserta terbagi Anggota (dengan NPA opsional) dan Non-Anggota (email verifikasi wajib) | UserID, NPA (nullable), Email, Role, Cabang (opt) |
 | **Event**        | Kegiatan yang bisa Single (sekali) atau Series (rutin). Dibuat oleh Admin                                                      | EventID, TipeEvent, StatusEvent, TargetPeserta    |
-| **Session**      | Sesi kegiatan untuk Series Event. Event Single tidak punya Session (1 Event = 1 Session implisit)                              | SessionID, Tanggal, Lokasi, StatusSesi            |
+| **Session**      | Sesi kegiatan. Single Event memiliki 1 sesi eksplisit (auto-created). Series Event memiliki multi-sesi                         | SessionID, Tanggal, Lokasi, Kapasitas, StatusSesi |
 | **RSVP**         | Reservasi peserta untuk event. Generate QR Code unik per RSVP                                                                  | RsvpID, QRToken, StatusRSVP                       |
 | **Attendance**   | Record kehadiran saat scan QR. **SyncStatus** untuk tracking offline-first                                                     | AttendID, WaktuHadir, StatusKehadiran, SyncStatus |
 | **Material**     | Materi kajian (PDF/Link/Video) per session                                                                                     | MatID, TipeFile, URL                              |

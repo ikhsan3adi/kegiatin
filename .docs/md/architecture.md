@@ -657,6 +657,8 @@ export class EventsModule {}
 
 ### 3.3 API Contract Overview
 
+> Detail lengkap (request/response schema, status codes, query params): lihat `.docs/openapi.yaml`
+
 | Method | Endpoint                | Auth   | Deskripsi                            |
 | ------ | ----------------------- | ------ | ------------------------------------ |
 | POST   | `/auth/register`        | Public | Registrasi user                      |
@@ -732,6 +734,7 @@ erDiagram
         string location
         int order
         enum status
+        int capacity
     }
 
     RSVP {
