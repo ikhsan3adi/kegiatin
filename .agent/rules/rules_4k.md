@@ -1,3 +1,9 @@
+---
+trigger: always_on
+glob:
+description: 'Kegiatin - Aplikasi Manajemen Kegiatan PD Pemuda Persis Kab. Bandung'
+---
+
 # AI Rules for Kegiatin - Flutter App
 
 > Aplikasi Manajemen Kegiatan PD Pemuda Persis Kab. Bandung
