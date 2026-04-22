@@ -1,0 +1,1113 @@
+openapi: 3.0.3
+info:
+  title: Kegiatin API
+  description: REST API for Kegiatin - Aplikasi Manajemen Kegiatan PD Pemuda Persis
+  version: 1.0.0
+  contact:
+    name: Kelompok C6
+
+servers:
+  - url: /api
+
+tags:
+  - name: Auth
+  - name: Events
+  - name: Sessions
+  - name: RSVP
+  - name: Attendance
+  - name: Profile
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # ── Enums ──
+    UserRole:
+      type: string
+      enum: [ADMIN, MEMBER]
+    EventType:
+      type: string
+      enum: [SINGLE, SERIES]
+    EventStatus:
+      type: string
+      enum: [DRAFT, PUBLISHED, ONGOING, COMPLETED, CANCELLED]
+    EventVisibility:
+      type: string
+      enum: [OPEN, INVITE_ONLY]
+    SessionStatus:
+      type: string
+      enum: [SCHEDULED, ONGOING, COMPLETED, POSTPONED]
+    RsvpStatus:
+      type: string
+      enum: [CONFIRMED, CANCELLED, WAITLIST]
+    AttendanceStatus:
+      type: string
+      enum: [PRESENT, LATE, ABSENT]
+    SyncStatus:
+      type: string
+      enum: [PENDING, SYNCING, SYNCED, CONFLICT]
+
+    # ── Response Envelope ──
+    ApiResponse:
+      type: object
+      required: [success, statusCode]
+      properties:
+        success:
+          type: boolean
+        statusCode:
+          type: integer
+        message:
+          type: string
+        data:
+          type: object
+    ApiErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        statusCode:
+          type: integer
+        message:
+          type: string
+        error:
+          type: string
+    PaginationMeta:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        totalPages:
+          type: integer
+
+    # ── Auth ──
+    RegisterDto:
+      type: object
+      required: [email, password, displayName, userType]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+        displayName:
+          type: string
+        userType:
+          type: string
+          enum: [ANGGOTA, UMUM]
+        npa:
+          type: string
+          description: Opsional, hanya untuk ANGGOTA
+        cabang:
+          type: string
+          description: Opsional, hanya untuk ANGGOTA
+    LoginDto:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+    AuthTokens:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        displayName:
+          type: string
+        role:
+          $ref: "#/components/schemas/UserRole"
+        npa:
+          type: string
+          nullable: true
+        cabang:
+          type: string
+          nullable: true
+        emailVerified:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    # ── Event ──
+    CreateEventDto:
+      type: object
+      required: [title, type, visibility]
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          $ref: "#/components/schemas/EventType"
+        visibility:
+          $ref: "#/components/schemas/EventVisibility"
+        location:
+          type: string
+        startTime:
+          type: string
+          format: date-time
+          description: Untuk SINGLE event, waktu mulai sesi
+        endTime:
+          type: string
+          format: date-time
+          description: Untuk SINGLE event, waktu selesai sesi
+    UpdateEventDto:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        visibility:
+          $ref: "#/components/schemas/EventVisibility"
+        location:
+          type: string
+    SessionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        location:
+          type: string
+        order:
+          type: integer
+        status:
+          $ref: "#/components/schemas/SessionStatus"
+        capacity:
+          type: integer
+          nullable: true
+          description: null = unlimited
+    EventResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          $ref: "#/components/schemas/EventType"
+        status:
+          $ref: "#/components/schemas/EventStatus"
+        visibility:
+          $ref: "#/components/schemas/EventVisibility"
+        location:
+          type: string
+        createdBy:
+          type: string
+        sessions:
+          type: array
+          items:
+            $ref: "#/components/schemas/SessionResponse"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    # ── Session ──
+    CreateSessionDto:
+      type: object
+      required: [title, startTime, endTime]
+      properties:
+        title:
+          type: string
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        location:
+          type: string
+        capacity:
+          type: integer
+          nullable: true
+          description: null = unlimited
+    UpdateSessionDto:
+      type: object
+      properties:
+        title:
+          type: string
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        location:
+          type: string
+        capacity:
+          type: integer
+          nullable: true
+
+    # ── RSVP ──
+    RsvpResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        eventId:
+          type: string
+        qrToken:
+          type: string
+          description: Custom algorithm token
+        status:
+          $ref: "#/components/schemas/RsvpStatus"
+        createdAt:
+          type: string
+          format: date-time
+
+    # ── Attendance ──
+    ScanQrDto:
+      type: object
+      required: [qrToken, sessionId]
+      properties:
+        qrToken:
+          type: string
+        sessionId:
+          type: string
+    SyncAttendanceRecord:
+      type: object
+      required: [localId, qrToken, sessionId, checkedInAt]
+      properties:
+        localId:
+          type: string
+          description: ID lokal dari Hive
+        qrToken:
+          type: string
+        sessionId:
+          type: string
+        checkedInAt:
+          type: string
+          format: date-time
+        status:
+          $ref: "#/components/schemas/AttendanceStatus"
+    SyncAttendanceBatchDto:
+      type: object
+      required: [records]
+      properties:
+        records:
+          type: array
+          items:
+            $ref: "#/components/schemas/SyncAttendanceRecord"
+    AttendanceResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        sessionId:
+          type: string
+        rsvpId:
+          type: string
+        status:
+          $ref: "#/components/schemas/AttendanceStatus"
+        syncStatus:
+          $ref: "#/components/schemas/SyncStatus"
+        checkedInAt:
+          type: string
+          format: date-time
+        syncedAt:
+          type: string
+          format: date-time
+          nullable: true
+    SyncResultResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              localId:
+                type: string
+              status:
+                type: string
+                enum: [SYNCED, CONFLICT, INVALID]
+              serverId:
+                type: string
+              reason:
+                type: string
+        summary:
+          type: object
+          properties:
+            synced:
+              type: integer
+            conflict:
+              type: integer
+            invalid:
+              type: integer
+
+    # ── Profile ──
+    UpdateProfileDto:
+      type: object
+      properties:
+        displayName:
+          type: string
+        cabang:
+          type: string
+        photoUrl:
+          type: string
+    ActivityRecord:
+      type: object
+      properties:
+        event:
+          $ref: "#/components/schemas/EventResponse"
+        attendancePerSession:
+          type: array
+          items:
+            type: object
+            properties:
+              session:
+                $ref: "#/components/schemas/SessionResponse"
+              status:
+                $ref: "#/components/schemas/AttendanceStatus"
+              checkedInAt:
+                type: string
+                format: date-time
+                nullable: true
+
+paths:
+  # ════════════ AUTH ════════════
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Register user baru
+      description: |
+        Dua tipe: ANGGOTA (NPA opsional) atau UMUM.
+        Email verification dikirim setelah registrasi.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterDto"
+      responses:
+        "201":
+          description: Registrasi berhasil, email verifikasi dikirim
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ApiResponse"
+                  - properties:
+                      data:
+                        $ref: "#/components/schemas/UserResponse"
+        "400":
+          description: Validasi gagal
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+        "409":
+          description: Email sudah terdaftar
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Login dengan email dan password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginDto"
+      responses:
+        "200":
+          description: Login berhasil
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ApiResponse"
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          user:
+                            $ref: "#/components/schemas/UserResponse"
+                          tokens:
+                            $ref: "#/components/schemas/AuthTokens"
+        "401":
+          description: Kredensial salah
+
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Refresh access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        "200":
+          description: Token baru
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ApiResponse"
+                  - properties:
+                      data:
+                        $ref: "#/components/schemas/AuthTokens"
+        "401":
+          description: Refresh token invalid/expired
+
+  /auth/verify-email:
+    get:
+      tags: [Auth]
+      summary: Verifikasi email via token
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Email terverifikasi
+        "400":
+          description: Token invalid/expired
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Get current user profile
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Profil user
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ApiResponse"
+                  - properties:
+                      data:
+                        $ref: "#/components/schemas/UserResponse"
+        "401":
+          description: Unauthorized
+
+  # ════════════ EVENTS ════════════
+  /events:
+    get:
+      tags: [Events]
+      summary: List events (paginated, filterable)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: status
+          in: query
+          schema:
+            $ref: "#/components/schemas/EventStatus"
+        - name: type
+          in: query
+          schema:
+            $ref: "#/components/schemas/EventType"
+        - name: visibility
+          in: query
+          schema:
+            $ref: "#/components/schemas/EventVisibility"
+        - name: search
+          in: query
+          description: Pencarian berdasarkan judul event (case-insensitive, partial match)
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Daftar event
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ApiResponse"
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/EventResponse"
+                      meta:
+                        $ref: "#/components/schemas/PaginationMeta"
+    post:
+      tags: [Events]
+      summary: Create event baru (Admin only)
+      description: |
+        Untuk SINGLE event: startTime dan endTime wajib, server auto-create 1 session.
+        Untuk SERIES event: session ditambah terpisah via POST /events/:id/sessions.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateEventDto"
+      responses:
+        "201":
+          description: Event berhasil dibuat (status DRAFT)
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ApiResponse"
+                  - properties:
+                      data:
+                        $ref: "#/components/schemas/EventResponse"
+        "403":
+          description: Bukan admin
+
+  /events/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Events]
+      summary: Detail event + sessions
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Detail event
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ApiResponse"
+                  - properties:
+                      data:
+                        $ref: "#/components/schemas/EventResponse"
+        "404":
+          description: Event not found
+    patch:
+      tags: [Events]
+      summary: Update event (Admin, DRAFT/PUBLISHED only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateEventDto"
+      responses:
+        "200":
+          description: Event updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ApiResponse"
+                  - properties:
+                      data:
+                        $ref: "#/components/schemas/EventResponse"
+        "400":
+          description: Cannot edit non-draft/published event
+    delete:
+      tags: [Events]
+      summary: Delete event (Admin, DRAFT only)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Event deleted
+        "400":
+          description: Only DRAFT events can be deleted
+
+  /events/{id}/publish:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    patch:
+      tags: [Events]
+      summary: Publish event (Admin, validasi canPublish)
+      description: Event harus punya minimal 1 session sebelum publish
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Event published
+        "400":
+          description: "canPublish failed: min 1 session required"
+
+  /events/{id}/cancel:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    patch:
+      tags: [Events]
+      summary: Cancel event (Admin)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Event cancelled
+        "400":
+          description: Cannot cancel completed/cancelled event
+
+  # ════════════ SESSIONS ════════════
+  /events/{id}/sessions:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      tags: [Sessions]
+      summary: Add session to event (Admin)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSessionDto"
+      responses:
+        "201":
+          description: Session created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ApiResponse"
+                  - properties:
+                      data:
+                        $ref: "#/components/schemas/SessionResponse"
+
+  /sessions/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    patch:
+      tags: [Sessions]
+      summary: Update session (Admin, not COMPLETED)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSessionDto"
+      responses:
+        "200":
+          description: Session updated
+        "400":
+          description: Cannot edit completed session
+    delete:
+      tags: [Sessions]
+      summary: Delete session (Admin, DRAFT/PUBLISHED event only)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Session deleted
+        "400":
+          description: Cannot delete from ongoing/completed event
+
+  /sessions/{id}/status:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    patch:
+      tags: [Sessions]
+      summary: Update session status (Admin)
+      description: "Transitions: SCHEDULED->ONGOING, ONGOING->COMPLETED, any->POSTPONED"
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  $ref: "#/components/schemas/SessionStatus"
+      responses:
+        "200":
+          description: Status updated
+        "400":
+          description: Invalid status transition
+
+  # ════════════ RSVP ════════════
+  /events/{id}/rsvp:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      tags: [RSVP]
+      summary: RSVP ke event (1 per user per event)
+      description: |
+        QR token di-generate server-side (custom algorithm).
+        Untuk Series Event, 1 RSVP covers all sessions.
+        Response includes qrToken untuk disimpan di Hive client.
+      security:
+        - bearerAuth: []
+      responses:
+        "201":
+          description: RSVP berhasil, qrToken included
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ApiResponse"
+                  - properties:
+                      data:
+                        $ref: "#/components/schemas/RsvpResponse"
+        "400":
+          description: Already RSVP'd or event not published
+        "409":
+          description: Duplicate RSVP
+    get:
+      tags: [RSVP]
+      summary: List peserta RSVP per event (Admin, for offline cache)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+      responses:
+        "200":
+          description: Daftar peserta RSVP
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ApiResponse"
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/RsvpResponse"
+                      meta:
+                        $ref: "#/components/schemas/PaginationMeta"
+
+  /rsvp/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    delete:
+      tags: [RSVP]
+      summary: Cancel RSVP
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: RSVP cancelled
+        "400":
+          description: Cannot cancel after check-in
+
+  /rsvp/{id}/qr:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [RSVP]
+      summary: Get QR token (re-fetch jika cache hilang)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: QR token
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ApiResponse"
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          qrToken:
+                            type: string
+
+  /rsvp/me:
+    get:
+      tags: [RSVP]
+      summary: List RSVP milik user sendiri
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: My RSVPs
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ApiResponse"
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/RsvpResponse"
+                      meta:
+                        $ref: "#/components/schemas/PaginationMeta"
+
+  # ════════════ ATTENDANCE ════════════
+  /attendance/scan:
+    post:
+      tags: [Attendance]
+      summary: Online scan - validate QR + record attendance
+      description: Untuk scan saat device online. Validasi real-time.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScanQrDto"
+      responses:
+        "201":
+          description: Attendance recorded
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ApiResponse"
+                  - properties:
+                      data:
+                        $ref: "#/components/schemas/AttendanceResponse"
+        "400":
+          description: QR invalid atau session tidak aktif
+        "409":
+          description: Already checked in for this session
+
+  /attendance/sync:
+    post:
+      tags: [Attendance]
+      summary: Bulk sync offline attendance records
+      description: |
+        Client mengirim batch records yang dikumpulkan saat offline.
+        Server memvalidasi per-record dan mengembalikan status masing-masing.
+        - SYNCED: valid dan berhasil disimpan
+        - CONFLICT: duplicate (userId + sessionId sudah ada)
+        - INVALID: QR token tidak valid (deferred validation gagal -> ABSENT)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SyncAttendanceBatchDto"
+      responses:
+        "200":
+          description: Sync result per record
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ApiResponse"
+                  - properties:
+                      data:
+                        $ref: "#/components/schemas/SyncResultResponse"
+
+  /sessions/{id}/attendance:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Attendance]
+      summary: Daftar hadir per session (Admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+      responses:
+        "200":
+          description: Attendance list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ApiResponse"
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/AttendanceResponse"
+                      meta:
+                        $ref: "#/components/schemas/PaginationMeta"
+
+  # ════════════ PROFILE ════════════
+  /profile/me:
+    get:
+      tags: [Profile]
+      summary: Get profil sendiri
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Profil user
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ApiResponse"
+                  - properties:
+                      data:
+                        $ref: "#/components/schemas/UserResponse"
+    patch:
+      tags: [Profile]
+      summary: Update profil sendiri
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProfileDto"
+      responses:
+        "200":
+          description: Profil updated
+
+  /profile/history:
+    get:
+      tags: [Profile]
+      summary: Histori kegiatan pribadi + attendance per session
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: search
+          in: query
+          description: Pencarian berdasarkan judul event di history (case-insensitive, partial match)
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Activity history
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ApiResponse"
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/ActivityRecord"
+                      meta:
+                        $ref: "#/components/schemas/PaginationMeta"
