@@ -17,6 +17,7 @@ tags:
   - name: RSVP
   - name: Attendance
   - name: Profile
+  - name: Uploads
 
 components:
   securitySchemes:
@@ -153,7 +154,7 @@ components:
     # ── Event ──
     CreateEventDto:
       type: object
-      required: [title, type, visibility]
+      required: [title, type, visibility, sessions]
       properties:
         title:
           type: string
@@ -165,14 +166,36 @@ components:
           $ref: "#/components/schemas/EventVisibility"
         location:
           type: string
-        startTime:
+        contactPerson:
           type: string
-          format: date-time
-          description: Untuk SINGLE event, waktu mulai sesi
-        endTime:
+          description: Nama dan kontak narahubung (e.g. "Pak Ahmad 08123456789")
+        imageUrl:
           type: string
-          format: date-time
-          description: Untuk SINGLE event, waktu selesai sesi
+          nullable: true
+          description: URL gambar/banner event (dari POST /uploads/image)
+        sessions:
+          type: array
+          description: |
+            SINGLE: 1 session wajib.
+            SERIES: N sessions (client-generated dari pola mingguan/bulanan/custom).
+          minItems: 1
+          items:
+            type: object
+            required: [title, startTime, endTime]
+            properties:
+              title:
+                type: string
+              startTime:
+                type: string
+                format: date-time
+              endTime:
+                type: string
+                format: date-time
+              location:
+                type: string
+              capacity:
+                type: integer
+                nullable: true
     UpdateEventDto:
       type: object
       properties:
@@ -184,6 +207,11 @@ components:
           $ref: "#/components/schemas/EventVisibility"
         location:
           type: string
+        contactPerson:
+          type: string
+        imageUrl:
+          type: string
+          nullable: true
     SessionResponse:
       type: object
       properties:
@@ -224,6 +252,11 @@ components:
           $ref: "#/components/schemas/EventVisibility"
         location:
           type: string
+        contactPerson:
+          type: string
+        imageUrl:
+          type: string
+          nullable: true
         createdBy:
           type: string
         sessions:
@@ -1112,3 +1145,45 @@ paths:
                           $ref: "#/components/schemas/ActivityRecord"
                       meta:
                         $ref: "#/components/schemas/PaginationMeta"
+
+  # ════════════ UPLOADS ════════════
+  /uploads/image:
+    post:
+      tags: [Uploads]
+      summary: Upload gambar (generic)
+      description: |
+        Upload gambar untuk event banner atau keperluan lain.
+        Mengembalikan URL publik yang bisa dipakai di field imageUrl.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: File gambar (JPEG/PNG, max 5MB)
+      responses:
+        "201":
+          description: Upload berhasil
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ApiResponse"
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          url:
+                            type: string
+                            description: URL publik gambar yang diupload
+        "400":
+          description: File tidak valid (format/ukuran)
+        "401":
+          description: Unauthorized
