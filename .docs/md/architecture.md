@@ -75,7 +75,8 @@ Pendekatan **layer-first** (bukan feature-first) dipilih karena:
 
 ```
 lib/
-  main.dart                              # Entry point, ProviderScope, MaterialApp.router
+  main.dart                              # Entry point: inisialisasi Hive, ProviderScope
+  app.dart                               # MaterialApp.router, tema, go_router
 
   core/
     constants/
@@ -94,19 +95,18 @@ lib/
       app_theme.dart                     # ThemeData assembly + ThemeExtension tokens
       util.dart                          # createTextTheme()
     utils/
-      qr_utils.dart
-      sync_status.dart                   # Enum: PENDING, SYNCING, SYNCED, CONFLICT
+      qr_utils.dart                      # Generate & parse custom QR token (Sprint 2)
 
   domain/
     entities/
-      user.dart
+      user.dart                          # Single source of truth untuk data pengguna
       event.dart
       session.dart
       attendance.dart
       rsvp.dart
       archive_item.dart
-      member_profile.dart
-      activity_record.dart
+      activity_record.dart               # Ringkasan keikutsertaan peserta per event (Sprint 4)
+                                         # Dipakai oleh GET /profile/history
     enums/
       user_role.dart                     # ADMIN, MEMBER
       event_type.dart                    # SINGLE, SERIES
@@ -152,15 +152,16 @@ lib/
 
   data/
     models/
-      user_model.dart                    # freezed + json_serializable
+      user_model.dart                    # freezed + json_serializable (full User)
+      user_summary_model.dart            # Proyeksi subset: id, displayName, photoUrl, npa, cabang
+                                         # Dipakai di response attendees list (admin view)
       auth_response_model.dart
       event_model.dart
       session_model.dart
       attendance_model.dart              # Includes syncStatus field
       rsvp_model.dart
       archive_model.dart
-      profile_model.dart
-      activity_record_model.dart
+      activity_record_model.dart         # Sprint 4
     datasources/
       auth_remote_datasource.dart
       auth_local_datasource.dart         # Hive box
@@ -430,17 +431,10 @@ server/
         repositories/
           profile.repository.impl.ts # MongooseProfileRepository
 
-      sync/
-        sync.module.ts
-        sync.controller.ts
-        sync.service.ts              # Handle bulk sync from client
-        dto/
-          sync-attendance-batch.dto.ts
-        domain/
-          sync.types.ts              # ISyncResult, SyncConflict enum
-          sync.repository.ts         # ISyncRepository interface
-        repositories/
-          sync.repository.impl.ts    # MongooseSyncRepository
+      uploads/
+        uploads.module.ts
+        uploads.controller.ts
+        uploads.service.ts             # Terima multipart, simpan file, return URL
 ```
 
 ### 3.2 Penjelasan Layer (NestJS)
@@ -489,8 +483,12 @@ export interface IEvent {
   id: string;
   title: string;
   description: string;
-  type: 'single' | 'series';
+  type: 'SINGLE' | 'SERIES';
   status: EventStatus;
+  visibility: 'OPEN' | 'INVITE_ONLY';
+  location: string;
+  contactPerson: string;
+  imageUrl: string | null;
   createdBy: string;
   sessions: ISession[];
   createdAt: Date;
@@ -499,9 +497,14 @@ export interface IEvent {
 
 export interface ISession {
   id: string;
+  eventId: string;
   title: string;
   startTime: Date;
   endTime: Date;
+  location: string;
+  order: number;
+  status: SessionStatus;
+  capacity: number | null;
 }
 ```
 
@@ -663,27 +666,32 @@ export class EventsModule {}
 | ------ | ----------------------- | ------ | ------------------------------------ |
 | POST   | `/auth/register`        | Public | Registrasi user                      |
 | POST   | `/auth/login`           | Public | Login email/password                 |
-| POST   | `/auth/google`          | Public | Login via Google OAuth               |
+| POST   | `/auth/refresh`         | Public | Refresh access token                 |
+| GET    | `/auth/me`              | User   | Get profil dari JWT                  |
 | GET    | `/auth/verify-email`    | Public | Verifikasi email token               |
-| GET    | `/events`               | User   | List events (filter by status, type) |
-| POST   | `/events`               | Admin  | Create event                         |
-| PATCH  | `/events/:id`           | Admin  | Update event                         |
-| PATCH  | `/events/:id/publish`   | Admin  | Publish event                        |
-| DELETE | `/events/:id`           | Admin  | Delete draft event                   |
+| GET    | `/events`               | User   | List events (filter by status, type, search) |
+| POST   | `/events`               | Admin  | Create event + sessions sekaligus    |
 | GET    | `/events/:id`           | User   | Event detail + sessions              |
-| POST   | `/events/:id/sessions`  | Admin  | Add session to event                 |
+| PATCH  | `/events/:id`           | Admin  | Update event metadata                |
+| PATCH  | `/events/:id/publish`   | Admin  | Publish event                        |
+| PATCH  | `/events/:id/cancel`    | Admin  | Cancel event                         |
+| DELETE | `/events/:id`           | Admin  | Delete draft event                   |
+| POST   | `/events/:id/sessions`  | Admin  | Add session ke event                 |
 | PATCH  | `/sessions/:id`         | Admin  | Update session                       |
 | DELETE | `/sessions/:id`         | Admin  | Delete session                       |
 | POST   | `/events/:id/rsvp`      | User   | RSVP ke event                        |
-| GET    | `/events/:id/attendees` | Admin  | List RSVP peserta (for local cache)  |
-| GET    | `/rsvp/:id/qr`          | User   | Get QR token for RSVP                |
+| DELETE | `/events/:id/rsvp`      | User   | Batalkan RSVP                        |
+| GET    | `/events/:id/attendees` | Admin  | List peserta RSVP (for local cache)  |
+| GET    | `/rsvp/:id/qr`          | User   | Get QR token untuk RSVP              |
 | POST   | `/attendance/scan`      | Admin  | Verify & record attendance           |
 | POST   | `/attendance/sync`      | Admin  | Bulk sync offline attendance         |
-| GET    | `/attendance/history`   | User   | Riwayat kehadiran sendiri            |
+| GET    | `/attendance/:sessionId`| Admin  | Daftar kehadiran per sesi            |
 | POST   | `/archive/upload`       | Admin  | Upload materi/foto                   |
 | GET    | `/archive/:eventId`     | User   | List materi event                    |
 | GET    | `/profile/me`           | User   | Profil sendiri                       |
-| GET    | `/profile/history`      | User   | Histori kegiatan pribadi             |
+| PATCH  | `/profile/me`           | User   | Update profil sendiri                |
+| GET    | `/profile/history`      | User   | Histori kegiatan pribadi (ActivityRecord[]) |
+| POST   | `/uploads/image`        | User   | Upload gambar (banner event)         |
 
 ---
 

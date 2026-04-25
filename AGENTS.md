@@ -67,7 +67,7 @@ Every syncable record carries a `SyncStatus` enum: `PENDING -> SYNCING -> SYNCED
 
 ## Enums (source of truth for code generation)
 
-Defined in `lib/domain/enums/`. See `.agent/rules/rules_4k.md` section "Domain Enums" for the canonical table.
+Defined in `lib/domain/enums/`. See `.agents/rules/rules_4k.md` section "Domain Enums" for the canonical table.
 
 ## Project Docs
 

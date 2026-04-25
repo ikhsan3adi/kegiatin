@@ -44,14 +44,17 @@ flowchart TB
     A[Dashboard Admin] --> B{Menu Utama}
     
     B -->|Kelola Kegiatan| C[Create Event]
-    C --> D{Pilih Tipe}
-    D -->|Single| E[Set 1 Sesi]
-    D -->|Series| F[Set Multi Sesi]
+    C --> D{Input Detail}
+    D --> D1[Judul, Deskripsi, Lokasi,\nNarahubung, GambarUrl]
+    D1 --> D2{Pilih Tipe}
+    D2 -->|Single| E[Set 1 Sesi Eksplisit]
+    D2 -->|Series| F[Pola: Mingguan/Bulanan/Custom\n→ Generate Daftar Sesi]
     E --> G1{Pilih Visibilitas}
     F --> G1
     G1 -->|Private/Invite Only| G2[Invite Peserta/Anggota]
-    G1 -->|Open Regis| G[Publish Event]
-    G2 --> G
+    G1 -->|Open Regis| G3[Simpan DRAFT]
+    G2 --> G3
+    G3 --> G[Publish Event]
     G --> H[Notifikasi ke Peserta]
 
     
@@ -61,7 +64,7 @@ flowchart TB
     M01 -->|Materi| R[Upload Materi/Dokumentasi]
     R --> S[Simpan ke Server]
     M02 -->|Series Event| M03[Pilih Sesi/Pertemuan]
-    M02 -->|Single Event| M04[Auto-select Sesi]
+    M02 -->|Single Event| M04[Pilih Sesi Tunggal]
     M03 --> M[Buka Menu Presensi]
     M04 --> M
     M --> M4

@@ -104,7 +104,7 @@ MaterialApp.router(routerConfig: _router);
 ## Data Layer
 
 ### JSON & Models
-* **JSON:** Use `json_serializable` with `fieldRename: FieldRename.snake`.
+* **JSON:** Use `json_serializable` with default `camelCase` to match the `openapi.yaml` definition. Do NOT use `FieldRename.snake`.
 * **Immutable Models:** Use `freezed` for both entities and DTOs. Models in `data/models/` extend entity behavior with serialization.
 
 ```dart
@@ -113,8 +113,17 @@ class EventModel with _$EventModel {
   const factory EventModel({
     required String id,
     required String title,
+    required String description,
     required EventType type,
     required EventStatus status,
+    required EventVisibility visibility,
+    required String location,
+    required String contactPerson,
+    String? imageUrl,
+    required String createdBy,
+    @Default([]) List<SessionModel> sessions,
+    required DateTime createdAt,
+    required DateTime updatedAt,
   }) = _EventModel;
 
   factory EventModel.fromJson(Map<String, dynamic> json) => _$EventModelFromJson(json);

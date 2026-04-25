@@ -124,14 +124,15 @@ Tanpa offline-first, aplikasi menjadi tidak fungsional di lokasi blank spot—pa
 
 **Main Success Scenario:**
 1. Admin memilih menu "Buat Kegiatan"
-2. Admin mengisi detail kegiatan: judul, deskripsi, tipe (Single/Series)
+2. Admin mengisi detail kegiatan: judul, deskripsi, tipe (Single/Series), lokasi, narahubung, gambar banner
 3. Admin memilih visibilitas: Open Registration atau Private/Invite Only
 4. Jika Private/Invite Only: Admin invite peserta/anggota tertentu
-5. Jika Series: Admin menentukan jumlah sesi awal dan jadwal per sesi
-6. Admin mengunggah materi awal (opsional)
-7. Admin men-submit form (Publish Event)
-8. Sistem memvalidasi data dan menyimpan ke MongoDB + Hive
-9. Sistem mengirim push notification ke peserta (jika Open Registration) atau peserta yang di-invite
+5. Jika Series: Admin mengatur jadwal dinamis dengan memasukkan pola berulang (mingguan/bulanan/custom/jumlah pertemuan)
+6. Client-side app menghitung dan menampilkan daftar tanggal sesi berdasarkan input admin. Admin dapat meninjau/merubah tiap sesi.
+7. Admin mengunggah materi awal (opsional)
+8. Admin men-submit form untuk menyimpan sebagai DRAFT (atau langsung Publish)
+9. Sistem memvalidasi data dan menyimpan event beserta seluruh list sesi sekaligus ke MongoDB + Hive
+10. Sistem mengirim push notification ke peserta target (jika di-Publish dan visibilitas Open/Invited)
 
 ---
 
@@ -350,19 +351,21 @@ erDiagram
     USER {
         ObjectId UserID PK
         String NPA "Nullable"
+        String DisplayName
         String Email
         String Password
-        String Role "Enum: admin/peserta"
+        String Role "Enum: ADMIN/MEMBER"
         Boolean IsVerified
+        String PhotoUrl "Nullable"
         String Cabang "Optional"
     }
     
     EVENT {
         ObjectId EventID PK
-        ObjectId AdminID FK
-        String TipeEvent "Enum: single/series"
-        String TargetPeserta "Enum: open/invite"
-        String Status "Enum: draft/published/ongoing/completed/cancelled"
+        ObjectId CreatedBy FK
+        String TipeEvent "Enum: SINGLE/SERIES"
+        String TargetPeserta "Enum: OPEN/INVITE_ONLY"
+        String Status "Enum: DRAFT/PUBLISHED/ONGOING/COMPLETED/CANCELLED"
         String Lokasi
         String Narahubung
         String GambarUrl "Nullable"
@@ -371,12 +374,13 @@ erDiagram
     SESSION {
         ObjectId SessionID PK
         ObjectId EventID FK
-        Date Tanggal
-        Time WaktuMulai
-        Time WaktuSelesai
+        String Title
+        DateTime StartTime
+        DateTime EndTime
         String Lokasi
+        Int Order
         Int Kapasitas "Nullable, null = unlimited"
-        String Status "Enum: scheduled/ongoing/completed/postponed"
+        String Status "Enum: SCHEDULED/ONGOING/COMPLETED/POSTPONED"
     }
     
     RSVP {
@@ -385,33 +389,33 @@ erDiagram
         ObjectId EventID FK
         String QRToken "Unique"
         DateTime TanggalReservasi
-        String Status "Enum: confirmed/cancelled/waitlist"
+        String Status "Enum: CONFIRMED/CANCELLED/WAITLIST"
     }
     
     ATTENDANCE {
         ObjectId AttendID PK
         ObjectId RsvpID FK
         ObjectId SessionID FK
-        String ScannedBy "Admin NPA"
+        ObjectId UserID FK "Scanned User"
         DateTime WaktuHadir
-        String Status "Enum: present/late/absent"
-        String SyncStatus "Enum: pending/synced/failed"
+        String Status "Enum: PRESENT/LATE/ABSENT"
+        String SyncStatus "Enum: PENDING/SYNCING/SYNCED/CONFLICT"
         DateTime SyncedAt "Nullable"
     }
     
-    MATERIAL {
+    ARCHIVE_ITEM {
         ObjectId MatID PK
         ObjectId SessionID FK
-        String TipeFile "Enum: pdf/link/video"
+        String TipeFile "Enum: MATERIAL/PHOTO/EVALUATION"
         String Judul
         String URL
-        String UploadedBy "Admin NPA"
+        ObjectId UploadedBy FK
     }
     
     NOTIFICATION {
         ObjectId NotifID PK
         ObjectId UserID FK
-        String TipeNotif "Enum: event_created/session_updated/reminder"
+        String TipeNotif "Enum: EVENT_CREATED/SESSION_UPDATED/REMINDER"
         String Title
         String Body
         Boolean IsRead
@@ -424,23 +428,23 @@ erDiagram
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
 | **User**         | Pengguna aplikasi (Admin atau Peserta). Peserta terbagi Anggota (dengan NPA opsional) dan Non-Anggota (email verifikasi wajib) | UserID, NPA (nullable), Email, Role, Cabang (opt) |
 | **Event**        | Kegiatan yang bisa Single (sekali) atau Series (rutin). Dibuat oleh Admin                                                      | EventID, TipeEvent, StatusEvent, TargetPeserta    |
-| **Session**      | Sesi kegiatan. Single Event memiliki 1 sesi eksplisit (auto-created). Series Event memiliki multi-sesi                         | SessionID, Tanggal, Lokasi, Kapasitas, StatusSesi |
+| **Session**      | Sesi kegiatan. Single Event memiliki 1 sesi eksplisit (auto-created). Series Event memiliki multi-sesi                         | SessionID, Title, StartTime, EndTime, Lokasi      |
 | **RSVP**         | Reservasi peserta untuk event. Generate QR Code unik per RSVP                                                                  | RsvpID, QRToken, StatusRSVP                       |
 | **Attendance**   | Record kehadiran saat scan QR. **SyncStatus** untuk tracking offline-first                                                     | AttendID, WaktuHadir, StatusKehadiran, SyncStatus |
-| **Material**     | Materi kajian (PDF/Link/Video) per session                                                                                     | MatID, TipeFile, URL                              |
-| **Notification** | Push notification ke user                                                                                                      | NotifID, TipeNotif, IsRead                        |
+| **Archive Item** | Materi kajian (PDF/Link/Video) atau dokumentasi/evaluasi per session                                                           | MatID, TipeFile, URL                              |
+| **Notification** | Push notification ke user (Disimpan di Client/Hive lokal)                                                                      | NotifID, TipeNotif, IsRead                        |
 
 ### 5.3 Kardinalitas Relasi
 
 | Relasi                | Kardinalitas | Keterangan                                                       |
 | --------------------- | ------------ | ---------------------------------------------------------------- |
 | User (Admin) → Event  | 1 : N        | 1 Admin bisa buat banyak Event                                   |
-| Event → Session       | 1 : N        | 1 Series Event punya banyak Session (Single Event: N=0 implisit) |
+| Event → Session       | 1 : N        | 1 Event punya banyak Session (Single Event: N=1 eksplisit)       |
 | User (Peserta) → RSVP | 1 : N        | 1 Peserta bisa RSVP banyak Event                                 |
 | Event → RSVP          | 1 : N        | 1 Event bisa punya banyak RSVP                                   |
 | RSVP → Attendance     | 1 : N        | 1 RSVP (Series) bisa punya N Attendance per Session              |
 | Session → Attendance  | 1 : N        | 1 Session punya banyak Attendance                                |
-| Session → Material    | 1 : N        | 1 Session punya banyak Material                                  |
+| Session → Archive Item| 1 : N        | 1 Session punya banyak Archive Item                              |
 | User → Notification   | 1 : N        | 1 User terima banyak Notifikasi                                  |
 
 ## Skema Alur Workflow
