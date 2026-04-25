@@ -363,6 +363,9 @@ erDiagram
         String TipeEvent "Enum: single/series"
         String TargetPeserta "Enum: open/invite"
         String Status "Enum: draft/published/ongoing/completed/cancelled"
+        String Lokasi
+        String Narahubung
+        String GambarUrl "Nullable"
     }
     
     SESSION {

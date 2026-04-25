@@ -721,6 +721,8 @@ erDiagram
         enum status
         enum visibility
         string location
+        string contactPerson
+        string imageUrl
         datetime createdAt
         datetime updatedAt
     }
