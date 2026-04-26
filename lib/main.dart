@@ -5,9 +5,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:kegiatin/app.dart';
 import 'package:kegiatin/core/constants/db_constants.dart';
 import 'package:kegiatin/presentation/providers/providers.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: '.env');
 
   await Hive.initFlutter();
   final authBox = await Hive.openBox(DbConstants.authBox);
