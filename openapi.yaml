@@ -150,6 +150,9 @@ components:
         cabang:
           type: string
           nullable: true
+        photoUrl:
+          type: string
+          nullable: true
         emailVerified:
           type: boolean
         createdAt:
