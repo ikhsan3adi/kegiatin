@@ -101,6 +101,37 @@ final _router = GoRouter(routes: [
 MaterialApp.router(routerConfig: _router);
 ```
 
+## Domain Layer
+
+### Use Cases
+* Base class: `UseCase<Output, Input>` with a `call(Input input)` method. Use `NoInput` for parameterless use cases.
+* Dart `call()` allows use cases to be invoked as functions: `final result = await loginUseCase(input);`
+
+### Input Class Placement
+
+| Scenario | Location | Naming |
+|---|---|---|
+| Use case maps 1:1 to a repository method (same input) | `domain/entities/` | `*Input` (e.g. `RegisterInput`) |
+| Use case needs compound input (multiple repos or extra fields) | Inline in use case file | `*UseCaseParams` |
+| Input is a primitive or `NoInput` | No class needed | `UseCase<Out, String>` or `NoInput` |
+
+```dart
+// Case 1: Reuse Input from entities — shared by repo and use case
+class RegisterUseCase extends UseCase<AuthResponse, RegisterInput> { ... }
+
+// Case 2: Compound input — defined inline in the use case file
+class UpdateEventUseCase extends UseCase<Event, UpdateEventUseCaseParams> { ... }
+
+class UpdateEventUseCaseParams { // UseCaseParams class must be placed directly below its corresponding UseCase class in the same file.
+  final String eventId;
+  final UpdateEventInput input;
+  const UpdateEventUseCaseParams({required this.eventId, required this.input});
+}
+
+// Case 3: Primitive input
+class DeleteEventUseCase extends UseCase<void, String> { ... }
+```
+
 ## Data Layer
 
 ### JSON & Models
