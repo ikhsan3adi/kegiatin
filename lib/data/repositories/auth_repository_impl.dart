@@ -41,16 +41,14 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, AuthResponse>> register(RegisterInput input) async {
+  Future<Either<Failure, User>> register(RegisterInput input) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure());
     }
 
     try {
-      final response = await remoteDataSource.register(input);
-      await localDataSource.saveTokens(response.accessToken, response.refreshToken);
-      await localDataSource.saveUser(response.user);
-      return Right(response.toEntity());
+      final userModel = await remoteDataSource.register(input);
+      return Right(userModel.toEntity());
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message, statusCode: e.statusCode));
     } catch (e) {
@@ -73,8 +71,12 @@ class AuthRepositoryImpl implements AuthRepository {
     } on UnauthorizedException catch (e) {
       return Left(AuthFailure(e.message));
     } on ServerException catch (e) {
+      final cached = await localDataSource.getCachedUser();
+      if (cached != null) return Right(cached.toEntity());
       return Left(ServerFailure(e.message, statusCode: e.statusCode));
     } catch (e) {
+      final cached = await localDataSource.getCachedUser();
+      if (cached != null) return Right(cached.toEntity());
       return Left(ServerFailure(e.toString()));
     }
   }
@@ -98,7 +100,6 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Either<Failure, void>> verifyEmail(String token) async {
-    // Endpoint belum tersedia di openapi.yaml — akan diimplementasi jika ditambahkan
     return const Left(ServerFailure('Endpoint belum tersedia'));
   }
 

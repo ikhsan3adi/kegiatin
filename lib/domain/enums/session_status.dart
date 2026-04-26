@@ -1,19 +1,15 @@
-/// Status lifecycle sebuah sesi kegiatan.
+import 'package:json_annotation/json_annotation.dart';
+
 enum SessionStatus {
-  /// Terjadwal, belum dimulai.
+  @JsonValue('SCHEDULED')
   scheduled,
 
-  /// Sedang berlangsung.
+  @JsonValue('ONGOING')
   ongoing,
 
-  /// Telah selesai.
+  @JsonValue('COMPLETED')
   completed,
 
-  /// Ditunda.
+  @JsonValue('POSTPONED')
   postponed;
-
-  String toJson() => name.toUpperCase();
-
-  static SessionStatus fromJson(String value) =>
-      SessionStatus.values.firstWhere((e) => e.name == value.toLowerCase());
 }

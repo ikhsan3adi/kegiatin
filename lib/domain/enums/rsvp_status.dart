@@ -1,16 +1,12 @@
-/// Status reservasi peserta terhadap sebuah event.
+import 'package:json_annotation/json_annotation.dart';
+
 enum RsvpStatus {
-  /// Terkonfirmasi — peserta mendapat QR code.
+  @JsonValue('CONFIRMED')
   confirmed,
 
-  /// Dibatalkan oleh peserta.
+  @JsonValue('CANCELLED')
   cancelled,
 
-  /// Masuk waiting list (jika kuota penuh).
+  @JsonValue('WAITLIST')
   waitlist;
-
-  String toJson() => name.toUpperCase();
-
-  static RsvpStatus fromJson(String value) =>
-      RsvpStatus.values.firstWhere((e) => e.name == value.toLowerCase());
 }

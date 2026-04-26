@@ -10,7 +10,7 @@ class MyApp extends ConsumerWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final brightness = View.of(context).platformDispatcher.platformBrightness;
+    // final brightness = View.of(context).platformDispatcher.platformBrightness;
     final textTheme = createTextTheme(context, 'Inter', 'Alumni Sans');
     final theme = MaterialTheme(textTheme);
 
@@ -19,7 +19,8 @@ class MyApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'Kegiatin',
       debugShowCheckedModeBanner: false,
-      theme: brightness == Brightness.light ? theme.light() : theme.dark(),
+      theme: theme.light(),
+      // theme: brightness == Brightness.light ? theme.light() : theme.dark(),
       routerConfig: router,
     );
   }

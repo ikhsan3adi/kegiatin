@@ -1,22 +1,18 @@
-/// Lifecycle status sebuah event.
+import 'package:json_annotation/json_annotation.dart';
+
 enum EventStatus {
-  /// Baru dibuat, belum dipublikasikan.
+  @JsonValue('DRAFT')
   draft,
 
-  /// Sudah dipublikasikan, peserta bisa RSVP.
+  @JsonValue('PUBLISHED')
   published,
 
-  /// Sedang berlangsung (sesi aktif).
+  @JsonValue('ONGOING')
   ongoing,
 
-  /// Semua sesi selesai.
+  @JsonValue('COMPLETED')
   completed,
 
-  /// Dibatalkan oleh admin.
+  @JsonValue('CANCELLED')
   cancelled;
-
-  String toJson() => name.toUpperCase();
-
-  static EventStatus fromJson(String value) =>
-      EventStatus.values.firstWhere((e) => e.name == value.toLowerCase());
 }

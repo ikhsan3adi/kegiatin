@@ -1,13 +1,9 @@
-/// Tipe kegiatan.
+import 'package:json_annotation/json_annotation.dart';
+
 enum EventType {
-  /// Kegiatan sekali jalan — harus memiliki tepat 1 sesi eksplisit.
+  @JsonValue('SINGLE')
   single,
 
-  /// Kegiatan rutin/berseri — memiliki banyak sesi.
+  @JsonValue('SERIES')
   series;
-
-  String toJson() => name.toUpperCase();
-
-  static EventType fromJson(String value) =>
-      EventType.values.firstWhere((e) => e.name == value.toLowerCase());
 }

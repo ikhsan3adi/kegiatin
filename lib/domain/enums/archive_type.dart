@@ -1,16 +1,12 @@
-/// Jenis arsip digital per sesi kegiatan.
+import 'package:json_annotation/json_annotation.dart';
+
 enum ArchiveType {
-  /// Materi kajian (PDF, link).
+  @JsonValue('MATERIAL')
   material,
 
-  /// Dokumentasi foto.
+  @JsonValue('PHOTO')
   photo,
 
-  /// Notulensi atau evaluasi.
+  @JsonValue('EVALUATION')
   evaluation;
-
-  String toJson() => name.toUpperCase();
-
-  static ArchiveType fromJson(String value) =>
-      ArchiveType.values.firstWhere((e) => e.name == value.toLowerCase());
 }

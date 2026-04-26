@@ -1,19 +1,15 @@
-/// Status sinkronisasi data offline → server.
+import 'package:json_annotation/json_annotation.dart';
+
 enum SyncStatus {
-  /// Belum dikirim ke server.
+  @JsonValue('PENDING')
   pending,
 
-  /// Sedang dalam proses kirim.
+  @JsonValue('SYNCING')
   syncing,
 
-  /// Berhasil tersinkronisasi.
+  @JsonValue('SYNCED')
   synced,
 
-  /// Terjadi konflik (mis. duplikat userId+sessionId).
+  @JsonValue('CONFLICT')
   conflict;
-
-  String toJson() => name.toUpperCase();
-
-  static SyncStatus fromJson(String value) =>
-      SyncStatus.values.firstWhere((e) => e.name == value.toLowerCase());
 }

@@ -1,16 +1,12 @@
-/// Status kehadiran peserta pada sebuah sesi.
+import 'package:json_annotation/json_annotation.dart';
+
 enum AttendanceStatus {
-  /// Hadir tepat waktu.
+  @JsonValue('PRESENT')
   present,
 
-  /// Hadir tetapi terlambat.
+  @JsonValue('LATE')
   late,
 
-  /// Tidak hadir.
+  @JsonValue('ABSENT')
   absent;
-
-  String toJson() => name.toUpperCase();
-
-  static AttendanceStatus fromJson(String value) =>
-      AttendanceStatus.values.firstWhere((e) => e.name == value.toLowerCase());
 }

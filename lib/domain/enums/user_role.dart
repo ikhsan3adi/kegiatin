@@ -1,14 +1,11 @@
-/// Hak akses pengguna di dalam aplikasi.
+import 'package:json_annotation/json_annotation.dart';
+
 enum UserRole {
-  /// Pengurus — dapat membuat event, scan QR, upload materi.
+  @JsonValue('ADMIN')
   admin,
 
-  /// Anggota atau peserta umum.
+  @JsonValue('MEMBER')
   member;
 
-  /// Nilai API: `"ADMIN"` / `"MEMBER"`.
-  String toJson() => name.toUpperCase();
-
-  static UserRole fromJson(String value) =>
-      UserRole.values.firstWhere((e) => e.name == value.toLowerCase());
+  String toJsonString() => name.toUpperCase();
 }

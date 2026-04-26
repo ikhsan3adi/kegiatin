@@ -7,7 +7,7 @@ import 'package:kegiatin/domain/entities/register_input.dart';
 
 abstract class AuthRemoteDataSource {
   Future<AuthResponseModel> login(String email, String password);
-  Future<AuthResponseModel> register(RegisterInput input);
+  Future<UserModel> register(RegisterInput input);
   Future<UserModel> getCurrentUser();
   Future<String> refreshToken(String refreshToken);
   Future<void> logout();
@@ -25,7 +25,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'email': email,
         'password': password,
       });
-      return AuthResponseModel.fromJson(response.data);
+      final responseData = response.data as Map<String, dynamic>;
+      final payload = responseData['data'] as Map<String, dynamic>;
+      return AuthResponseModel(
+        user: UserModel.fromJson(payload['user'] as Map<String, dynamic>),
+        accessToken: (payload['tokens'] as Map<String, dynamic>)['accessToken'] as String,
+        refreshToken: (payload['tokens'] as Map<String, dynamic>)['refreshToken'] as String,
+      );
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
         throw const UnauthorizedException('Email atau password salah');
@@ -37,7 +43,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<AuthResponseModel> register(RegisterInput input) async {
+  Future<UserModel> register(RegisterInput input) async {
     try {
       final response = await dio.post(ApiConstants.register, data: {
         'email': input.email,
@@ -46,7 +52,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'userType': input.userType,
         if (input.npa != null) 'npa': input.npa,
       });
-      return AuthResponseModel.fromJson(response.data);
+      final responseData = response.data as Map<String, dynamic>;
+      final payload = responseData['data'] as Map<String, dynamic>;
+      return UserModel.fromJson(payload);
     } on DioException catch (e) {
       final data = e.response?.data;
       final message = (data is Map<String, dynamic>) ? data['message'] : null;
@@ -58,7 +66,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<UserModel> getCurrentUser() async {
     try {
       final response = await dio.get(ApiConstants.me);
-      return UserModel.fromJson(response.data);
+      final responseData = response.data as Map<String, dynamic>;
+      final payload = responseData['data'] as Map<String, dynamic>;
+      return UserModel.fromJson(payload);
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) throw const UnauthorizedException();
       final data = e.response?.data;
@@ -75,7 +85,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         data: {'refreshToken': refreshToken},
       );
       final responseData = response.data as Map<String, dynamic>;
-      return responseData['accessToken'] as String;
+      final payload = responseData['data'] as Map<String, dynamic>;
+      return payload['accessToken'] as String;
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) throw const UnauthorizedException('Sesi berakhir');
       final data = e.response?.data;

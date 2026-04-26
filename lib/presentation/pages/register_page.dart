@@ -51,7 +51,13 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
         SnackBar(content: Text(error), backgroundColor: Theme.of(context).colorScheme.error),
       );
     } else {
-      context.go('/');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Registrasi berhasil. Silakan masuk.'),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+        ),
+      );
+      context.go('/login');
     }
   }
 

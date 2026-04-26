@@ -10,6 +10,8 @@ abstract class AuthLocalDataSource {
   Future<void> saveUser(UserModel user);
   Future<UserModel?> getCachedUser();
   Future<void> clearAll();
+  Future<void> setOnboardingSeen(bool seen);
+  Future<bool> hasSeenOnboarding();
 }
 
 class AuthLocalDataSourceImpl implements AuthLocalDataSource {
@@ -48,5 +50,15 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
     await sharedPreferences.remove(DbConstants.tokenKey);
     await sharedPreferences.remove(DbConstants.refreshTokenKey);
     await authBox.delete(DbConstants.cachedUserKey);
+  }
+
+  @override
+  Future<void> setOnboardingSeen(bool seen) async {
+    await sharedPreferences.setBool(DbConstants.hasSeenOnboardingKey, seen);
+  }
+
+  @override
+  Future<bool> hasSeenOnboarding() async {
+    return sharedPreferences.getBool(DbConstants.hasSeenOnboardingKey) ?? false;
   }
 }

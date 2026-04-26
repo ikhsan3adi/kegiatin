@@ -1,29 +1,9 @@
-/// Visibilitas event — menentukan siapa yang bisa melihat dan RSVP.
+import 'package:json_annotation/json_annotation.dart';
+
 enum EventVisibility {
-  /// Terbuka untuk semua pengguna.
+  @JsonValue('OPEN')
   open,
 
-  /// Hanya peserta yang diundang.
+  @JsonValue('INVITE_ONLY')
   inviteOnly;
-
-  /// Serialisasi ke `"OPEN"` atau `"INVITE_ONLY"`.
-  String toJson() {
-    switch (this) {
-      case EventVisibility.open:
-        return 'OPEN';
-      case EventVisibility.inviteOnly:
-        return 'INVITE_ONLY';
-    }
-  }
-
-  static EventVisibility fromJson(String value) {
-    switch (value) {
-      case 'OPEN':
-        return EventVisibility.open;
-      case 'INVITE_ONLY':
-        return EventVisibility.inviteOnly;
-      default:
-        throw ArgumentError('Unknown EventVisibility: $value');
-    }
-  }
 }

@@ -37,9 +37,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(error), backgroundColor: Theme.of(context).colorScheme.error),
       );
-    } else {
-      context.go('/');
     }
+    // Router redirect will handle navigation to home when auth state changes
   }
 
   @override
