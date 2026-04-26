@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { UserRole } from '../domain/user.types';
 
-@Schema({ timestamps: true })
+@Schema({ timestamps: true, collection: 'users' })
 export class UserEntity extends Document {
   @Prop({ required: true, unique: true, lowercase: true, trim: true })
   email: string;
