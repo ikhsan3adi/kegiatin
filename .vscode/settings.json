@@ -10,6 +10,7 @@
     "**/.symlinks": true,
     "**/.plugin_symlinks": true,
     "linux": true,
+    "snap": true,
     "windows": true,
     "macos": true,
     "web": true,
