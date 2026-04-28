@@ -29,7 +29,6 @@ async function bootstrap() {
   );
 
   const reflector = app.get(Reflector);
-  app.useGlobalGuards(new RolesGuard(reflector));
 
   app.setGlobalPrefix('api');
 
