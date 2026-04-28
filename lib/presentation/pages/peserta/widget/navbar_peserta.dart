@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
+import 'package:kegiatin/presentation/widgets/kegiatin_app_bar.dart';
 
 class NavbarPeserta extends ConsumerStatefulWidget {
   const NavbarPeserta({super.key});
@@ -21,41 +22,190 @@ class _NavbarPesertaState extends ConsumerState<NavbarPeserta> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     final authState = ref.watch(authControllerProvider);
 
-    // Daftar halaman untuk didemonstrasikan perpindahan tab
     final List<Widget> pages = [
-      // Index 0: Beranda (Konten dari PesertaHomePage sebelumnya)
-      Center(
-        child: authState.when(
-          data: (user) => Column(
-            mainAxisSize: MainAxisSize.min,
+      // Index 0: Beranda
+      authState.when(
+        data: (user) => SingleChildScrollView(
+          child: Column(
             children: [
-              Icon(Icons.person, size: 64, color: colorScheme.primary),
-              const SizedBox(height: 16),
-              Text('Selamat datang, ${user?.displayName ?? '-'}'),
-              const SizedBox(height: 8),
-              Text(
-                user?.email ?? '',
-                style: Theme.of(context).textTheme.bodySmall,
+              KegiatinAppBar(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Logo + nama app + notifikasi
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Image.asset(
+                              'assets/LogoKegiaTin 2.png',
+                              width: 32,
+                              height: 32,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'KEGIATIN',
+                              style: textTheme.titleMedium?.copyWith(
+                                color: colorScheme.onPrimary,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                          ],
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            // TODO: navigasi ke halaman notifikasi
+                          },
+                          icon: Icon(
+                            Icons.notifications_outlined,
+                            color: colorScheme.onPrimary,
+                            size: 26,
+                          ),
+                          tooltip: 'Notifikasi',
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Selamat Datang',
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onPrimary.withValues(alpha: 0.85),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      user?.displayName ?? '-',
+                      style: textTheme.headlineSmall?.copyWith(
+                        color: colorScheme.onPrimary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Kegiatan Terkini',
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Center(
+                child: Text(
+                  'Belum ada kegiatan',
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
               ),
             ],
           ),
-          loading: () => const CircularProgressIndicator(),
-          error: (e, _) => Text('Error: $e'),
+        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(child: Text('Error: $e')),
+      ),
+      // Index 1: Kegiatan
+      SingleChildScrollView(
+        child: Column(
+          children: [
+            KegiatinAppBar(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Kegiatan',
+                    style: textTheme.headlineSmall?.copyWith(
+                      color: colorScheme.onPrimary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '0 Kegiatan Tersedia',
+                    style: textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onPrimary.withValues(alpha: 0.85),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Center(
+              child: Text(
+                'Belum ada kegiatan',
+                style: textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
-      // Index 1: Acara
-      const Center(
-        child: Text('Halaman Acara', style: TextStyle(fontSize: 24)),
-      ),
       // Index 2: Riwayat
-      const Center(
-        child: Text('Halaman Riwayat', style: TextStyle(fontSize: 24)),
+      SingleChildScrollView(
+        child: Column(
+          children: [
+            KegiatinAppBar(
+              child: Text(
+                'Riwayat',
+                style: textTheme.headlineSmall?.copyWith(
+                  color: colorScheme.onPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Center(
+              child: Text(
+                'Belum ada riwayat',
+                style: textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
       // Index 3: Profil
-      const Center(
-        child: Text('Halaman Profil', style: TextStyle(fontSize: 24)),
+      SingleChildScrollView(
+        child: Column(
+          children: [
+            KegiatinAppBar(
+              child: Text(
+                'Profil Saya',
+                style: textTheme.headlineSmall?.copyWith(
+                  color: colorScheme.onPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Center(
+              child: Text(
+                'Konten profil',
+                style: textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     ];
 
