@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
 
-/// Placeholder home page — akan diganti dengan dashboard di sprint berikutnya.
-class HomePage extends ConsumerWidget {
-  const HomePage({super.key});
+class PesertaHomePage extends ConsumerWidget {
+  const PesertaHomePage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -13,7 +12,7 @@ class HomePage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Kegiatin'),
+        title: const Text('Beranda Peserta'),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -26,7 +25,7 @@ class HomePage extends ConsumerWidget {
           data: (user) => Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.check_circle_outline, size: 64, color: colorScheme.primary),
+              Icon(Icons.person, size: 64, color: colorScheme.primary),
               const SizedBox(height: 16),
               Text('Selamat datang, ${user?.displayName ?? '-'}'),
               const SizedBox(height: 8),
