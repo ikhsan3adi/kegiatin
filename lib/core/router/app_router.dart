@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kegiatin/domain/enums/user_role.dart';
 import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
-import 'package:kegiatin/presentation/pages/home_page.dart';
+import 'package:kegiatin/presentation/pages/admin/admin_dashboard_page.dart';
+import 'package:kegiatin/presentation/pages/peserta/peserta_home_page.dart';
 import 'package:kegiatin/presentation/pages/login_page.dart';
 import 'package:kegiatin/presentation/pages/onboarding_page.dart';
 import 'package:kegiatin/presentation/pages/register_page.dart';
@@ -38,9 +40,27 @@ GoRouter appRouter(Ref ref) {
         return '/splash';
       }
 
-      // Auth resolved, user is logged in → redirect away from guest-only pages 
-      // (isSplash dihapus dari sini agar tidak otomatis hilang)
-      if (isLoggedIn && (isAuth || isOnboarding)) return '/';
+      // Auth resolved, user is logged in
+      if (isLoggedIn) {
+        final role = authState.value?.role;
+        final isAdmin = role == UserRole.admin;
+        final isPeserta = role == UserRole.member;
+
+        // Redirect away from guest-only pages based on role
+        if (isSplash || isAuth || isOnboarding) {
+          if (isAdmin) return '/admin';
+          if (isPeserta) return '/peserta';
+          return null; // Fallback
+        }
+
+        // Guard routes: Prevent Peserta from accessing Admin routes and vice-versa
+        if (isAdmin && location.startsWith('/peserta')) {
+          return '/admin';
+        }
+        if (isPeserta && location.startsWith('/admin')) {
+          return '/peserta';
+        }
+      }
 
       if (!isLoggedIn && (isAuth || isOnboarding)) return null;
 
@@ -58,7 +78,8 @@ GoRouter appRouter(Ref ref) {
       GoRoute(path: '/onboarding', builder: (_, _) => const OnboardingPage()),
       GoRoute(path: '/login', builder: (_, _) => const LoginPage()),
       GoRoute(path: '/register', builder: (_, _) => const RegisterPage()),
-      GoRoute(path: '/', builder: (_, _) => const HomePage()),
+      GoRoute(path: '/admin', builder: (_, _) => const AdminDashboardPage()),
+      GoRoute(path: '/peserta', builder: (_, _) => const PesertaHomePage()),
     ],
   );
 }
