@@ -28,7 +28,13 @@ export class TransformInterceptor<T> implements NestInterceptor<
         };
 
         if (data !== undefined && data !== null) {
-          result.data = data;
+          // Unwrap if data already contains { data, meta } structure
+          if (typeof data === 'object' && 'data' in data && 'meta' in data) {
+            result.data = (data as any).data;
+            result.meta = (data as any).meta;
+          } else {
+            result.data = data;
+          }
         }
 
         return result;
