@@ -35,11 +35,8 @@ GoRouter appRouter(Ref ref) {
       final isAuth = location == '/login' || location == '/register';
       final isOnboarding = location == '/onboarding';
 
-      // Still resolving auth state
       if (isLoading) {
-        // Already on splash, auth, or onboarding → stay put
         if (isSplash || isAuth || isOnboarding) return null;
-        // Anywhere else during loading → show splash
         return '/splash';
       }
 
@@ -65,17 +62,14 @@ GoRouter appRouter(Ref ref) {
         }
       }
 
-      // Auth resolved, not logged in, already on auth/onboarding → stay
       if (!isLoggedIn && (isAuth || isOnboarding)) return null;
 
-      // Auth resolved, not logged in, on splash → check onboarding
-      if (!isLoggedIn && isSplash) {
-        final hasSeenOnboarding = ref.read(hasSeenOnboardingSyncProvider);
-        return hasSeenOnboarding ? '/login' : '/onboarding';
-      }
+      // Blok kode pengecekan "hasSeenOnboarding" saat di splash DIHAPUS 
+      // dan dipindahkan ke dalam logic splash_page.dart agar bisa menunggu 3 detik.
 
       // Auth resolved, not logged in, trying to access protected route
-      if (!isLoggedIn) return '/login';
+      // (Tambahkan pengecualian isSplash agar tetap bisa diam di halaman splash)
+      if (!isLoggedIn && !isSplash) return '/login';
 
       return null;
     },
