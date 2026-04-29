@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:kegiatin/core/theme/custom.dart';
 
-/// Template AppBar melengkung (curved) dengan gradient primary.
+/// Template AppBar melengkung (curved) dengan gradient warna tema.
 ///
 /// Hanya menyediakan container visual (gradient, border radius, shadow).
 /// Konten di dalamnya sepenuhnya dikontrol via parameter [child].
 /// Digunakan di semua halaman — Beranda, Kegiatan, Profil, Pengaturan, dll.
 class KegiatinAppBar extends StatelessWidget {
-  const KegiatinAppBar({
-    super.key,
-    required this.child,
-    this.padding,
-  });
+  const KegiatinAppBar({super.key, required this.child, this.padding});
 
   /// Konten yang ditampilkan di dalam container AppBar.
   final Widget child;
@@ -25,12 +22,9 @@ class KegiatinAppBar extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            colorScheme.primary,
-            colorScheme.primary.withValues(alpha: 0.85),
-          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [KegiatinCustomTheme.appBarTop, KegiatinCustomTheme.appBarBottom],
         ),
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(28),
@@ -50,10 +44,7 @@ class KegiatinAppBar extends StatelessWidget {
           padding: padding ?? const EdgeInsets.fromLTRB(20, 12, 20, 24),
           child: SizedBox(
             height: 140,
-            child: Align(
-              alignment: Alignment.topLeft,
-              child: child,
-            ),
+            child: Align(alignment: Alignment.topLeft, child: child),
           ),
         ),
       ),
