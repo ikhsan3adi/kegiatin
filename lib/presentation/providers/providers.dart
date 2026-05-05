@@ -6,7 +6,8 @@ import 'package:kegiatin/core/network/dio_client.dart';
 import 'package:kegiatin/core/network/network_info.dart';
 import 'package:kegiatin/data/datasources/local/auth_local_datasource.dart';
 import 'package:kegiatin/data/datasources/remote/auth_remote_datasource.dart';
-import 'package:kegiatin/data/datasources/remote/event_remote_datasource.dart';
+import 'package:kegiatin/data/datasources/remote/event_remote_datasource.dart'
+    hide EventRemoteDataSource, EventRemoteDataSourceImpl;
 import 'package:kegiatin/data/repositories/auth_repository_impl.dart';
 import 'package:kegiatin/data/repositories/event_repository_impl.dart';
 import 'package:kegiatin/domain/repositories/auth_repository.dart';
@@ -85,14 +86,15 @@ EventRemoteDataSource eventRemoteDataSource(Ref ref) =>
     EventRemoteDataSourceImpl(ref.watch(dioClientProvider).dio);
 
 @Riverpod(keepAlive: true)
-EventRepository eventRepository(Ref ref) => EventRepositoryImpl(
-      remoteDataSource: ref.watch(eventRemoteDataSourceProvider),
-    );
+EventRepository eventRepository(Ref ref) =>
+    EventRepositoryImpl(remoteDataSource: ref.watch(eventRemoteDataSourceProvider));
 
 @riverpod
-GetEventsUseCase getEventsUseCase(Ref ref) =>
-    GetEventsUseCase(ref.watch(eventRepositoryProvider));
+GetEventsUseCase getEventsUseCase(Ref ref) => GetEventsUseCase(ref.watch(eventRepositoryProvider));
 
 @riverpod
 GetEventByIdUseCase getEventByIdUseCase(Ref ref) =>
     GetEventByIdUseCase(ref.watch(eventRepositoryProvider));
+@riverpod
+CreateEventUseCase createEventUseCase(Ref ref) =>
+    CreateEventUseCase(ref.watch(eventRepositoryProvider));
