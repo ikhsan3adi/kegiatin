@@ -1,4 +1,4 @@
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   ArrayMinSize,
   IsDateString,
@@ -10,6 +10,7 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
+import { UppercaseEnum } from '../../../core/decorators/uppercase-enum.decorator';
 import { EventType, EventVisibility } from '../domain/event.types';
 
 export class CreateSessionInlineDto {
@@ -42,9 +43,11 @@ export class CreateEventDto {
   @IsString()
   description?: string;
 
+  @UppercaseEnum()
   @IsEnum(EventType)
   type: EventType;
 
+  @UppercaseEnum()
   @IsEnum(EventVisibility)
   visibility: EventVisibility;
 

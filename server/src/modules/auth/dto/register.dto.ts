@@ -6,6 +6,7 @@ import {
   IsString,
   MinLength,
 } from 'class-validator';
+import { UppercaseEnum } from '../../../core/decorators/uppercase-enum.decorator';
 
 export enum UserType {
   ANGGOTA = 'ANGGOTA',
@@ -24,6 +25,7 @@ export class RegisterDto {
   @IsNotEmpty()
   displayName: string;
 
+  @UppercaseEnum()
   @IsEnum(UserType)
   userType: UserType;
 

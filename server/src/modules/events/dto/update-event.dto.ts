@@ -1,4 +1,5 @@
 import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { UppercaseEnum } from '../../../core/decorators/uppercase-enum.decorator';
 import { EventVisibility } from '../domain/event.types';
 
 export class UpdateEventDto {
@@ -11,6 +12,7 @@ export class UpdateEventDto {
   description?: string;
 
   @IsOptional()
+  @UppercaseEnum()
   @IsEnum(EventVisibility)
   visibility?: EventVisibility;
 
