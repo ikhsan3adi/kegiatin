@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
+import 'package:kegiatin/presentation/controllers/event_list_controller.dart';
 import 'package:kegiatin/presentation/widgets/kegiatin_app_bar.dart';
 
 class NavbarPeserta extends ConsumerStatefulWidget {
@@ -24,6 +25,7 @@ class _NavbarPesertaState extends ConsumerState<NavbarPeserta> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final authState = ref.watch(authControllerProvider);
+    final eventListState = ref.watch(eventListProvider());
 
     final List<Widget> pages = [
       // Index 0: Beranda
@@ -120,42 +122,88 @@ class _NavbarPesertaState extends ConsumerState<NavbarPeserta> {
         error: (e, _) => Center(child: Text('Error: $e')),
       ),
       // Index 1: Kegiatan
-      SingleChildScrollView(
-        child: Column(
-          children: [
-            KegiatinAppBar(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Kegiatan',
-                    style: textTheme.headlineSmall?.copyWith(
-                      color: colorScheme.onPrimary,
-                      fontWeight: FontWeight.bold,
-                    ),
+      eventListState.when(
+        data: (paginatedEvents) {
+          final events = paginatedEvents.data;
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                KegiatinAppBar(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Kegiatan',
+                        style: textTheme.headlineSmall?.copyWith(
+                          color: colorScheme.onPrimary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${events.length} Kegiatan Tersedia',
+                        style: textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onPrimary.withValues(alpha: 0.85),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '0 Kegiatan Tersedia',
-                    style: textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onPrimary.withValues(alpha: 0.85),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            Center(
-              child: Text(
-                'Belum ada kegiatan',
-                style: textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
                 ),
-              ),
+                const SizedBox(height: 16),
+                if (events.isEmpty)
+                  Center(
+                    child: Text(
+                      'Belum ada kegiatan',
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  )
+                else
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: events.length,
+                    itemBuilder: (context, index) {
+                      final event = events[index];
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        child: ListTile(
+                          title: Text(
+                            event.title,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text(
+                            event.description,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          trailing: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: colorScheme.primaryContainer,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              event.status.name,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: colorScheme.onPrimaryContainer,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text('Gagal memuat kegiatan: $err')),
       ),
       // Index 2: Riwayat
       SingleChildScrollView(
