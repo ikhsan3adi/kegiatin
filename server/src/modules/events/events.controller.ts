@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   Patch,
   Post,
@@ -28,14 +29,18 @@ export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
   @Get()
-  findAll(@Query() query: EventQueryDto) {
-    return this.eventsService.findAll(query);
+  findAll(@Req() req: Request, @Query() query: EventQueryDto) {
+    const user = req.user as RequestUser;
+    return this.eventsService.findAll(query, user.role);
   }
 
   @Post()
   @Roles(UserRole.ADMIN)
   create(@Req() req: Request, @Body() dto: CreateEventDto) {
     const user = req.user as RequestUser;
+
+    Logger.debug(dto)
+
     return this.eventsService.create(user.userId, dto);
   }
 

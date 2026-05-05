@@ -15,4 +15,12 @@ enum EventStatus {
 
   @JsonValue('CANCELLED')
   cancelled;
+
+  static EventStatus fromJson(String value) {
+    final upper = value.toUpperCase();
+    return EventStatus.values.firstWhere(
+      (e) => e.name.toUpperCase() == upper,
+      orElse: () => throw ArgumentError('Unknown EventStatus: $value'),
+    );
+  }
 }

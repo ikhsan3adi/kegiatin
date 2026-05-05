@@ -9,4 +9,12 @@ enum AttendanceStatus {
 
   @JsonValue('ABSENT')
   absent;
+
+  static AttendanceStatus fromJson(String value) {
+    final upper = value.toUpperCase();
+    return AttendanceStatus.values.firstWhere(
+      (e) => e.name.toUpperCase() == upper,
+      orElse: () => throw ArgumentError('Unknown AttendanceStatus: $value'),
+    );
+  }
 }

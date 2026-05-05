@@ -9,4 +9,12 @@ enum ArchiveType {
 
   @JsonValue('EVALUATION')
   evaluation;
+
+  static ArchiveType fromJson(String value) {
+    final upper = value.toUpperCase();
+    return ArchiveType.values.firstWhere(
+      (e) => e.name.toUpperCase() == upper,
+      orElse: () => throw ArgumentError('Unknown ArchiveType: $value'),
+    );
+  }
 }

@@ -8,7 +8,7 @@ import {
   EventStatus,
   EventType,
   IEvent,
-  IEventWithSessions,
+  IEventResponse,
   ISession,
   SessionStatus,
 } from './domain/event.types';
@@ -30,7 +30,7 @@ export class EventsService {
   async create(
     userId: string,
     dto: CreateEventDto,
-  ): Promise<IEventWithSessions> {
+  ): Promise<IEventResponse> {
     if (dto.type === EventType.SINGLE && dto.sessions.length !== 1) {
       throw new BadRequestException('Single event harus memiliki tepat 1 sesi');
     }
@@ -59,23 +59,47 @@ export class EventsService {
       sessions.push(session);
     }
 
-    return { event, sessions };
+    return { ...event, sessions };
   }
 
-  async findAll(query: EventQueryDto) {
+  async findAll(query: EventQueryDto, userRole: string) {
+    const MEMBER_VISIBLE: EventStatus[] = [
+      EventStatus.PUBLISHED,
+      EventStatus.ONGOING,
+      EventStatus.COMPLETED,
+    ];
+
+    let effectiveStatus = query.status;
+    let effectiveStatusIn: EventStatus[] | undefined;
+
+    if (userRole !== 'ADMIN') {
+      if (query.status) {
+        if (!MEMBER_VISIBLE.includes(query.status)) {
+          return {
+            data: [] as IEventResponse[],
+            meta: { page: query.page, limit: query.limit, total: 0, totalPages: 0 },
+          };
+        }
+      } else {
+        effectiveStatus = undefined;
+        effectiveStatusIn = MEMBER_VISIBLE;
+      }
+    }
+
     const { events, total } = await this.eventRepo.findEvents({
       page: query.page,
       limit: query.limit,
-      status: query.status,
+      status: effectiveStatus,
+      statusIn: effectiveStatusIn,
       type: query.type,
       visibility: query.visibility,
       search: query.search,
     });
 
-    const data: IEventWithSessions[] = await Promise.all(
+    const data: IEventResponse[] = await Promise.all(
       events.map(async (event) => {
         const sessions = await this.eventRepo.findSessionsByEventId(event.id);
-        return { event, sessions };
+        return { ...event, sessions };
       }),
     );
 
@@ -92,15 +116,15 @@ export class EventsService {
     };
   }
 
-  async findOne(id: string): Promise<IEventWithSessions> {
+  async findOne(id: string): Promise<IEventResponse> {
     const event = await this.eventRepo.findEventById(id);
     if (!event) throw new NotFoundException('Event tidak ditemukan');
 
     const sessions = await this.eventRepo.findSessionsByEventId(id);
-    return { event, sessions };
+    return { ...event, sessions };
   }
 
-  async update(id: string, dto: UpdateEventDto): Promise<IEventWithSessions> {
+  async update(id: string, dto: UpdateEventDto): Promise<IEventResponse> {
     const existing = await this.eventRepo.findEventById(id);
     if (!existing) throw new NotFoundException('Event tidak ditemukan');
 
@@ -115,7 +139,7 @@ export class EventsService {
 
     const event = await this.eventRepo.updateEvent(id, dto as Partial<IEvent>);
     const sessions = await this.eventRepo.findSessionsByEventId(id);
-    return { event: event!, sessions };
+    return { ...event!, sessions };
   }
 
   async delete(id: string): Promise<void> {

@@ -8,7 +8,6 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import * as morgan from 'morgan';
 import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './core/filters/http-exception.filter';
-import { RolesGuard } from './core/guards/roles.guard';
 import { TransformInterceptor } from './core/interceptors/transform.interceptor';
 
 async function bootstrap() {

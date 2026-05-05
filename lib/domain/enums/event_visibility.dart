@@ -6,4 +6,12 @@ enum EventVisibility {
 
   @JsonValue('INVITE_ONLY')
   inviteOnly;
+
+  static EventVisibility fromJson(String value) {
+    final upper = value.toUpperCase();
+    return EventVisibility.values.firstWhere(
+      (e) => e.name.toUpperCase() == upper,
+      orElse: () => throw ArgumentError('Unknown EventVisibility: $value'),
+    );
+  }
 }

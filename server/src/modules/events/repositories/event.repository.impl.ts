@@ -56,7 +56,11 @@ export class MongooseEventRepository implements IEventRepository {
   ): Promise<{ events: IEvent[]; total: number }> {
     const query: Record<string, any> = {};
 
-    if (filter.status) query.status = filter.status;
+    if (filter.status) {
+      query.status = filter.status;
+    } else if (filter.statusIn) {
+      query.status = { $in: filter.statusIn };
+    }
     if (filter.type) query.type = filter.type;
     if (filter.visibility) query.visibility = filter.visibility;
     if (filter.search) {

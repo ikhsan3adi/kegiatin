@@ -12,4 +12,12 @@ enum SessionStatus {
 
   @JsonValue('POSTPONED')
   postponed;
+
+  static SessionStatus fromJson(String value) {
+    final upper = value.toUpperCase();
+    return SessionStatus.values.firstWhere(
+      (e) => e.name.toUpperCase() == upper,
+      orElse: () => throw ArgumentError('Unknown SessionStatus: $value'),
+    );
+  }
 }

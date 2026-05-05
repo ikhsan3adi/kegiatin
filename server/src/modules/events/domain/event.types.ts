@@ -57,6 +57,9 @@ export interface IEventWithSessions {
   sessions: ISession[];
 }
 
+/** Flat response shape — matches OpenAPI EventResponse (sessions embedded). */
+export type IEventResponse = IEvent & { sessions: ISession[] };
+
 export interface ICreateSessionData {
   title: string;
   startTime: Date;
@@ -82,6 +85,8 @@ export interface IEventFilter {
   page: number;
   limit: number;
   status?: EventStatus;
+  /** Match any of the given statuses. Ignored when `status` is set. */
+  statusIn?: EventStatus[];
   type?: EventType;
   visibility?: EventVisibility;
   search?: string;

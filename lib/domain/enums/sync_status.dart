@@ -12,4 +12,12 @@ enum SyncStatus {
 
   @JsonValue('CONFLICT')
   conflict;
+
+  static SyncStatus fromJson(String value) {
+    final upper = value.toUpperCase();
+    return SyncStatus.values.firstWhere(
+      (e) => e.name.toUpperCase() == upper,
+      orElse: () => throw ArgumentError('Unknown SyncStatus: $value'),
+    );
+  }
 }
