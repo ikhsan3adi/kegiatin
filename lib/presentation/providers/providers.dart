@@ -17,7 +17,7 @@ import 'package:kegiatin/domain/usecases/get_current_user_usecase.dart';
 import 'package:kegiatin/domain/usecases/login_usecase.dart';
 import 'package:kegiatin/domain/usecases/logout_usecase.dart';
 import 'package:kegiatin/domain/usecases/register_usecase.dart';
-import 'package:kegiatin/data/datasources/event_remote_datasource.dart';
+import 'package:kegiatin/data/datasources/remote/event_remote_datasource.dart';
 import 'package:kegiatin/data/repositories/event_repository_impl.dart';
 import 'package:kegiatin/domain/repositories/event_repository.dart';
 import 'package:kegiatin/domain/usecases/get_event_by_id_usecase.dart';

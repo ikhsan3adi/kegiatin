@@ -2,16 +2,26 @@ import 'package:dio/dio.dart';
 import 'package:kegiatin/core/constants/api_constants.dart';
 import 'package:kegiatin/core/errors/exceptions.dart';
 import 'package:kegiatin/data/models/event_model.dart';
-import 'package:kegiatin/data/models/session_model.dart';
 import 'package:kegiatin/domain/entities/create_event_input.dart';
+import 'package:kegiatin/domain/entities/paginated_result.dart';
+import 'package:kegiatin/domain/entities/update_event_input.dart';
+import 'package:kegiatin/domain/enums/event_status.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
-import 'package:kegiatin/domain/enums/event_visibility.dart';
 
 abstract class EventRemoteDataSource {
-  /// Membuat kegiatan baru beserta sesi-sesinya.
-  ///
-  /// Melempar [ServerException] jika request gagal.
+  Future<PaginatedResult<EventModel>> getEvents({
+    int page = 1,
+    int limit = 10,
+    EventStatus? status,
+    EventType? type,
+    String? search,
+  });
+  Future<EventModel> getEventById(String id);
   Future<EventModel> createEvent(CreateEventInput input);
+  Future<EventModel> updateEvent(String id, UpdateEventInput input);
+  Future<void> deleteEvent(String id);
+  Future<EventModel> publishEvent(String id);
+  Future<EventModel> cancelEvent(String id);
 }
 
 class EventRemoteDataSourceImpl implements EventRemoteDataSource {
@@ -20,62 +30,155 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
   EventRemoteDataSourceImpl(this.dio);
 
   @override
-  Future<EventModel> createEvent(CreateEventInput input) async {
+  Future<PaginatedResult<EventModel>> getEvents({
+    int page = 1,
+    int limit = 10,
+    EventStatus? status,
+    EventType? type,
+    String? search,
+  }) async {
     try {
-      final response = await dio.post(
-        ApiConstants.events,
-        data: {
-          'title': input.title,
-          'description': input.description,
-          'type': _eventTypeToJson(input.type),
-          'visibility': _visibilityToJson(input.visibility),
-          'location': input.location,
-          'contactPerson': input.contactPerson,
-          'sessions': input.sessions
-              .map(
-                (s) => {
-                  'title': s.title,
-                  'startTime': s.startTime.toIso8601String(),
-                  'endTime': s.endTime.toIso8601String(),
-                  if (s.location != null) 'location': s.location,
-                  if (s.capacity != null) 'capacity': s.capacity,
-                },
-              )
-              .toList(),
-        },
-      );
+      final queryParams = {
+        'page': page,
+        'limit': limit,
+        if (status != null) 'status': status.name,
+        if (type != null) 'type': type.name,
+        if (search != null) 'search': search,
+      };
 
-      final responseData = response.data as Map<String, dynamic>;
-      final payload = responseData['data'] as Map<String, dynamic>;
+      final response = await dio.get(ApiConstants.events, queryParameters: queryParams);
 
-      final eventJson = payload['event'] as Map<String, dynamic>;
-      final sessionsJson = payload['sessions'] as List<dynamic>;
-
-      final sessions = sessionsJson
-          .map((s) => SessionModel.fromJson(s as Map<String, dynamic>))
+      final data = (response.data['data'] as List)
+          .map((json) {
+            // Menangani struktur dari backend sementara (nested 'event' dan 'sessions')
+            if (json.containsKey('event') && json.containsKey('sessions')) {
+              final eventJson = Map<String, dynamic>.from(json['event']);
+              eventJson['sessions'] = json['sessions'];
+              return EventModel.fromJson(eventJson);
+            }
+            return EventModel.fromJson(json);
+          })
           .toList();
+          
+      final meta = response.data['meta'];
 
-      return EventModel.fromJson(eventJson).copyWith(sessions: sessions);
+      return PaginatedResult<EventModel>(
+        data: data,
+        total: meta['total'],
+        page: meta['page'],
+        limit: meta['limit'],
+      );
     } on DioException catch (e) {
-      if (e.response?.statusCode == 401) {
-        throw const UnauthorizedException();
-      }
-      final data = e.response?.data;
-      final message = (data is Map<String, dynamic>) ? data['message'] : null;
       throw ServerException(
-        message ?? 'Gagal membuat kegiatan',
+        e.response?.data['message'] ?? e.message ?? 'Terjadi kesalahan saat mengambil events',
+        statusCode: e.response?.statusCode,
+      );
+    } catch (e) {
+      throw ServerException('Terjadi kesalahan yang tidak diketahui: $e');
+    }
+  }
+
+  @override
+  Future<EventModel> getEventById(String id) async {
+    try {
+      final response = await dio.get(ApiConstants.eventById(id));
+      return EventModel.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw ServerException(
+        e.response?.data['message'] ?? e.message ?? 'Gagal mengambil event',
         statusCode: e.response?.statusCode,
       );
     }
   }
 
-  String _eventTypeToJson(EventType type) => switch (type) {
-        EventType.single => 'SINGLE',
-        EventType.series => 'SERIES',
+  @override
+  Future<EventModel> createEvent(CreateEventInput input) async {
+    try {
+      // NOTE: Sesuaikan dengan struktur JSON yang diinginkan CreateEventDto
+      final data = {
+        'title': input.title,
+        'description': input.description,
+        'type': input.type.name,
+        'visibility': input.visibility.name,
+        'location': input.location,
+        'contactPerson': input.contactPerson,
+        'imageUrl': input.imageUrl,
+        'sessions': input.sessions.map((s) => {
+          'title': s.title,
+          'startTime': s.startTime.toIso8601String(),
+          'endTime': s.endTime.toIso8601String(),
+          'location': s.location,
+          'capacity': s.capacity,
+        }).toList(),
       };
 
-  String _visibilityToJson(EventVisibility visibility) => switch (visibility) {
-        EventVisibility.open => 'OPEN',
-        EventVisibility.inviteOnly => 'INVITE_ONLY',
+      final response = await dio.post(ApiConstants.events, data: data);
+      return EventModel.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw ServerException(
+        e.response?.data['message'] ?? e.message ?? 'Gagal membuat event',
+        statusCode: e.response?.statusCode,
+      );
+    }
+  }
+
+  @override
+  Future<EventModel> updateEvent(String id, UpdateEventInput input) async {
+    try {
+      final data = {
+        if (input.title != null) 'title': input.title,
+        if (input.description != null) 'description': input.description,
+        if (input.visibility != null) 'visibility': input.visibility!.name,
+        if (input.location != null) 'location': input.location,
+        if (input.contactPerson != null) 'contactPerson': input.contactPerson,
+        if (input.imageUrl != null) 'imageUrl': input.imageUrl,
       };
+
+      final response = await dio.patch(ApiConstants.eventById(id), data: data);
+      return EventModel.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw ServerException(
+        e.response?.data['message'] ?? e.message ?? 'Gagal mengupdate event',
+        statusCode: e.response?.statusCode,
+      );
+    }
+  }
+
+  @override
+  Future<void> deleteEvent(String id) async {
+    try {
+      await dio.delete(ApiConstants.eventById(id));
+    } on DioException catch (e) {
+      throw ServerException(
+        e.response?.data['message'] ?? e.message ?? 'Gagal menghapus event',
+        statusCode: e.response?.statusCode,
+      );
+    }
+  }
+
+  @override
+  Future<EventModel> publishEvent(String id) async {
+    try {
+      final response = await dio.patch(ApiConstants.publishEvent(id));
+      return EventModel.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw ServerException(
+        e.response?.data['message'] ?? e.message ?? 'Gagal mempublish event',
+        statusCode: e.response?.statusCode,
+      );
+    }
+  }
+
+  @override
+  Future<EventModel> cancelEvent(String id) async {
+    try {
+      final response = await dio.patch(ApiConstants.cancelEvent(id));
+      return EventModel.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw ServerException(
+        e.response?.data['message'] ?? e.message ?? 'Gagal membatalkan event',
+        statusCode: e.response?.statusCode,
+      );
+    }
+  }
 }

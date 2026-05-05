@@ -1,7 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:kegiatin/core/errors/exceptions.dart';
 import 'package:kegiatin/core/errors/failures.dart';
-import 'package:kegiatin/data/datasources/event_remote_datasource.dart';
+import 'package:kegiatin/data/datasources/remote/event_remote_datasource.dart';
 import 'package:kegiatin/domain/entities/create_event_input.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/entities/paginated_result.dart';
