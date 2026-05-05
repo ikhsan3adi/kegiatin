@@ -21,10 +21,23 @@ abstract class SessionModel with _$SessionModel {
     int? capacity,
   }) = _SessionModel;
 
-  factory SessionModel.fromJson(Map<String, dynamic> json) =>
-      _$SessionModelFromJson(json);
+  factory SessionModel.fromJson(Map<String, dynamic> json) => _$SessionModelFromJson(json);
 
   Session toEntity() => Session(
+        id: id,
+        eventId: eventId,
+        title: title,
+        startTime: startTime,
+        endTime: endTime,
+        location: location,
+        order: order,
+        status: status,
+        capacity: capacity,
+      );
+}
+
+extension SessionX on Session {
+  SessionModel toModel() => SessionModel(
         id: id,
         eventId: eventId,
         title: title,

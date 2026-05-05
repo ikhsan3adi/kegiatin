@@ -1,8 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:kegiatin/core/errors/exceptions.dart';
 import 'package:kegiatin/core/errors/failures.dart';
-import 'package:kegiatin/core/network/network_info.dart';
-import 'package:kegiatin/data/datasources/remote/event_remote_datasource.dart';
+import 'package:kegiatin/data/datasources/event_remote_datasource.dart';
 import 'package:kegiatin/domain/entities/create_event_input.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/entities/paginated_result.dart';
@@ -13,34 +12,8 @@ import 'package:kegiatin/domain/repositories/event_repository.dart';
 
 class EventRepositoryImpl implements EventRepository {
   final EventRemoteDataSource remoteDataSource;
-  final NetworkInfo networkInfo;
 
-  EventRepositoryImpl({
-    required this.remoteDataSource,
-    required this.networkInfo,
-  });
-
-  @override
-  Future<Either<Failure, Event>> createEvent(CreateEventInput input) async {
-    if (!await networkInfo.isConnected) {
-      return const Left(NetworkFailure());
-    }
-
-    try {
-      final model = await remoteDataSource.createEvent(input);
-      return Right(model.toEntity());
-    } on UnauthorizedException catch (e) {
-      return Left(AuthFailure(e.message));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message, statusCode: e.statusCode));
-    } catch (e) {
-      return Left(ServerFailure(e.toString()));
-    }
-  }
-
-  // ---------------------------------------------------------------------------
-  // Metode berikut belum diimplementasi; akan ditambahkan pada iterasi berikutnya.
-  // ---------------------------------------------------------------------------
+  EventRepositoryImpl({required this.remoteDataSource});
 
   @override
   Future<Either<Failure, PaginatedResult<Event>>> getEvents({
@@ -50,34 +23,96 @@ class EventRepositoryImpl implements EventRepository {
     EventType? type,
     String? search,
   }) async {
-    return const Left(ServerFailure('Belum diimplementasi'));
+    try {
+      final result = await remoteDataSource.getEvents(
+        page: page,
+        limit: limit,
+        status: status,
+        type: type,
+        search: search,
+      );
+      return Right(PaginatedResult<Event>(
+        data: result.data.map((m) => m.toEntity()).toList(),
+        total: result.total,
+        page: result.page,
+        limit: result.limit,
+      ));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, statusCode: e.statusCode));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
   }
 
   @override
   Future<Either<Failure, Event>> getEventById(String id) async {
-    return const Left(ServerFailure('Belum diimplementasi'));
+    try {
+      final result = await remoteDataSource.getEventById(id);
+      return Right(result.toEntity());
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, statusCode: e.statusCode));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
   }
 
   @override
-  Future<Either<Failure, Event>> updateEvent(
-    String id,
-    UpdateEventInput input,
-  ) async {
-    return const Left(ServerFailure('Belum diimplementasi'));
+  Future<Either<Failure, Event>> createEvent(CreateEventInput input) async {
+    try {
+      final result = await remoteDataSource.createEvent(input);
+      return Right(result.toEntity());
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, statusCode: e.statusCode));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Event>> updateEvent(String id, UpdateEventInput input) async {
+    try {
+      final result = await remoteDataSource.updateEvent(id, input);
+      return Right(result.toEntity());
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, statusCode: e.statusCode));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
   }
 
   @override
   Future<Either<Failure, void>> deleteEvent(String id) async {
-    return const Left(ServerFailure('Belum diimplementasi'));
+    try {
+      await remoteDataSource.deleteEvent(id);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, statusCode: e.statusCode));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
   }
 
   @override
   Future<Either<Failure, Event>> publishEvent(String id) async {
-    return const Left(ServerFailure('Belum diimplementasi'));
+    try {
+      final result = await remoteDataSource.publishEvent(id);
+      return Right(result.toEntity());
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, statusCode: e.statusCode));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
   }
 
   @override
   Future<Either<Failure, Event>> cancelEvent(String id) async {
-    return const Left(ServerFailure('Belum diimplementasi'));
+    try {
+      final result = await remoteDataSource.cancelEvent(id);
+      return Right(result.toEntity());
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, statusCode: e.statusCode));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
   }
 }
