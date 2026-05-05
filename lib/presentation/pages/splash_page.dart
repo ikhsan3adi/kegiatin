@@ -142,7 +142,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
                     ),
                     // Bintang bawah (di bawah garis, center)
                     Positioned(
-                      bottom: -(h * 0.025),
+                      bottom: -(h * 0.070),
                       child: _buildStar(
                         starSize * 0.75,
                         brandColor.withValues(alpha: 0.25),

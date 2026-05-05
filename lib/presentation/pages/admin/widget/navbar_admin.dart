@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:kegiatin/core/theme/custom.dart';
 import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
 import 'package:kegiatin/presentation/widgets/kegiatin_app_bar.dart';
 
@@ -210,7 +212,30 @@ class _NavbarAdminState extends ConsumerState<NavbarAdmin> {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      body: pages[_selectedIndex],
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          pages[_selectedIndex],
+          // FAB tambah kegiatan — tampil di tab Beranda (index 0) dan Kegiatan (index 1)
+          if (_selectedIndex == 0 || _selectedIndex == 1)
+            Positioned(
+              right: 24,
+              bottom: 16,
+              child: FloatingActionButton(
+                heroTag: 'fab_tambah_kegiatan',
+                onPressed: () => context.push('/admin/create-event'),
+                backgroundColor: KegiatinCustomTheme.appBarBottom,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 4.0,
+                tooltip: 'Tambah Kegiatan',
+                child: const Icon(Icons.add, size: 28),
+              ),
+            ),
+        ],
+      ),
       // --- Tombol Tengah (Pindai QR) ---
       floatingActionButton: FloatingActionButton(
         onPressed: () {
