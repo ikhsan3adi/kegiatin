@@ -17,4 +17,6 @@ enum AttendanceStatus {
       orElse: () => throw ArgumentError('Unknown AttendanceStatus: $value'),
     );
   }
+
+  String toJson() => name.toUpperCase();
 }

@@ -41,8 +41,8 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
       final queryParams = {
         'page': page,
         'limit': limit,
-        if (status != null) 'status': status.name,
-        if (type != null) 'type': type.name,
+        if (status != null) 'status': status.toJson(),
+        if (type != null) 'type': type.toJson(),
         if (search != null) 'search': search,
       };
 
@@ -98,8 +98,8 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
       final data = {
         'title': input.title,
         'description': input.description,
-        'type': input.type.name,
-        'visibility': input.visibility.name,
+        'type': input.type.toJson(),
+        'visibility': input.visibility.toJson(),
         'location': input.location,
         'contactPerson': input.contactPerson,
         'imageUrl': input.imageUrl,
@@ -128,7 +128,7 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
       final data = {
         if (input.title != null) 'title': input.title,
         if (input.description != null) 'description': input.description,
-        if (input.visibility != null) 'visibility': input.visibility!.name,
+        if (input.visibility != null) 'visibility': input.visibility!.toJson(),
         if (input.location != null) 'location': input.location,
         if (input.contactPerson != null) 'contactPerson': input.contactPerson,
         if (input.imageUrl != null) 'imageUrl': input.imageUrl,

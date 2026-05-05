@@ -3,13 +3,12 @@ import {
   Controller,
   Delete,
   Get,
-  Logger,
   Param,
   Patch,
   Post,
   Query,
   Req,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { Roles } from '../../core/decorators/roles.decorator';
@@ -38,9 +37,6 @@ export class EventsController {
   @Roles(UserRole.ADMIN)
   create(@Req() req: Request, @Body() dto: CreateEventDto) {
     const user = req.user as RequestUser;
-
-    Logger.debug(dto)
-
     return this.eventsService.create(user.userId, dto);
   }
 

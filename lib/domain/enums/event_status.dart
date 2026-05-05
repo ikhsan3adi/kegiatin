@@ -23,4 +23,6 @@ enum EventStatus {
       orElse: () => throw ArgumentError('Unknown EventStatus: $value'),
     );
   }
+
+  String toJson() => name.toUpperCase();
 }

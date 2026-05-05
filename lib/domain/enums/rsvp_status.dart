@@ -17,4 +17,6 @@ enum RsvpStatus {
       orElse: () => throw ArgumentError('Unknown RsvpStatus: $value'),
     );
   }
+
+  String toJson() => name.toUpperCase();
 }

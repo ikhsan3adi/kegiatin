@@ -20,4 +20,6 @@ enum SyncStatus {
       orElse: () => throw ArgumentError('Unknown SyncStatus: $value'),
     );
   }
+
+  String toJson() => name.toUpperCase();
 }
