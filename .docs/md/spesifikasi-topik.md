@@ -204,6 +204,7 @@ Tanpa offline-first, aplikasi menjadi tidak fungsional di lokasi blank spot—pa
 - *4a. QR tidak ada di local cache + Device Online:* Sistem melakukan API Lookup ke Server. Jika valid, lanjut step 5. Jika invalid, tampil error.
 - *4b. QR tidak ada di local cache + Device Offline:* Sistem menerima dengan PENDING_VALIDATION, lanjut step 5-6. Saat sync, server validasi ulang.
 - *4c. QR Code expired atau sudah pernah scan:* Sistem menampilkan pesan error, proses check-in gagal
+- *4d. Kapasitas Sesi Penuh (Soft Warning):* Jika scan ke-N melampaui `capacity` sesi, sistem menampilkan alert visual "Kapasitas ruangan penuh (X/X)", namun tidak memblokir proses scan (admin tetap bisa lanjut check-in).
 
 ---
 

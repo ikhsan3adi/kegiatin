@@ -33,6 +33,7 @@ export class DrizzleEventRepository implements IEventRepository {
         location: data.location ?? '',
         contactPerson: data.contactPerson ?? '',
         imageUrl: data.imageUrl ?? null,
+        maxParticipants: data.maxParticipants ?? null,
         createdById: data.createdBy,
       })
       .returning();
@@ -100,6 +101,8 @@ export class DrizzleEventRepository implements IEventRepository {
     if (data.contactPerson !== undefined)
       setData.contactPerson = data.contactPerson;
     if (data.imageUrl !== undefined) setData.imageUrl = data.imageUrl;
+    if (data.maxParticipants !== undefined)
+      setData.maxParticipants = data.maxParticipants;
 
     const rows = await this.db
       .update(events)
@@ -206,6 +209,7 @@ export class DrizzleEventRepository implements IEventRepository {
       location: row.location,
       contactPerson: row.contactPerson,
       imageUrl: row.imageUrl ?? null,
+      maxParticipants: row.maxParticipants ?? null,
       createdBy: row.createdById,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,

@@ -1,4 +1,4 @@
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsInt, IsOptional, IsString, Min } from 'class-validator';
 import { UppercaseEnum } from '../../../core/decorators/uppercase-enum.decorator';
 import { EventVisibility } from '../domain/event.types';
 
@@ -27,4 +27,9 @@ export class UpdateEventDto {
   @IsOptional()
   @IsString()
   imageUrl?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  maxParticipants?: number;
 }
