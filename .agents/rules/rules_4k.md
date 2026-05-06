@@ -41,7 +41,7 @@ presentation/ --> domain/ <-- data/
   * **DEPRECATED:** Do NOT use `StateProvider` or `StateNotifierProvider`. These are legacy (moved to `flutter_riverpod/legacy.dart` in Riverpod v3).
 
 ## Offline-First Architecture
-* **Strategy:** Local data (Hive CE) is the primary source. Cloud (MongoDB via REST API) for sync.
+* **Strategy:** Local data (Hive CE) is the primary source. Cloud (PostgreSQL via REST API) for sync.
 * **Four offline areas:**
   1. **Local Cache Peserta** - Admin syncs RSVP attendee list for offline QR validation.
   2. **Presensi QR** - Attendance recorded locally first, synced when online.
