@@ -32,6 +32,7 @@ CREATE TABLE "events" (
 	"location" varchar(500) DEFAULT '' NOT NULL,
 	"contact_person" varchar(500) DEFAULT '' NOT NULL,
 	"image_url" varchar(512),
+	"max_participants" integer,
 	"created_by_id" uuid NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
