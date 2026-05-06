@@ -1,4 +1,5 @@
 import {
+  integer,
   pgTable,
   text,
   timestamp,
@@ -23,6 +24,7 @@ export const events = pgTable(
       .notNull()
       .default(''),
     imageUrl: varchar('image_url', { length: 512 }),
+    maxParticipants: integer('max_participants'),
     createdById: uuid('created_by_id')
       .notNull()
       .references(() => users.id),

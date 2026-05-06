@@ -40,6 +40,7 @@ export class EventsService {
       location: dto.location,
       contactPerson: dto.contactPerson,
       imageUrl: dto.imageUrl,
+      maxParticipants: dto.maxParticipants,
       createdBy: userId,
     });
 

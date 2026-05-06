@@ -47,6 +47,7 @@ export interface IEvent {
   location: string;
   contactPerson: string;
   imageUrl: string | null;
+  maxParticipants: number | null;
   createdBy: string;
   createdAt: Date;
   updatedAt: Date;
@@ -78,6 +79,7 @@ export interface ICreateEventData {
   location?: string;
   contactPerson?: string;
   imageUrl?: string | null;
+  maxParticipants?: number | null;
   createdBy: string;
 }
 
