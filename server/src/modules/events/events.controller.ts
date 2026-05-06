@@ -8,7 +8,7 @@ import {
   Post,
   Query,
   Req,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { Roles } from '../../core/decorators/roles.decorator';
