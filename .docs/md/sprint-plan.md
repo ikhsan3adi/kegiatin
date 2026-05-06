@@ -99,6 +99,7 @@
 | 9   | Admin: Rekap daftar hadir per sesi (read-only screen)                           | Should Have |
 | 10  | API lookup fallback: Jika QR tidak di cache + device online                     | Should Have |
 | 11  | Desain UI/UX: Scan screen + attendance list + sync indicator                    | Should Have |
+| 12  | Session Capacity Check: Implement Soft Warning UI jika kapasitas fisik penuh    | Should Have |
 
 ### Definition of Done
 - Admin bisa scan QR peserta dan mencatat kehadiran tanpa internet
