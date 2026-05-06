@@ -17,4 +17,6 @@ enum ArchiveType {
       orElse: () => throw ArgumentError('Unknown ArchiveType: $value'),
     );
   }
+
+  String toJson() => name.toUpperCase();
 }

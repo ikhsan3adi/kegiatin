@@ -7,7 +7,10 @@ enum UserRole {
   @JsonValue('MEMBER')
   member;
 
-  String toJsonString() => name.toUpperCase();
+  String toJson() => name.toUpperCase();
+
+  @Deprecated('Use toJson() instead')
+  String toJsonString() => toJson();
 
   static UserRole fromJson(String value) {
     final upper = value.toUpperCase();

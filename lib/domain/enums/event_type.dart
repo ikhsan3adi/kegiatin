@@ -14,4 +14,6 @@ enum EventType {
       orElse: () => throw ArgumentError('Unknown EventType: $value'),
     );
   }
+
+  String toJson() => name.toUpperCase();
 }
