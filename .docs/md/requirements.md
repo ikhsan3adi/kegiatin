@@ -63,7 +63,7 @@ A. Functional Requirement
 | FR-08 | UR-04        | Sistem harus menyimpan QR Code RSVP di local storage (Hive) agar bisa diakses peserta tanpa internet.                       | Data QR Code Peserta, ID Sesi Kegiatan.                              | Status kehadiran sementara (Pending Sync), Log kehadiran lokal. |
 | FR-09 | UR-05        | Sistem harus memungkinkan Admin memindai QR Code dalam kondisi Offline.                                                     | Data QR Code Peserta, ID Sesi Kegiatan.                              | Hasil scan                                                      |
 | FR-10 | UR-04        | Sistem harus menolak scan jika QR Code tidak terdaftar dalam list RSVP kegiatan tersebut.                                   | Data QR Code Peserta, ID Sesi Kegiatan.                              | hasil scan                                                      |
-| FR-11 | UR-05        | Sistem harus otomatis melakukan sinkronisasi data presensi dari Hive ke MongoDB saat perangkat mendeteksi koneksi internet. |                                                                      |                                                                 |
+| FR-11 | UR-05        | Sistem harus otomatis melakukan sinkronisasi data presensi dari Hive ke PostgreSQL saat perangkat mendeteksi koneksi internet. |                                                                      |                                                                 |
 | FR-12 | UR-13        | Admin dapat mengekspor daftar kehadiran peserta ke dalam format Excel atau PDF.                                             | Format File (PDF/Excel), ID Kegiatan.                                | Dokumen laporan (PDF/Excel) yang siap diunduh/dibagikan.        |
 | FR-13 | UR-10        | Peserta dapat melihat histori kegiatan yang pernah diikuti beserta status kehadirannya secara offline.                      | ID Peserta (Session Login).                                          | Daftar riwayat kegiatan yang pernah diikuti.                    |
 | FR-14 | UR-11        | Sistem harus menampilkan grafik statistik jumlah peserta per kegiatan di dashboard admin.                                   | ID Kegiatan, Periode Waktu.                                          | Grafik jumlah peserta, Ringkasan total kehadiran.               |
@@ -111,7 +111,7 @@ B. Non-Functional Requirement
 | Series Event Management | Pengaturan sesi rutin untuk satu rangkaian kegiatan.                  | UR-02     |
 | Laporan Daftar Hadir    | Tampilan daftar hadir bagi Admin untuk verifikasi.                    | UR-11     |
 | Riwayat Kegiatan        | Peserta dapat melihat daftar kegiatan yang pernah diikuti.            | UR-08     |
-| Data Synchronization    | Mekanisme sinkronisasi otomatis data lokal (Hive) ke cloud (MongoDB). | UR-06     |
+| Data Synchronization    | Mekanisme sinkronisasi otomatis data lokal (Hive) ke cloud (PostgreSQL). | UR-06     |
 
 | Could Have                 | Deskripsi                                                        | Referensi |
 | -------------------------- | ---------------------------------------------------------------- | --------- |

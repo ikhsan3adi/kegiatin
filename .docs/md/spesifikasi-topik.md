@@ -49,7 +49,7 @@ Berdasarkan observasi pada operasional PD Pemuda Persis Kabupaten Bandung, ditem
 
 Pengembangan aplikasi mobile berbasis *Offline-First* diperlukan untuk menyediakan solusi teknis sebagai berikut:
 
-* **Stabilitas Operasional di Lokasi Minim Sinyal:** Penggunaan database lokal (**Hive**) menjamin proses presensi tetap berjalan tanpa dependensi internet. Data akan disinkronkan secara otomatis ke **Cloud MongoDB** setelah perangkat terhubung kembali ke jaringan.
+* **Stabilitas Operasional di Lokasi Minim Sinyal:** Penggunaan database lokal (**Hive**) menjamin proses presensi tetap berjalan tanpa dependensi internet. Data akan disinkronkan secara otomatis ke **Cloud PostgreSQL** setelah perangkat terhubung kembali ke jaringan.
 * **Sentralisasi Rekam Jejak Keanggotaan:** Sistem menyediakan portofolio digital bagi setiap anggota, sehingga histori keikutsertaan dalam berbagai jenjang kegiatan terdokumentasi dengan akurat dan transparan.
 * **Efisiensi Administrasi dan Distribusi Konten:** Digitalisasi alur kerja mengurangi penggunaan kertas (*paperless*) dan menyediakan wadah terintegrasi untuk pendistribusian materi kajian secara sistematis per sesi kegiatan.
 * **Validasi Keamanan Data:** Registrasi dengan NPA (opsional) untuk anggota organisasi, dengan validasi email wajib untuk non-anggota.
@@ -63,7 +63,7 @@ Pengembangan aplikasi mobile berbasis *Offline-First* diperlukan untuk menyediak
 
 **Kenapa butuh Offline-First Architecture?**
 Tanpa offline-first, aplikasi menjadi tidak fungsional di lokasi blank spot—padahal justru di sinilah presensi paling kritis. Arsitektur offline-first memastikan:
-- Data tersimpan lokal dulu (Hive), sync ke cloud (MongoDB) saat online
+- Data tersimpan lokal dulu (Hive), sync ke cloud (PostgreSQL) saat online
 - Zero data loss meski device offline selama beberapa hari
 - UX seamless: user tidak pernah melihat loading spinner akibat network timeout
 
@@ -119,7 +119,7 @@ Tanpa offline-first, aplikasi menjadi tidak fungsional di lokasi blank spot—pa
 - Admin telah terautentikasi dan memiliki role admin
 
 **Postconditions:**
-- Event tersimpan di database (MongoDB dan Hive local cache)
+- Event tersimpan di database (PostgreSQL dan Hive local cache)
 - Notifikasi push terkirim ke peserta target (jika target = open)
 
 **Main Success Scenario:**
@@ -131,7 +131,7 @@ Tanpa offline-first, aplikasi menjadi tidak fungsional di lokasi blank spot—pa
 6. Client-side app menghitung dan menampilkan daftar tanggal sesi berdasarkan input admin. Admin dapat meninjau/merubah tiap sesi.
 7. Admin mengunggah materi awal (opsional)
 8. Admin men-submit form untuk menyimpan sebagai DRAFT (atau langsung Publish)
-9. Sistem memvalidasi data dan menyimpan event beserta seluruh list sesi sekaligus ke MongoDB + Hive
+9. Sistem memvalidasi data dan menyimpan event beserta seluruh list sesi sekaligus ke PostgreSQL + Hive
 10. Sistem mengirim push notification ke peserta target (jika di-Publish dan visibilitas Open/Invited)
 
 ---
@@ -273,7 +273,7 @@ Tanpa offline-first, aplikasi menjadi tidak fungsional di lokasi blank spot—pa
 - **Peserta:** Ingin data pribadi (RSVP, histori) konsisten di semua device
 - **Organisasi:** Ingin data terpusat di cloud untuk laporan
 
-**Brief Description:** Sistem mengelola sinkronisasi data antara Hive (local database) dan MongoDB (cloud) secara otomatis. Sync terjadi saat device online atau berdasarkan interval tertentu.
+**Brief Description:** Sistem mengelola sinkronisasi data antara Hive (local database) dan PostgreSQL (cloud) secara otomatis. Sync terjadi saat device online atau berdasarkan interval tertentu.
 
 **Preconditions:**
 - Ada data dengan sync_status = 'pending' atau 'pending_validation' di Hive
@@ -287,7 +287,7 @@ Tanpa offline-first, aplikasi menjadi tidak fungsional di lokasi blank spot—pa
 1. Device mendeteksi koneksi internet tersedia (atau interval trigger)
 2. Background Service mengecek tabel pending_sync di Hive
 3. Service mengirim batch data dengan sync_status: 'pending' ke Express API
-4. API memvalidasi dan menyimpan ke MongoDB
+4. API memvalidasi dan menyimpan ke PostgreSQL
 5. API mengembalikan konfirmasi sukses
 6. Service mengupdate sync_status di Hive menjadi 'synced'
 
@@ -539,7 +539,7 @@ sequenceDiagram
     participant L as Local Device (Hive)
     participant B as Background Service
     participant A as Express API
-    participant M as MongoDB Cloud
+    participant M as PostgreSQL Cloud
     
     Note over L: Attendance recorded offline
     L->>L: Save with sync_status: PENDING
@@ -587,7 +587,7 @@ sequenceDiagram
 4. **Server Processing:**
    - Validasi: Apakah RSVP valid? Apakah session masih ongoing?
    - Cek conflict: Apakah sudah ada record dengan (RsvpID, SessionID) yang sama?
-   - Jika no conflict: Insert ke MongoDB, return 200 OK
+   - Jika no conflict: Insert ke PostgreSQL, return 200 OK
    - Jika conflict: Return 409 Conflict dengan data existing
 
 5. **Client Update:**
@@ -644,7 +644,7 @@ Aplikasi berfungsi **100% normal** tanpa internet. Data tersimpan lokal (Hive). 
 - **Scenario A (Duplicate):** Admin scan QR saat offline. Ternyata peserta sudah tercatat hadir oleh admin lain (device lain yang online). **Strategy:** Last-write-wins atau manual review.
 - **Scenario B (Deferred Validation):** Admin terima QR saat offline (tidak di cache). Saat sync, server cek kevalidan. **Strategy:** Jika valid → sync sukses. Jika invalid → auto no-show.
 
-**Note:** Server disediakan oleh pihak mitra. Backend menggunakan arsitektur API + Database (MongoDB), dengan database lokal (Hive) sebagai cache dan offline storage.
+**Note:** Server disediakan oleh pihak mitra. Backend menggunakan arsitektur API + Database (PostgreSQL), dengan database lokal (Hive) sebagai cache dan offline storage.
 
 ### 7.4 Perbandingan dengan Solusi Konvensional
 
