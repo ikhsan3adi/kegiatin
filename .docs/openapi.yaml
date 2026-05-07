@@ -181,6 +181,10 @@ components:
           type: string
           nullable: true
           description: URL gambar/banner event (dari POST /uploads/image)
+        maxParticipants:
+          type: integer
+          nullable: true
+          description: Batas maksimal peserta RSVP (null = unlimited)
         sessions:
           type: array
           description: |
@@ -222,6 +226,10 @@ components:
         imageUrl:
           type: string
           nullable: true
+        maxParticipants:
+          type: integer
+          nullable: true
+          description: Batas maksimal peserta RSVP (null = unlimited)
     SessionResponse:
       type: object
       properties:
@@ -267,6 +275,10 @@ components:
         imageUrl:
           type: string
           nullable: true
+        maxParticipants:
+          type: integer
+          nullable: true
+          description: Batas maksimal peserta RSVP (null = unlimited)
         createdBy:
           type: string
         sessions:

@@ -63,6 +63,11 @@ export class CreateEventDto {
   @IsString()
   imageUrl?: string;
 
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  maxParticipants?: number;
+
   @ValidateNested({ each: true })
   @Type(() => CreateSessionInlineDto)
   @ArrayMinSize(1)

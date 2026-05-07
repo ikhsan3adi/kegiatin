@@ -5,14 +5,14 @@ Offline-first event management app for PD Pemuda Persis Kab. Bandung.
 ## Tech Stack
 
 - **Frontend:** Flutter + Riverpod + GoRouter
-- **Backend:** NestJS + MongoDB (Mongoose)
+- **Backend:** NestJS + PostgreSQL (DrizzleORM)
 - **Local DB:** Hive CE
 
 ## Prerequisites
 
 - Flutter SDK 3.41+ (Dart SDK ^3.11+)
 - Node.js 20+ or Bun
-- MongoDB (local or Atlas)
+- PostgreSQL (local via Docker or cloud)
 
 ## Project Structure
 

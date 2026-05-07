@@ -27,10 +27,7 @@ export class EventsService {
   // EVENTS
   // ---------------------------------------------------------------------------
 
-  async create(
-    userId: string,
-    dto: CreateEventDto,
-  ): Promise<IEventResponse> {
+  async create(userId: string, dto: CreateEventDto): Promise<IEventResponse> {
     if (dto.type === EventType.SINGLE && dto.sessions.length !== 1) {
       throw new BadRequestException('Single event harus memiliki tepat 1 sesi');
     }
@@ -43,6 +40,7 @@ export class EventsService {
       location: dto.location,
       contactPerson: dto.contactPerson,
       imageUrl: dto.imageUrl,
+      maxParticipants: dto.maxParticipants,
       createdBy: userId,
     });
 
@@ -77,7 +75,12 @@ export class EventsService {
         if (!MEMBER_VISIBLE.includes(query.status)) {
           return {
             data: [] as IEventResponse[],
-            meta: { page: query.page, limit: query.limit, total: 0, totalPages: 0 },
+            meta: {
+              page: query.page,
+              limit: query.limit,
+              total: 0,
+              totalPages: 0,
+            },
           };
         }
       } else {
@@ -198,9 +201,8 @@ export class EventsService {
       throw new BadRequestException('Tidak bisa menambah sesi ke Single Event');
     }
 
-    const currentSessionsCount = await this.eventRepo.countSessionsByEventId(
-      eventId,
-    );
+    const currentSessionsCount =
+      await this.eventRepo.countSessionsByEventId(eventId);
     return this.eventRepo.createSession({
       ...dto,
       startTime: new Date(dto.startTime),

@@ -34,7 +34,7 @@ graph TB
     end
 
     subgraph Infra["Infrastructure"]
-        MDB[(MongoDB)]
+        MDB[(PostgreSQL)]
         HIVE[(Hive - Local)]
         FCM[FCM]
         GAuth[Google Auth]
@@ -344,7 +344,7 @@ server/
         validation.pipe.ts
 
     config/
-      database.config.ts             # Mongoose connection
+      drizzle.config.ts              # Drizzle Config
       auth.config.ts                 # JWT, Google OAuth, Passport strategies
       app.config.ts                  # Environment variables
 
@@ -368,9 +368,9 @@ server/
           user.types.ts              # Plain TS interface (IUser, IUserProfile)
           auth.repository.ts         # IAuthRepository interface
         repositories/
-          auth.repository.impl.ts    # MongooseAuthRepository implements IAuthRepository
+          auth.repository.impl.ts    # DrizzleAuthRepository implements IAuthRepository
         entities/
-          user.entity.ts             # Mongoose schema
+          schema/users.ts            # Drizzle schema
         strategies/
           jwt.strategy.ts
           google.strategy.ts
@@ -387,7 +387,7 @@ server/
           event.rules.ts             # Pure domain rules (canPublish, canCancel)
           event.repository.ts        # IEventRepository interface
         repositories/
-          event.repository.impl.ts   # MongooseEventRepository implements IEventRepository
+          event.repository.impl.ts   # DrizzleEventRepository implements IEventRepository
         entities/
           event.entity.ts
           session.entity.ts
@@ -404,7 +404,7 @@ server/
           attendance.rules.ts        # validateQrToken, resolveSyncConflict
           attendance.repository.ts   # IAttendanceRepository interface
         repositories/
-          attendance.repository.impl.ts  # MongooseAttendanceRepository
+          attendance.repository.impl.ts  # DrizzleAttendanceRepository
         entities/
           attendance.entity.ts
           rsvp.entity.ts
@@ -419,7 +419,7 @@ server/
           archive.types.ts           # IArchiveItem
           archive.repository.ts      # IArchiveRepository interface
         repositories/
-          archive.repository.impl.ts # MongooseArchiveRepository
+          archive.repository.impl.ts # DrizzleArchiveRepository
 
       profile/
         profile.module.ts
@@ -429,7 +429,7 @@ server/
           profile.types.ts           # IUserHistory
           profile.repository.ts      # IProfileRepository interface
         repositories/
-          profile.repository.impl.ts # MongooseProfileRepository
+          profile.repository.impl.ts # DrizzleProfileRepository
 
       uploads/
         uploads.module.ts
@@ -445,7 +445,7 @@ NestJS menggunakan modular architecture (module-per-feature). Setiap module memi
 | ---------------- | -------------------------------------------------------------------- | ----------------------------------------------------------- |
 | **Presentation** | Controller + DTO                                                     | Request/response shaping, input validation                  |
 | **Domain**       | `domain/*.types.ts` + `domain/*.rules.ts` + `domain/*.repository.ts` | Business rules + Repository interface (pure TS)             |
-| **Data**         | Entity (Mongoose schema) + `repositories/*.repository.impl.ts`       | Persistensi, query, data access                             |
+| **Data**         | Entity (Drizzle schema) + `repositories/*.repository.impl.ts`       | Persistensi, query, data access                             |
 | **Service**      | Service (orchestration)                                              | Menggabungkan domain rules + repository, return plain types |
 
 #### Dependency Rule (Server)
@@ -455,20 +455,20 @@ Controller --> Service --> domain/rules (pure TS)
                    |--> domain/repository (interface)
                    |--> domain/types (return types)
 
-Repository Impl --> Entity/Mongoose (data access)
+Repository Impl --> Entity/Drizzle (data access)
                 |--> domain/types (mapping target)
 ```
 
 - Controller hanya mengimpor DTO dan Service. Tidak mengimpor Entity atau Repository langsung.
-- Service mengimpor **Repository interface** (dari `domain/`), bukan Mongoose Model langsung.
-- Service mengembalikan **plain TypeScript interface** (dari `domain/types`), bukan Mongoose Document.
+- Service mengimpor **Repository interface** (dari `domain/`), bukan Drizzle DB instance langsung.
+- Service mengembalikan **plain TypeScript interface** (dari `domain/types`), bukan Drizzle Model.
 - `domain/rules.ts` berisi fungsi pure tanpa side-effect, bisa di-unit test tanpa mock DB.
-- Repository Impl (`repositories/`) mengimplementasikan interface dari `domain/`, mengimpor Entity (Mongoose).
-- Jika DB berubah (misal MongoDB ke PostgreSQL), cukup buat Repository Impl baru. Service dan Domain tidak berubah.
+- Repository Impl (`repositories/`) mengimplementasikan interface dari `domain/`, mengimpor Entity (Drizzle).
+- Karena DB sudah migrasi dari MongoDB ke PostgreSQL menggunakan Drizzle, Service dan Domain terbukti tidak perlu diubah.
 
 #### Contoh: Event Module
 
-**domain/event.types.ts** - Plain TypeScript interface, tidak terikat Mongoose:
+**domain/event.types.ts** - Plain TypeScript interface, tidak terikat Drizzle:
 
 ```typescript
 export enum EventStatus {
@@ -545,7 +545,7 @@ export abstract class IEventRepository {
 }
 ```
 
-**repositories/event.repository.impl.ts** - Mongoose implementation, mengimpor Entity:
+**repositories/event.repository.impl.ts** - Drizzle implementation, mengimpor Schema:
 
 ```typescript
 import { Injectable } from '@nestjs/common';
@@ -556,7 +556,7 @@ import { IEvent } from '../domain/event.types';
 import { Event, EventDocument } from '../entities/event.entity';
 
 @Injectable()
-export class MongooseEventRepository extends IEventRepository {
+export class DrizzleEventRepository implements IEventRepository {
   constructor(
     @InjectModel(Event.name) private eventModel: Model<EventDocument>,
   ) {
@@ -608,7 +608,7 @@ export class MongooseEventRepository extends IEventRepository {
 }
 ```
 
-**events.service.ts** - Service inject Repository interface, bukan Mongoose Model:
+**events.service.ts** - Service inject Repository interface, bukan Drizzle Model:
 
 ```typescript
 import { canPublish } from './domain/event.rules';
@@ -637,13 +637,13 @@ export class EventsService {
 
 ```typescript
 import { IEventRepository } from './domain/event.repository';
-import { MongooseEventRepository } from './repositories/event.repository.impl';
+import { DrizzleEventRepository } from './repositories/event.repository.impl';
 
 @Module({
-  imports: [MongooseModule.forFeature([Event, Session])],
+  // Drizzle di-provide di level AppModule
   controllers: [EventsController],
   providers: [
-    { provide: IEventRepository, useClass: MongooseEventRepository },
+    { provide: IEventRepository, useClass: DrizzleEventRepository },
     EventsService,
   ],
 })
@@ -652,10 +652,10 @@ export class EventsModule {}
 
 #### Mengapa tidak full Clean Architecture (Use Case layer)?
 
-- Repository interface **sudah ditambahkan** untuk melindungi Service dari perubahan DB. Jika MongoDB berubah ke PostgreSQL, cukup buat `PostgresEventRepository` baru, Service dan Domain tidak berubah.
+- Repository interface **sudah ditambahkan** untuk melindungi Service dari perubahan DB. Terbukti saat MongoDB berubah ke PostgreSQL, kita cukup mengganti `MongooseEventRepository` dengan `DrizzleEventRepository`, Service dan Domain tidak berubah.
 - Use Case layer **tidak ditambahkan** karena Service sudah tipis (hanya orchestrate repo + domain rules). Menambah Use Case per aksi = duplikasi logic tanpa benefit signifikan untuk kompleksitas proyek ini.
 - `domain/rules.ts` sudah memisahkan business logic, bisa di-unit test tanpa mock DB.
-- Service bisa di-test dengan mock `IEventRepository` (interface), tanpa perlu mock Mongoose Model.
+- Service bisa di-test dengan mock `IEventRepository` (interface), tanpa perlu mock koneksi DB asli.
 - Total file tambahan per module: 2 (interface + impl). Ini trade-off yang seimbang untuk portabilitas DB.
 
 ### 3.3 API Contract Overview
@@ -912,7 +912,7 @@ presentation/
 | **Local Database**   | Hive CE (Community Edition)                     |
 | **Server Framework** | NestJS (TypeScript)                             |
 | **Server Runtime**   | Node.js                                         |
-| **Database**         | MongoDB (Mongoose ODM)                          |
+| **Database**         | PostgreSQL (DrizzleORM)                          |
 | **Auth**             | Passport.js (JWT + Google OAuth)                |
 | **Notifications**    | Client-local (Hive). Delivery: TBD (FCM / WebSocket) |
 | **QR**               | mobile_scanner (scan) + qr_flutter (generate)   |

@@ -2,7 +2,7 @@
 
 ## Project
 
-Offline-first event management app for PD Pemuda Persis Kab. Bandung. Flutter client + NestJS server (server not yet scaffolded).
+Offline-first event management app for PD Pemuda Persis Kab. Bandung. Flutter client + NestJS server.
 
 ## Flutter Version
 
@@ -46,6 +46,7 @@ Dependency rule: `presentation/ -> domain/ <- data/`. Domain must not import fro
 - **QR:** `mobile_scanner` (scan), `qr_flutter` (render). NOT `qr_code_scanner` (unmaintained).
 - **Testing mocks:** `mocktail`, NOT `mockito`.
 - **Notifications:** Client-local only (Hive box). Not stored server-side. Delivery mechanism TBD (FCM vs WebSocket).
+- **Backend DB:** PostgreSQL with **DrizzleORM** and **UUIDv7** for primary keys.
 
 ## Offline-First
 
