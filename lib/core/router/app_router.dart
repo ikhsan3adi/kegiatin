@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kegiatin/domain/enums/user_role.dart';
 import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
-import 'package:kegiatin/presentation/pages/admin/admin_dashboard_page.dart';
+import 'package:kegiatin/presentation/pages/admin/admin_home_page.dart';
 import 'package:kegiatin/presentation/pages/admin/create_event_page.dart';
 import 'package:kegiatin/presentation/pages/peserta/peserta_home_page.dart';
 import 'package:kegiatin/presentation/pages/login_page.dart';
@@ -81,7 +81,7 @@ GoRouter appRouter(Ref ref) {
       GoRoute(path: '/register', builder: (_, _) => const RegisterPage()),
       GoRoute(
         path: '/admin',
-        builder: (_, _) => const AdminDashboardPage(),
+        builder: (_, _) => const AdminHomePage(),
         routes: [
           GoRoute(
             path: 'create-event',
