@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -9,12 +9,18 @@ import 'package:kegiatin/domain/enums/event_type.dart';
 import 'package:kegiatin/domain/enums/event_visibility.dart';
 import 'package:kegiatin/presentation/controllers/event/create_event_controller.dart';
 import 'package:kegiatin/presentation/widgets/custom_input_card.dart';
+import 'package:kegiatin/presentation/widgets/dropdown_item_row.dart';
 import 'package:kegiatin/presentation/widgets/gradient_header.dart';
+import 'package:kegiatin/presentation/widgets/section_label.dart';
+import 'create_event_sessions.dart';
 
 // ---------------------------------------------------------------------------
 // Enum internal untuk pola pengulangan Series Event
 // ---------------------------------------------------------------------------
 enum _RepeatPattern { mingguan, bulanan, custom }
+
+/// Batas atas jumlah sesi untuk mencegah rendering yang berat.
+const int _kMaxSesi = 15;
 
 /// Halaman form untuk membuat kegiatan baru.
 ///
@@ -42,7 +48,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
   EventVisibility? _visibilitas;
   _RepeatPattern? _polaPengulangan;
 
-  /// Tanggal kegiatan — digunakan bersama oleh waktu mulai dan waktu selesai.
+  /// Tanggal kegiatan â€” digunakan bersama oleh waktu mulai dan waktu selesai.
   DateTime? _tanggal;
 
   /// Jam mulai sesi.
@@ -129,21 +135,43 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
   // Series Session Generation
   // ---------------------------------------------------------------------------
 
+  /// Generate ulang daftar sesi berdasarkan pola.
+  ///
+  /// Untuk mode [_RepeatPattern.custom], tanggal yang sudah diedit user
+  /// dipertahankan selama jumlah sesi tidak berubah (hanya sesi baru
+  /// yang ditambahkan di akhir dengan interval 7 hari sebagai default).
   void _regenerateSessions() {
     if (_tipe != EventType.series || _tanggal == null) {
       _generatedSessions = [];
       return;
     }
 
-    final raw = int.tryParse(_jumlahPertemuanController.text);
-    if (raw == null || raw <= 0) {
+    final rawCount = int.tryParse(_jumlahPertemuanController.text);
+    if (rawCount == null || rawCount <= 0) {
       _generatedSessions = [];
       return;
     }
 
-    final count = raw;
-    final sessions = <DateTime>[];
+    final count = rawCount.clamp(1, _kMaxSesi);
 
+    if (_polaPengulangan == _RepeatPattern.custom) {
+      // Pertahankan tanggal yang sudah diedit. Hanya resize list.
+      final prev = List<DateTime>.from(_generatedSessions);
+      if (count == prev.length) return; // tidak ada perubahan
+      final result = <DateTime>[];
+      for (int i = 0; i < count; i++) {
+        if (i < prev.length) {
+          result.add(prev[i]);
+        } else {
+          // Sesi baru: pakai interval 7 hari dari tanggal awal sebagai default.
+          result.add(_tanggal!.add(Duration(days: 7 * i)));
+        }
+      }
+      _generatedSessions = result;
+      return;
+    }
+
+    final sessions = <DateTime>[];
     for (int i = 0; i < count; i++) {
       final DateTime next;
       switch (_polaPengulangan) {
@@ -154,16 +182,32 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
             ((m - 1) % 12) + 1,
             _tanggal!.day,
           );
-        // Mingguan dan Custom sama-sama pakai interval 7 hari.
         case _RepeatPattern.mingguan:
-        case _RepeatPattern.custom:
         case null:
+          next = _tanggal!.add(Duration(days: 7 * i));
+        case _RepeatPattern.custom:
+          // Ditangani di blok atas; tidak akan masuk ke sini.
           next = _tanggal!.add(Duration(days: 7 * i));
       }
       sessions.add(next);
     }
-
     _generatedSessions = sessions;
+  }
+
+  /// Buka DatePicker untuk mengedit tanggal sesi ke-[index] (mode Custom).
+  Future<void> _pickSessionDate(int index) async {
+    final current = _generatedSessions[index];
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: current,
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
+    );
+    if (picked == null || !mounted) return;
+    setState(() {
+      _generatedSessions = List<DateTime>.from(_generatedSessions)
+        ..[index] = picked;
+    });
   }
 
   // ---------------------------------------------------------------------------
@@ -309,10 +353,10 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _SectionLabel(label: 'Informasi Kegiatan'),
+                    SectionLabel(label: 'Informasi Kegiatan', icon: Icons.info_outline_rounded),
                     const SizedBox(height: 12),
 
-                    // ── Nama Kegiatan ────────────────────────────────────────
+                    // â”€â”€ Nama Kegiatan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     CustomInputCard(
                       child: TextFormField(
                         controller: _namaController,
@@ -322,6 +366,16 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                           hintStyle: textTheme.bodyMedium?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
+                        ).copyWith(
+                          prefixIcon: Icon(
+                            Icons.event_outlined,
+                            size: 18,
+                            color: colorScheme.primary,
+                          ),
+                          prefixIconConstraints: const BoxConstraints(
+                            minWidth: 36,
+                            minHeight: 0,
+                          ),
                         ),
                         textInputAction: TextInputAction.next,
                         validator: (v) =>
@@ -330,7 +384,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                     ),
                     const SizedBox(height: 8),
 
-                    // ── Jenis Kegiatan ───────────────────────────────────────
+                    // â”€â”€ Jenis Kegiatan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     CustomInputCard(
                       child: DropdownButtonFormField<EventType>(
                         value: _tipe,
@@ -353,9 +407,21 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                             .map(
                               (t) => DropdownMenuItem(
                                 value: t,
-                                child: Text(
-                                  _labelTipe(t),
-                                  style: textTheme.bodyMedium,
+                                child: Builder(
+                                  builder: (ctx) {
+                                    final cs = Theme.of(ctx).colorScheme;
+                                    final tt = Theme.of(ctx).textTheme;
+                                    return DropdownItemRow(
+                                      icon: t == EventType.single
+                                          ? Icons.event_outlined
+                                          : Icons.event_repeat_outlined,
+                                      iconColor: t == EventType.single
+                                          ? cs.primary
+                                          : cs.secondary,
+                                      label: _labelTipe(t),
+                                      textStyle: tt.bodyMedium,
+                                    );
+                                  },
                                 ),
                               ),
                             )
@@ -366,12 +432,31 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                           _jumlahPertemuanController.clear();
                           _generatedSessions = [];
                         }),
+                        selectedItemBuilder: (ctx) {
+                          final tt = Theme.of(ctx).textTheme;
+                          final cs = Theme.of(ctx).colorScheme;
+                          return EventType.values.map((t) => Align(
+                            alignment: Alignment.centerLeft,
+                            child: DropdownItemRow(
+                              icon: t == EventType.single
+                                  ? Icons.event_outlined
+                                  : Icons.event_repeat_outlined,
+                              iconColor: t == EventType.single
+                                  ? cs.primary
+                                  : cs.secondary,
+                              label: _labelTipe(t),
+                              textStyle: tt.bodyMedium?.copyWith(
+                                color: cs.onSurface,
+                              ),
+                            ),
+                          )).toList();
+                        },
                         validator: (v) => v == null ? 'Wajib dipilih' : null,
                       ),
                     ),
                     const SizedBox(height: 8),
 
-                    // ── Deskripsi ────────────────────────────────────────────
+                    // â”€â”€ Deskripsi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     CustomInputCard(
                       child: TextFormField(
                         controller: _deskripsiController,
@@ -382,6 +467,19 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                           hintStyle: textTheme.bodyMedium?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
+                        ).copyWith(
+                          prefixIcon: Padding(
+                            padding: const EdgeInsets.only(top: 2),
+                            child: Icon(
+                              Icons.notes_rounded,
+                              size: 18,
+                              color: colorScheme.tertiary,
+                            ),
+                          ),
+                          prefixIconConstraints: const BoxConstraints(
+                            minWidth: 36,
+                            minHeight: 0,
+                          ),
                         ),
                         validator: (v) =>
                             (v == null || v.trim().isEmpty) ? 'Wajib diisi' : null,
@@ -389,8 +487,8 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                     ),
                     const SizedBox(height: 20),
 
-                    // ── Waktu Kegiatan ───────────────────────────────────────
-                    _SectionLabel(label: 'Waktu Kegiatan'),
+                    // â”€â”€ Waktu Kegiatan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                    SectionLabel(label: 'Waktu Kegiatan', icon: Icons.schedule_outlined),
                     const SizedBox(height: 12),
 
                     // Tanggal Kegiatan (shared mulai & selesai)
@@ -482,10 +580,10 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                       ],
                     ),
 
-                    // ── Pengaturan Series ────────────────────────────────────
+                    // â”€â”€ Pengaturan Series â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     if (_tipe == EventType.series) ...[
                       const SizedBox(height: 20),
-                      _SectionLabel(label: 'Pengaturan Series'),
+                      SectionLabel(label: 'Pengaturan Series', icon: Icons.repeat_rounded),
                       const SizedBox(height: 12),
 
                       // Pola Pengulangan
@@ -507,25 +605,74 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                               color: colorScheme.onSurfaceVariant,
                             ),
                           ),
-                          items: const [
-                            DropdownMenuItem(
-                              value: _RepeatPattern.mingguan,
-                              child: Text('Mingguan'),
-                            ),
-                            DropdownMenuItem(
-                              value: _RepeatPattern.bulanan,
-                              child: Text('Bulanan'),
-                            ),
-                            DropdownMenuItem(
-                              value: _RepeatPattern.custom,
-                              child: Text('Custom'),
-                            ),
+                          items: [
+                            for (final p in _RepeatPattern.values)
+                              DropdownMenuItem(
+                                value: p,
+                                child: Builder(
+                                  builder: (ctx) {
+                                    final cs = Theme.of(ctx).colorScheme;
+                                    final tt = Theme.of(ctx).textTheme;
+                                    return DropdownItemRow(
+                                      icon: switch (p) {
+                                        _RepeatPattern.mingguan =>
+                                          Icons.calendar_view_week_outlined,
+                                        _RepeatPattern.bulanan =>
+                                          Icons.calendar_month_outlined,
+                                        _RepeatPattern.custom =>
+                                          Icons.tune_rounded,
+                                      },
+                                      iconColor: switch (p) {
+                                        _RepeatPattern.mingguan => cs.primary,
+                                        _RepeatPattern.bulanan  => cs.tertiary,
+                                        _RepeatPattern.custom   => cs.secondary,
+                                      },
+                                      label: switch (p) {
+                                        _RepeatPattern.mingguan => 'Mingguan',
+                                        _RepeatPattern.bulanan  => 'Bulanan',
+                                        _RepeatPattern.custom   => 'Custom',
+                                      },
+                                      textStyle: tt.bodyMedium,
+                                    );
+                                  },
+                                ),
+                              ),
                           ],
                           onChanged: (v) => setState(() {
                             _polaPengulangan = v;
                             _jumlahPertemuanController.clear();
                             _generatedSessions = [];
                           }),
+                          selectedItemBuilder: (ctx) {
+                            final tt = Theme.of(ctx).textTheme;
+                            final cs = Theme.of(ctx).colorScheme;
+                            return _RepeatPattern.values.map((p) => Align(
+                              alignment: Alignment.centerLeft,
+                              child: DropdownItemRow(
+                                icon: switch (p) {
+                                  _RepeatPattern.mingguan =>
+                                    Icons.calendar_view_week_outlined,
+                                  _RepeatPattern.bulanan =>
+                                    Icons.calendar_month_outlined,
+                                  _RepeatPattern.custom =>
+                                    Icons.tune_rounded,
+                                },
+                                iconColor: switch (p) {
+                                  _RepeatPattern.mingguan => cs.primary,
+                                  _RepeatPattern.bulanan  => cs.tertiary,
+                                  _RepeatPattern.custom   => cs.secondary,
+                                },
+                                label: switch (p) {
+                                  _RepeatPattern.mingguan => 'Mingguan',
+                                  _RepeatPattern.bulanan  => 'Bulanan',
+                                  _RepeatPattern.custom   => 'Custom',
+                                },
+                                textStyle: tt.bodyMedium?.copyWith(
+                                  color: cs.onSurface,
+                                ),
+                              ),
+                            )).toList();
+                          },
                           validator: (v) =>
                               (_tipe == EventType.series && v == null)
                                   ? 'Wajib dipilih'
@@ -544,16 +691,30 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                           ],
                           style: textTheme.bodyMedium,
                           decoration: InputDecoration.collapsed(
-                            hintText: 'Jumlah Pertemuan',
+                            hintText: 'Jumlah Pertemuan (maks. $_kMaxSesi)',
                             hintStyle: textTheme.bodyMedium?.copyWith(
                               color: colorScheme.onSurfaceVariant,
+                            ),
+                          ).copyWith(
+                            prefixIcon: Icon(
+                              Icons.format_list_numbered_rounded,
+                              size: 18,
+                              color: colorScheme.primary,
+                            ),
+                            prefixIconConstraints: const BoxConstraints(
+                              minWidth: 36,
+                              minHeight: 0,
                             ),
                           ),
                           onChanged: (_) => setState(_regenerateSessions),
                           validator: (v) {
-                            if (_tipe == EventType.series &&
-                                (v == null || v.trim().isEmpty)) {
+                            if (_tipe != EventType.series) return null;
+                            if (v == null || v.trim().isEmpty) {
                               return 'Wajib diisi untuk Series';
+                            }
+                            final n = int.tryParse(v.trim());
+                            if (n == null || n <= 0) {
+                              return 'Minimal 1 pertemuan';
                             }
                             return null;
                           },
@@ -563,44 +724,24 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                       // Jadwal sesi ter-generate
                       if (_generatedSessions.isNotEmpty) ...[
                         const SizedBox(height: 12),
-                        Text(
-                          'Jadwal Sesi (${_generatedSessions.length} pertemuan)',
-                          style: textTheme.labelMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
+                        SessionListHeader(
+                          count: _generatedSessions.length,
+                          isCustom: _polaPengulangan == _RepeatPattern.custom,
                         ),
                         const SizedBox(height: 8),
-                        Wrap(
-                          spacing: 6,
-                          runSpacing: 6,
-                          children: _generatedSessions
-                              .asMap()
-                              .entries
-                              .map(
-                                (e) => Chip(
-                                  label: Text(
-                                    '${e.key + 1}. ${_formatDateShort(e.value)}',
-                                    style: textTheme.labelSmall?.copyWith(
-                                      color: colorScheme.onPrimaryContainer,
-                                    ),
-                                  ),
-                                  backgroundColor:
-                                      colorScheme.primaryContainer,
-                                  side: BorderSide.none,
-                                  padding: EdgeInsets.zero,
-                                  materialTapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                ),
-                              )
-                              .toList(),
+                        SessionDateGrid(
+                          sessions: _generatedSessions,
+                          isCustom: _polaPengulangan == _RepeatPattern.custom,
+                          onEdit: _pickSessionDate,
+                          formatDate: _formatDateShort,
                         ),
                       ],
                     ],
 
                     const SizedBox(height: 20),
 
-                    // ── Lokasi & Kontak ──────────────────────────────────────
-                    _SectionLabel(label: 'Lokasi & Kontak'),
+                    // â”€â”€ Lokasi & Kontak â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                    SectionLabel(label: 'Lokasi & Kontak', icon: Icons.place_outlined),
                     const SizedBox(height: 12),
 
                     // Lokasi
@@ -612,6 +753,16 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                           hintText: 'Lokasi Pelaksanaan',
                           hintStyle: textTheme.bodyMedium?.copyWith(
                             color: colorScheme.onSurfaceVariant,
+                          ),
+                        ).copyWith(
+                          prefixIcon: Icon(
+                            Icons.location_on_outlined,
+                            size: 18,
+                            color: colorScheme.tertiary,
+                          ),
+                          prefixIconConstraints: const BoxConstraints(
+                            minWidth: 36,
+                            minHeight: 0,
                           ),
                         ),
                         textInputAction: TextInputAction.next,
@@ -631,6 +782,16 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                           hintStyle: textTheme.bodyMedium?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
+                        ).copyWith(
+                          prefixIcon: Icon(
+                            Icons.person_outline_rounded,
+                            size: 18,
+                            color: colorScheme.secondary,
+                          ),
+                          prefixIconConstraints: const BoxConstraints(
+                            minWidth: 36,
+                            minHeight: 0,
+                          ),
                         ),
                         textInputAction: TextInputAction.next,
                         validator: (v) =>
@@ -639,8 +800,8 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                     ),
                     const SizedBox(height: 20),
 
-                    // ── Pengaturan ───────────────────────────────────────────
-                    _SectionLabel(label: 'Pengaturan'),
+                    // â”€â”€ Pengaturan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                    SectionLabel(label: 'Pengaturan', icon: Icons.tune_rounded),
                     const SizedBox(height: 12),
 
                     // Visibilitas
@@ -664,22 +825,53 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                         ),
                         items: EventVisibility.values
                             .map(
-                              (v) => DropdownMenuItem(
-                                value: v,
-                                child: Text(
-                                  _labelVisibilitas(v),
-                                  style: textTheme.bodyMedium,
+                              (vis) => DropdownMenuItem(
+                                value: vis,
+                                child: Builder(
+                                  builder: (ctx) {
+                                    final cs = Theme.of(ctx).colorScheme;
+                                    final tt = Theme.of(ctx).textTheme;
+                                    return DropdownItemRow(
+                                      icon: vis == EventVisibility.open
+                                          ? Icons.public_rounded
+                                          : Icons.lock_outline_rounded,
+                                      iconColor: vis == EventVisibility.open
+                                          ? cs.tertiary
+                                          : cs.secondary,
+                                      label: _labelVisibilitas(vis),
+                                      textStyle: tt.bodyMedium,
+                                    );
+                                  },
                                 ),
                               ),
                             )
                             .toList(),
                         onChanged: (v) => setState(() => _visibilitas = v),
+                        selectedItemBuilder: (ctx) {
+                          final tt = Theme.of(ctx).textTheme;
+                          final cs = Theme.of(ctx).colorScheme;
+                          return EventVisibility.values.map((vis) => Align(
+                            alignment: Alignment.centerLeft,
+                            child: DropdownItemRow(
+                              icon: vis == EventVisibility.open
+                                  ? Icons.public_rounded
+                                  : Icons.lock_outline_rounded,
+                              iconColor: vis == EventVisibility.open
+                                  ? cs.tertiary
+                                  : cs.secondary,
+                              label: _labelVisibilitas(vis),
+                              textStyle: tt.bodyMedium?.copyWith(
+                                color: cs.onSurface,
+                              ),
+                            ),
+                          )).toList();
+                        },
                         validator: (v) => v == null ? 'Wajib dipilih' : null,
                       ),
                     ),
                     const SizedBox(height: 32),
 
-                    // ── Tombol Simpan ────────────────────────────────────────
+                    // â”€â”€ Tombol Simpan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     SizedBox(
                       width: double.infinity,
                       height: 50,
@@ -735,26 +927,4 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
         EventVisibility.open => 'Terbuka untuk Umum',
         EventVisibility.inviteOnly => 'Undangan Saja',
       };
-}
-
-// ---------------------------------------------------------------------------
-// Widget Helper
-// ---------------------------------------------------------------------------
-
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel({required this.label});
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
-    return Text(
-      label,
-      style: textTheme.titleSmall?.copyWith(
-        fontWeight: FontWeight.w700,
-        color: colorScheme.onSurface,
-      ),
-    );
-  }
 }

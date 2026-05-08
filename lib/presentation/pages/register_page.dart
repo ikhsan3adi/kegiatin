@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kegiatin/core/theme/custom.dart';
 import 'package:kegiatin/domain/entities/register_input.dart';
 import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
 
@@ -80,7 +81,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Color(0xFF0F3F7A), Color(0xFF679AE3)],
+                  colors: [KegiatinCustomTheme.appBarTop, KegiatinCustomTheme.appBarBottom],
                 ),
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(48),
@@ -118,64 +119,86 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   child: Center(
                     child: SingleChildScrollView(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(vertical: 24),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border(
-                            bottom: BorderSide(color: const Color(0xFF068A50), width: 6),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withValues(alpha: 0.1),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
+                      child: Stack(
+                        alignment: Alignment.topCenter,
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.only(top: 30, bottom: 24),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withValues(alpha: 0.1),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-                        child: Form(
-                          key: _formKey,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Text(
-                                'SIGN UP',
-                                style: textTheme.headlineSmall?.copyWith(
-                                  color: colorScheme.primary,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 24),
-                              SegmentedButton<String>(
-                                segments: const [
-                                  ButtonSegment(value: 'UMUM', label: Text('Umum')),
-                                  ButtonSegment(value: 'ANGGOTA', label: Text('Anggota')),
-                                ],
-                                selected: {_userType},
-                                onSelectionChanged: (selection) =>
-                                    setState(() => _userType = selection.first),
-                              ),
-                              const SizedBox(height: 24),
-                              TextFormField(
-                                controller: _nameController,
-                                textInputAction: TextInputAction.next,
-                                decoration: InputDecoration(
-                                  labelText: 'Nama Lengkap',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                            child: Form(
+                              key: _formKey,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  const SizedBox(height: 20),
+                                  Text(
+                                    'SIGN UP',
+                                    style: textTheme.titleLarge?.copyWith(
+                                      color: colorScheme.primary,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 36,
+                                    ),
+                                    textAlign: TextAlign.center,
                                   ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 14,
+                                  const SizedBox(height: 24),
+                                  SegmentedButton<String>(
+                                    segments: const [
+                                      ButtonSegment(value: 'UMUM', label: Text('Umum')),
+                                      ButtonSegment(value: 'ANGGOTA', label: Text('Anggota')),
+                                    ],
+                                    selected: {_userType},
+                                    style: ButtonStyle(
+                                      backgroundColor: WidgetStateProperty.resolveWith<Color?>(
+                                        (states) => states.contains(WidgetState.selected)
+                                            ? KegiatinCustomTheme.selectionBlue
+                                            : Colors.white,
+                                      ),
+                                      foregroundColor: WidgetStateProperty.resolveWith<Color?>(
+                                        (states) => states.contains(WidgetState.selected)
+                                            ? Colors.white
+                                            : colorScheme.primary,
+                                      ),
+                                      side: WidgetStateProperty.resolveWith<BorderSide?>(
+                                        (states) => BorderSide(
+                                          color: states.contains(WidgetState.selected)
+                                              ? KegiatinCustomTheme.selectionBlue
+                                              : Colors.grey.shade300,
+                                        ),
+                                      ),
+                                    ),
+                                    onSelectionChanged: (selection) =>
+                                        setState(() => _userType = selection.first),
                                   ),
-                                ),
-                                validator: (v) =>
-                                    (v == null || v.isEmpty) ? 'Nama wajib diisi' : null,
-                              ),
+                                  const SizedBox(height: 24),
+                                  TextFormField(
+                                    controller: _nameController,
+                                    textInputAction: TextInputAction.next,
+                                    decoration: InputDecoration(
+                                      labelText: 'Nama Lengkap',
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 14,
+                                      ),
+                                    ),
+                                    validator: (v) =>
+                                        (v == null || v.isEmpty) ? 'Nama wajib diisi' : null,
+                                  ),
+                                
                               const SizedBox(height: 16),
                               TextFormField(
                                 controller: _emailController,
@@ -294,9 +317,11 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                                   ),
                                 ],
                               ),
-                            ],
+                            ]    
+                            ),
+                          )
                           ),
-                        ),
+                        ],
                       ),
                     ),
                   ),
