@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/presentation/pages/peserta/peserta_dashboard_page.dart';
 import 'package:kegiatin/presentation/pages/peserta/peserta_event_page.dart';
+import 'package:kegiatin/presentation/pages/peserta/peserta_profile_page.dart';
 import 'package:kegiatin/presentation/pages/peserta/peserta_riwayat_page.dart';
 
 class NavbarPeserta extends ConsumerStatefulWidget {
@@ -18,7 +19,7 @@ class _NavbarPesertaState extends ConsumerState<NavbarPeserta> {
     BerandaPage(),
     AcaraPage(),
     RiwayatPage(),
-    ProfilPage(),
+    PesertaProfilePage(),
   ];
 
   void _onItemTapped(int index) {

@@ -5,8 +5,8 @@ import 'package:kegiatin/presentation/widgets/kegiatin_app_bar.dart';
 import 'package:kegiatin/presentation/widgets/profile_card.dart';
 import 'package:kegiatin/presentation/widgets/profile_header_card.dart';
 
-class AdminProfilePage extends ConsumerWidget {
-  const AdminProfilePage({super.key});
+class PesertaProfilePage extends ConsumerWidget {
+  const PesertaProfilePage({super.key});
 
   /// Tampilkan dialog konfirmasi sebelum logout diproses.
   Future<void> _showLogoutDialog(BuildContext context, WidgetRef ref) async {
