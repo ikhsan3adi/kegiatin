@@ -5,6 +5,8 @@ import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
 import 'package:kegiatin/presentation/pages/admin/admin_home_page.dart';
 import 'package:kegiatin/presentation/pages/admin/create_event_page.dart';
 import 'package:kegiatin/presentation/pages/peserta/peserta_home_page.dart';
+import 'package:kegiatin/presentation/pages/peserta/peserta_event_detail_page.dart';
+import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/presentation/pages/login_page.dart';
 import 'package:kegiatin/presentation/pages/onboarding_page.dart';
 import 'package:kegiatin/presentation/pages/register_page.dart';
@@ -89,7 +91,19 @@ GoRouter appRouter(Ref ref) {
           ),
         ],
       ),
-      GoRoute(path: '/peserta', builder: (_, _) => const PesertaHomePage()),
+      GoRoute(
+        path: '/peserta', 
+        builder: (_, _) => const PesertaHomePage(),
+        routes: [
+          GoRoute(
+            path: 'event-detail',
+            builder: (context, state) {
+              final event = state.extra as Event;
+              return PesertaEventDetailPage(event: event);
+            },
+          ),
+        ],
+      ),
     ],
   );
 }

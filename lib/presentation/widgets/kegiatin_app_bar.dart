@@ -7,13 +7,16 @@ import 'package:kegiatin/core/theme/custom.dart';
 /// Konten di dalamnya sepenuhnya dikontrol via parameter [child].
 /// Digunakan di semua halaman — Beranda, Kegiatan, Profil, Pengaturan, dll.
 class KegiatinAppBar extends StatelessWidget {
-  const KegiatinAppBar({super.key, required this.child, this.padding});
+  const KegiatinAppBar({super.key, required this.child, this.padding, this.height = 140});
 
   /// Konten yang ditampilkan di dalam container AppBar.
   final Widget child;
 
   /// Padding kustom. Default: `EdgeInsets.fromLTRB(20, 12, 20, 24)`.
   final EdgeInsetsGeometry? padding;
+
+  /// Tinggi dari AppBar. Default: `140`. Jika diset `null`, akan mengikuti tinggi child.
+  final double? height;
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +46,7 @@ class KegiatinAppBar extends StatelessWidget {
         child: Padding(
           padding: padding ?? const EdgeInsets.fromLTRB(20, 12, 20, 24),
           child: SizedBox(
-            height: 140,
+            height: height,
             child: Align(alignment: Alignment.topLeft, child: child),
           ),
         ),
