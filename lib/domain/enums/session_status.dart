@@ -20,4 +20,6 @@ enum SessionStatus {
       orElse: () => throw ArgumentError('Unknown SessionStatus: $value'),
     );
   }
+
+  String toJson() => name.toUpperCase();
 }

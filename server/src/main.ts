@@ -12,8 +12,10 @@ import { TransformInterceptor } from './core/interceptors/transform.interceptor'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  
   app.use(morgan.default('combined'));
+  
+  // app.useGlobalInterceptors(new LoggingInterceptor());
 
   app.useGlobalFilters(new GlobalExceptionFilter());
 
