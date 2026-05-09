@@ -69,6 +69,18 @@ export class EventsController {
     return this.eventsService.cancel(id);
   }
 
+  @Patch(':id/start')
+  @Roles(UserRole.ADMIN)
+  start(@Param('id') id: string) {
+    return this.eventsService.start(id);
+  }
+
+  @Patch(':id/complete')
+  @Roles(UserRole.ADMIN)
+  complete(@Param('id') id: string) {
+    return this.eventsService.complete(id);
+  }
+
   @Post(':id/sessions')
   @Roles(UserRole.ADMIN)
   addSession(@Param('id') id: string, @Body() dto: CreateSessionDto) {

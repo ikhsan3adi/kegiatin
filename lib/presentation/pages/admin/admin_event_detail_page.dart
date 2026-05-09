@@ -7,6 +7,8 @@ import 'package:kegiatin/domain/enums/event_type.dart';
 import 'package:kegiatin/domain/enums/event_visibility.dart';
 import 'package:kegiatin/presentation/controllers/event_list_controller.dart';
 import 'package:kegiatin/presentation/controllers/publish_event_controller.dart';
+import 'package:kegiatin/presentation/controllers/start_event_controller.dart';
+import 'package:kegiatin/presentation/controllers/complete_event_controller.dart';
 import 'package:kegiatin/presentation/widgets/kegiatin_app_bar.dart';
 
 class AdminEventDetailPage extends ConsumerWidget {
@@ -32,15 +34,53 @@ class AdminEventDetailPage extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Kegiatan berhasil di-publish!')),
         );
-        // Refresh daftar kegiatan
         ref.invalidate(eventListProvider);
-        // Kembali ke daftar
+        context.pop();
+      }
+    });
+
+    // Listen to start state
+    ref.listen(startEventControllerProvider, (previous, next) {
+      if (next is AsyncError) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Gagal: ${next.error}'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      } else if (next is AsyncData && next.value != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Kegiatan berhasil dimulai!')),
+        );
+        ref.invalidate(eventListProvider);
+        context.pop();
+      }
+    });
+
+    // Listen to complete state
+    ref.listen(completeEventControllerProvider, (previous, next) {
+      if (next is AsyncError) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Gagal: ${next.error}'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      } else if (next is AsyncData && next.value != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Kegiatan berhasil diselesaikan!')),
+        );
+        ref.invalidate(eventListProvider);
         context.pop();
       }
     });
 
     final publishState = ref.watch(publishEventControllerProvider);
+    final startState = ref.watch(startEventControllerProvider);
+    final completeState = ref.watch(completeEventControllerProvider);
     final isPublishing = publishState.isLoading;
+    final isStarting = startState.isLoading;
+    final isCompleting = completeState.isLoading;
 
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
@@ -253,15 +293,17 @@ class AdminEventDetailPage extends ConsumerWidget {
           ),
           
           // Bottom Actions untuk Admin
-          _buildAdminActionBottomBar(context, ref, isPublishing),
+          _buildAdminActionBottomBar(context, ref, isPublishing, isStarting, isCompleting),
         ],
       ),
     );
   }
 
-  Widget _buildAdminActionBottomBar(BuildContext context, WidgetRef ref, bool isPublishing) {
+  Widget _buildAdminActionBottomBar(BuildContext context, WidgetRef ref, bool isPublishing, bool isStarting, bool isCompleting) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDraft = event.status == EventStatus.draft;
+    final isPublished = event.status == EventStatus.published;
+    final isOngoing = event.status == EventStatus.ongoing;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -317,6 +359,62 @@ class AdminEventDetailPage extends ConsumerWidget {
                         )
                       : const Icon(Icons.publish_rounded, size: 18),
                   label: Text(isPublishing ? 'Loading...' : 'Publish'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: colorScheme.tertiary,
+                    foregroundColor: colorScheme.onTertiary,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+            ],
+
+            // Tombol Mulai (Hanya jika Published)
+            if (isPublished) ...[
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: isStarting 
+                    ? null 
+                    : () {
+                        ref.read(startEventControllerProvider.notifier).start(event.id);
+                      },
+                  icon: isStarting
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.play_arrow_rounded, size: 18),
+                  label: Text(isStarting ? 'Loading...' : 'Mulai'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: colorScheme.tertiary,
+                    foregroundColor: colorScheme.onTertiary,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+            ],
+
+            // Tombol Selesai (Hanya jika Ongoing)
+            if (isOngoing) ...[
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: isCompleting 
+                    ? null 
+                    : () {
+                        ref.read(completeEventControllerProvider.notifier).complete(event.id);
+                      },
+                  icon: isCompleting
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.check_circle_outline, size: 18),
+                  label: Text(isCompleting ? 'Loading...' : 'Selesai'),
                   style: FilledButton.styleFrom(
                     backgroundColor: colorScheme.tertiary,
                     foregroundColor: colorScheme.onTertiary,

@@ -115,4 +115,28 @@ class EventRepositoryImpl implements EventRepository {
       return Left(ServerFailure(e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, Event>> startEvent(String id) async {
+    try {
+      final result = await remoteDataSource.startEvent(id);
+      return Right(result.toEntity());
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, statusCode: e.statusCode));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Event>> completeEvent(String id) async {
+    try {
+      final result = await remoteDataSource.completeEvent(id);
+      return Right(result.toEntity());
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, statusCode: e.statusCode));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
 }

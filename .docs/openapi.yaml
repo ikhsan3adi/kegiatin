@@ -799,6 +799,42 @@ paths:
         "400":
           description: Cannot cancel completed/cancelled event
 
+  /events/{id}/start:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    patch:
+      tags: [Events]
+      summary: Start event (Admin)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Event started
+        "400":
+          description: Cannot start non-published event
+
+  /events/{id}/complete:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    patch:
+      tags: [Events]
+      summary: Complete event (Admin)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Event completed
+        "400":
+          description: Cannot complete non-ongoing event
+
   # ════════════ SESSIONS ════════════
   /events/{id}/sessions:
     parameters:

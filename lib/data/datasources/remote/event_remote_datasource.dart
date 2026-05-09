@@ -22,6 +22,8 @@ abstract class EventRemoteDataSource {
   Future<void> deleteEvent(String id);
   Future<EventModel> publishEvent(String id);
   Future<EventModel> cancelEvent(String id);
+  Future<EventModel> startEvent(String id);
+  Future<EventModel> completeEvent(String id);
 }
 
 class EventRemoteDataSourceImpl implements EventRemoteDataSource {
@@ -181,6 +183,36 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
     } on DioException catch (e) {
       throw ServerException(
         e.response?.data['message'] ?? e.message ?? 'Gagal membatalkan event',
+        statusCode: e.response?.statusCode,
+      );
+    }
+  }
+
+  @override
+  Future<EventModel> startEvent(String id) async {
+    try {
+      await dio.patch(ApiConstants.startEvent(id));
+      // Fetch ulang karena backend return void
+      final response = await dio.get(ApiConstants.eventById(id));
+      return EventModel.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw ServerException(
+        e.response?.data['message'] ?? e.message ?? 'Gagal memulai event',
+        statusCode: e.response?.statusCode,
+      );
+    }
+  }
+
+  @override
+  Future<EventModel> completeEvent(String id) async {
+    try {
+      await dio.patch(ApiConstants.completeEvent(id));
+      // Fetch ulang karena backend return void
+      final response = await dio.get(ApiConstants.eventById(id));
+      return EventModel.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw ServerException(
+        e.response?.data['message'] ?? e.message ?? 'Gagal menyelesaikan event',
         statusCode: e.response?.statusCode,
       );
     }

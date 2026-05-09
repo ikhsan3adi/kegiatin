@@ -189,6 +189,28 @@ export class EventsService {
     await this.eventRepo.updateEvent(id, { status: EventStatus.CANCELLED });
   }
 
+  async start(id: string): Promise<void> {
+    const event = await this.eventRepo.findEventById(id);
+    if (!event) throw new NotFoundException('Event tidak ditemukan');
+
+    if (event.status !== EventStatus.PUBLISHED) {
+      throw new BadRequestException('Hanya event PUBLISHED yang dapat dimulai');
+    }
+
+    await this.eventRepo.updateEvent(id, { status: EventStatus.ONGOING });
+  }
+
+  async complete(id: string): Promise<void> {
+    const event = await this.eventRepo.findEventById(id);
+    if (!event) throw new NotFoundException('Event tidak ditemukan');
+
+    if (event.status !== EventStatus.ONGOING) {
+      throw new BadRequestException('Hanya event ONGOING yang dapat diselesaikan');
+    }
+
+    await this.eventRepo.updateEvent(id, { status: EventStatus.COMPLETED });
+  }
+
   // ---------------------------------------------------------------------------
   // SESSIONS
   // ---------------------------------------------------------------------------
