@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:hive_ce/hive.dart';
 import 'package:kegiatin/core/constants/db_constants.dart';
 import 'package:kegiatin/data/models/user_model.dart';
@@ -34,14 +35,21 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
       sharedPreferences.getString(DbConstants.refreshTokenKey);
 
   @override
-  Future<void> saveUser(UserModel user) => authBox.put(DbConstants.cachedUserKey, user.toJson());
+  Future<void> saveUser(UserModel user) =>
+      authBox.put(DbConstants.cachedUserKey, jsonEncode(user.toJson()));
 
   @override
   Future<UserModel?> getCachedUser() async {
     final raw = authBox.get(DbConstants.cachedUserKey);
     if (raw == null) return null;
 
-    final json = Map<String, dynamic>.from(raw as Map);
+    // Mendukung format lama (Map) dan format baru (JSON string)
+    final Map<String, dynamic> json;
+    if (raw is String) {
+      json = Map<String, dynamic>.from(jsonDecode(raw) as Map);
+    } else {
+      json = Map<String, dynamic>.from(raw as Map);
+    }
     return UserModel.fromJson(json);
   }
 

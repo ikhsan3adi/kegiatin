@@ -238,12 +238,7 @@ class _NavbarAdminState extends ConsumerState<NavbarAdmin> {
       ),
       // --- Tombol Tengah (Pindai QR) ---
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Aksi ketika tombol Pindai QR ditekan
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('Membuka Kamera QR...')));
-        },
+        onPressed: () => context.push('/admin/scan'),
         backgroundColor: colorScheme.primaryContainer, // Menggunakan secondary color
         foregroundColor: colorScheme.onPrimaryContainer, // Warna icon FAB
         shape: const CircleBorder(), // Memastikan bentuknya bulat sempurna

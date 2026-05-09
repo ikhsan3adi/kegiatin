@@ -4,12 +4,12 @@ import 'package:kegiatin/domain/enums/user_role.dart';
 import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
 import 'package:kegiatin/presentation/pages/admin/admin_dashboard_page.dart';
 import 'package:kegiatin/presentation/pages/admin/create_event_page.dart';
+import 'package:kegiatin/presentation/pages/admin/qr_scan_page.dart';
 import 'package:kegiatin/presentation/pages/peserta/peserta_home_page.dart';
 import 'package:kegiatin/presentation/pages/login_page.dart';
 import 'package:kegiatin/presentation/pages/onboarding_page.dart';
 import 'package:kegiatin/presentation/pages/register_page.dart';
 import 'package:kegiatin/presentation/pages/splash_page.dart';
-import 'package:kegiatin/presentation/providers/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_router.g.dart';
@@ -86,6 +86,10 @@ GoRouter appRouter(Ref ref) {
           GoRoute(
             path: 'create-event',
             builder: (_, _) => const CreateEventPage(),
+          ),
+          GoRoute(
+            path: 'scan',
+            builder: (_, _) => const QrScanPage(),
           ),
         ],
       ),
