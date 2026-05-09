@@ -5,6 +5,7 @@ import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
 import 'package:kegiatin/presentation/pages/admin/admin_home_page.dart';
 import 'package:kegiatin/presentation/pages/admin/admin_event_detail_page.dart';
 import 'package:kegiatin/presentation/pages/admin/create_event_page.dart';
+import 'package:kegiatin/presentation/pages/admin/qr_scan_page.dart';
 import 'package:kegiatin/presentation/pages/peserta/peserta_home_page.dart';
 import 'package:kegiatin/presentation/pages/peserta/peserta_event_detail_page.dart';
 import 'package:kegiatin/domain/entities/event.dart';
@@ -12,7 +13,6 @@ import 'package:kegiatin/presentation/pages/login_page.dart';
 import 'package:kegiatin/presentation/pages/onboarding_page.dart';
 import 'package:kegiatin/presentation/pages/register_page.dart';
 import 'package:kegiatin/presentation/pages/splash_page.dart';
-import 'package:kegiatin/presentation/providers/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_router.g.dart';
@@ -96,6 +96,10 @@ GoRouter appRouter(Ref ref) {
               final event = state.extra as Event;
               return AdminEventDetailPage(event: event);
             },
+          ),
+          GoRoute(
+            path: 'scan',
+            builder: (_, _) => const QrScanPage(),
           ),
         ],
       ),
