@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kegiatin/domain/enums/user_role.dart';
 import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
 import 'package:kegiatin/presentation/pages/admin/admin_home_page.dart';
+import 'package:kegiatin/presentation/pages/admin/admin_event_detail_page.dart';
 import 'package:kegiatin/presentation/pages/admin/create_event_page.dart';
 import 'package:kegiatin/presentation/pages/peserta/peserta_home_page.dart';
 import 'package:kegiatin/presentation/pages/peserta/peserta_event_detail_page.dart';
@@ -88,6 +89,13 @@ GoRouter appRouter(Ref ref) {
           GoRoute(
             path: 'create-event',
             builder: (_, _) => const CreateEventPage(),
+          ),
+          GoRoute(
+            path: 'event-detail',
+            builder: (context, state) {
+              final event = state.extra as Event;
+              return AdminEventDetailPage(event: event);
+            },
           ),
         ],
       ),

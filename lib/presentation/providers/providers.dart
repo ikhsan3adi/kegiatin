@@ -22,6 +22,7 @@ import 'package:kegiatin/data/repositories/event_repository_impl.dart';
 import 'package:kegiatin/domain/repositories/event_repository.dart';
 import 'package:kegiatin/domain/usecases/get_event_by_id_usecase.dart';
 import 'package:kegiatin/domain/usecases/get_events_usecase.dart';
+import 'package:kegiatin/domain/usecases/publish_event_usecase.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -98,3 +99,7 @@ GetEventByIdUseCase getEventByIdUseCase(Ref ref) =>
 @riverpod
 CreateEventUseCase createEventUseCase(Ref ref) =>
     CreateEventUseCase(ref.watch(eventRepositoryProvider));
+
+@riverpod
+PublishEventUseCase publishEventUseCase(Ref ref) =>
+    PublishEventUseCase(ref.watch(eventRepositoryProvider));
