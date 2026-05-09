@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kegiatin/core/theme/custom.dart';
-import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
-import 'package:kegiatin/presentation/widgets/kegiatin_app_bar.dart';
+import 'package:kegiatin/presentation/pages/admin/admin_dashboard_page.dart';
+import 'package:kegiatin/presentation/pages/admin/admin_event_page.dart';
+import 'package:kegiatin/presentation/pages/admin/admin_profile_page.dart';
+import 'package:kegiatin/presentation/pages/admin/admin_settings_page.dart';
 
 class NavbarAdmin extends ConsumerStatefulWidget {
   const NavbarAdmin({super.key});
@@ -15,6 +17,14 @@ class NavbarAdmin extends ConsumerStatefulWidget {
 class _NavbarAdminState extends ConsumerState<NavbarAdmin> {
   int _selectedIndex = 0;
 
+  static const List<Widget> _pages = [
+    AdminDashboardPage(),
+    AdminEventPage(),
+    AdminProfilePage(),
+    AdminSettingsPage(),
+  ];
+
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -24,199 +34,15 @@ class _NavbarAdminState extends ConsumerState<NavbarAdmin> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final authState = ref.watch(authControllerProvider);
 
-    final List<Widget> pages = [
-      // Index 0: Beranda
-      authState.when(
-        data: (user) => SingleChildScrollView(
-          child: Column(
-            children: [
-              KegiatinAppBar(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Image.asset(
-                              'assets/LogoKegiaTin 2.png',
-                              width: 32,
-                              height: 32,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'KEGIATIN',
-                              style: textTheme.titleMedium?.copyWith(
-                                color: colorScheme.onPrimary,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 1.2,
-                              ),
-                            ),
-                          ],
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            // TODO: navigasi ke halaman notifikasi
-                          },
-                          icon: Icon(
-                            Icons.notifications_outlined,
-                            color: colorScheme.onPrimary,
-                            size: 26,
-                          ),
-                          tooltip: 'Notifikasi',
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Selamat Datang',
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onPrimary.withValues(alpha: 0.85),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      user?.displayName ?? '-',
-                      style: textTheme.headlineSmall?.copyWith(
-                        color: colorScheme.onPrimary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Kegiatan Terkini',
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Center(
-                child: Text(
-                  'Belum ada kegiatan',
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
-      ),
-      // Index 1: Kegiatan
-      SingleChildScrollView(
-        child: Column(
-          children: [
-            KegiatinAppBar(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Kegiatan',
-                    style: textTheme.headlineSmall?.copyWith(
-                      color: colorScheme.onPrimary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '0 Kegiatan Tersedia',
-                    style: textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onPrimary.withValues(alpha: 0.85),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            Center(
-              child: Text(
-                'Belum ada kegiatan',
-                style: textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-      // Index 2: Profil
-      SingleChildScrollView(
-        child: Column(
-          children: [
-            KegiatinAppBar(
-              child: Text(
-                'Profil Saya',
-                style: textTheme.headlineSmall?.copyWith(
-                  color: colorScheme.onPrimary,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Center(
-              child: Text(
-                'Konten profil',
-                style: textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-      // Index 3: Pengaturan
-      SingleChildScrollView(
-        child: Column(
-          children: [
-            KegiatinAppBar(
-              child: Text(
-                'Pengaturan',
-                style: textTheme.headlineSmall?.copyWith(
-                  color: colorScheme.onPrimary,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Center(
-              child: Text(
-                'Konten pengaturan',
-                style: textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    ];
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
       body: Stack(
         fit: StackFit.expand,
         children: [
-          pages[_selectedIndex],
-          // FAB tambah kegiatan — tampil di tab Beranda (index 0) dan Kegiatan (index 1)
+          _pages[_selectedIndex],
+          // FAB tambah kegiatan — tampil di tab Dashboard (index 0) dan Kegiatan (index 1)
           if (_selectedIndex == 0 || _selectedIndex == 1)
             Positioned(
               right: 24,
@@ -266,7 +92,7 @@ class _NavbarAdminState extends ConsumerState<NavbarAdmin> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildNavItem(Icons.home, 'Beranda', 0, colorScheme),
+                    _buildNavItem(Icons.home, 'Dashboard', 0, colorScheme),
                     _buildNavItem(
                       Icons.calendar_month,
                       'Kegiatan',
@@ -276,6 +102,7 @@ class _NavbarAdminState extends ConsumerState<NavbarAdmin> {
                   ],
                 ),
               ),
+
               // Ruang kosong di tengah untuk memberi tempat bagi FloatingActionButton
               const SizedBox(width: 48),
               // Kelompok menu sebelah kanan

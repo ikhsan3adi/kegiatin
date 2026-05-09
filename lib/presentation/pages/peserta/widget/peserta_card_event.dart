@@ -6,11 +6,13 @@ import 'package:kegiatin/domain/enums/event_type.dart';
 class CardEvent extends StatelessWidget {
   final Event event;
   final VoidCallback? onTap;
+  final bool showActionButton;
 
   const CardEvent({
     super.key,
     required this.event,
     this.onTap,
+    this.showActionButton = false,
   });
 
   @override
@@ -135,20 +137,87 @@ class CardEvent extends StatelessWidget {
                       ),
                     ],
                   ),
+                  
+                  if (showActionButton) ...[
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      child: _buildActionButton(context),
+                    ),
+                  ],
                 ],
               ),
             ),
 
             // Icon Chevron Kanan
-            Padding(
-              padding: const EdgeInsets.only(top: 4.0),
-              child: Icon(
-                Icons.chevron_right_rounded,
-                color: colorScheme.onSurfaceVariant.withOpacity(0.3),
-                size: 28,
+            if (onTap != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 4.0),
+                child: Icon(
+                  Icons.chevron_right_rounded,
+                  color: colorScheme.onSurfaceVariant.withOpacity(0.3),
+                  size: 28,
+                ),
               ),
-            ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButton(BuildContext context) {
+    // Mocking state based on EventStatus for UI purposes
+    Color bgColor;
+    Color textColor;
+    String text;
+    IconData? icon;
+
+    if (event.status == EventStatus.completed) {
+      bgColor = Colors.blue.shade100;
+      textColor = Colors.blue.shade700;
+      text = 'Kehadiran Terverifikasi';
+      icon = Icons.verified;
+    } else if (event.status == EventStatus.ongoing) {
+      bgColor = Colors.lightGreen.shade300;
+      textColor = Colors.green.shade800;
+      text = 'Lihat QR Saya';
+      icon = Icons.qr_code_2;
+    } else {
+      // Default: Published / Draft
+      bgColor = Colors.orange.shade100;
+      textColor = Colors.orange.shade800;
+      text = 'Detail Kegiatan';
+      icon = Icons.assignment_outlined;
+    }
+
+    return Material(
+      color: bgColor,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: () {
+          // Akan diarahkan ke detail atau langsung pop up QR nanti
+          if (onTap != null) onTap!();
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (icon != null) ...[
+                Icon(icon, size: 16, color: textColor),
+                const SizedBox(width: 8),
+              ],
+              Text(
+                text,
+                style: TextStyle(
+                  color: textColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -22,4 +22,6 @@ abstract class EventRepository {
   Future<Either<Failure, void>> deleteEvent(String id);
   Future<Either<Failure, Event>> publishEvent(String id);
   Future<Either<Failure, Event>> cancelEvent(String id);
+  Future<Either<Failure, Event>> startEvent(String id);
+  Future<Either<Failure, Event>> completeEvent(String id);
 }
