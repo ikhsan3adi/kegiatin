@@ -144,7 +144,7 @@ class _ScanHeader extends StatelessWidget {
     required this.onRetry,
   });
 
-  final AsyncValue<dynamic> eventsAsync;
+  final AsyncValue<PaginatedResult<Event>> eventsAsync;
   final Event? selectedEvent;
   final int totalScanned;
   final ValueChanged<Event?> onEventChanged;
@@ -236,7 +236,7 @@ class _EventDropdown extends StatelessWidget {
     required this.onRetry,
   });
 
-  final AsyncValue<dynamic> eventsAsync;
+  final AsyncValue<PaginatedResult<Event>> eventsAsync;
   final Event? selected;
   final ValueChanged<Event?> onChanged;
   final VoidCallback onRetry;
@@ -256,7 +256,7 @@ class _EventDropdown extends StatelessWidget {
       ),
       child: eventsAsync.when(
         loading: () => _buildLoadingState(textTheme),
-        error: (_, __) => _buildErrorState(textTheme),
+        error: (_, _) => _buildErrorState(textTheme),
         data: (result) {
           final events = result.data;
           return _buildDropdown(context, textTheme, events);

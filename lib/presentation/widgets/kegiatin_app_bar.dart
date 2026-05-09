@@ -24,7 +24,7 @@ class KegiatinAppBar extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [KegiatinCustomTheme.appBarTop, KegiatinCustomTheme.appBarBottom],

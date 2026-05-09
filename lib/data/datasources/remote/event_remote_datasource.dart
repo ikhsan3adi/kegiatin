@@ -31,6 +31,26 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
 
   EventRemoteDataSourceImpl(this.dio);
 
+  Map<String, dynamic> _asMap(dynamic value) => Map<String, dynamic>.from(value as Map);
+
+  String _extractErrorMessage(DioException e, String fallbackMessage) {
+    final responseData = e.response?.data;
+    if (responseData is Map) {
+      final mapData = _asMap(responseData);
+      final message = mapData['message'];
+      if (message is String && message.isNotEmpty) {
+        return message;
+      }
+    }
+    return e.message ?? fallbackMessage;
+  }
+
+  EventModel _eventFromResponse(Response<dynamic> response) {
+    final responseBody = _asMap(response.data);
+    final eventData = _asMap(responseBody['data']);
+    return EventModel.fromJson(eventData);
+  }
+
   @override
   Future<PaginatedResult<EventModel>> getEvents({
     int page = 1,
@@ -45,24 +65,26 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
         'limit': limit,
         if (status != null) 'status': status.toJson(),
         if (type != null) 'type': type.toJson(),
-        if (search != null) 'search': search,
+        'search': ?search,
       };
 
       final response = await dio.get(ApiConstants.events, queryParameters: queryParams);
 
-      final data = (response.data['data'] as List)
+      final responseBody = _asMap(response.data);
+      final data = (responseBody['data'] as List)
           .map((json) {
+            final item = _asMap(json);
             // Menangani struktur dari backend sementara (nested 'event' dan 'sessions')
-            if (json.containsKey('event') && json.containsKey('sessions')) {
-              final eventJson = Map<String, dynamic>.from(json['event']);
-              eventJson['sessions'] = json['sessions'];
+            if (item.containsKey('event') && item.containsKey('sessions')) {
+              final eventJson = _asMap(item['event']);
+              eventJson['sessions'] = item['sessions'];
               return EventModel.fromJson(eventJson);
             }
-            return EventModel.fromJson(json);
+            return EventModel.fromJson(item);
           })
           .toList();
-          
-      final meta = response.data['meta'];
+
+      final meta = _asMap(responseBody['meta']);
 
       return PaginatedResult<EventModel>(
         data: data,
@@ -72,7 +94,7 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
       );
     } on DioException catch (e) {
       throw ServerException(
-        e.response?.data['message'] ?? e.message ?? 'Terjadi kesalahan saat mengambil events',
+        _extractErrorMessage(e, 'Terjadi kesalahan saat mengambil events'),
         statusCode: e.response?.statusCode,
       );
     } catch (e) {
@@ -84,10 +106,10 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
   Future<EventModel> getEventById(String id) async {
     try {
       final response = await dio.get(ApiConstants.eventById(id));
-      return EventModel.fromJson(response.data['data']);
+      return _eventFromResponse(response);
     } on DioException catch (e) {
       throw ServerException(
-        e.response?.data['message'] ?? e.message ?? 'Gagal mengambil event',
+        _extractErrorMessage(e, 'Gagal mengambil event'),
         statusCode: e.response?.statusCode,
       );
     }
@@ -115,10 +137,10 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
       };
 
       final response = await dio.post(ApiConstants.events, data: data);
-      return EventModel.fromJson(response.data['data']);
+      return _eventFromResponse(response);
     } on DioException catch (e) {
       throw ServerException(
-        e.response?.data['message'] ?? e.message ?? 'Gagal membuat event',
+        _extractErrorMessage(e, 'Gagal membuat event'),
         statusCode: e.response?.statusCode,
       );
     }
@@ -137,10 +159,10 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
       };
 
       final response = await dio.patch(ApiConstants.eventById(id), data: data);
-      return EventModel.fromJson(response.data['data']);
+      return _eventFromResponse(response);
     } on DioException catch (e) {
       throw ServerException(
-        e.response?.data['message'] ?? e.message ?? 'Gagal mengupdate event',
+        _extractErrorMessage(e, 'Gagal mengupdate event'),
         statusCode: e.response?.statusCode,
       );
     }
@@ -152,7 +174,7 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
       await dio.delete(ApiConstants.eventById(id));
     } on DioException catch (e) {
       throw ServerException(
-        e.response?.data['message'] ?? e.message ?? 'Gagal menghapus event',
+        _extractErrorMessage(e, 'Gagal menghapus event'),
         statusCode: e.response?.statusCode,
       );
     }
@@ -164,10 +186,10 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
       await dio.patch(ApiConstants.publishEvent(id));
       // Fetch ulang karena backend return void
       final response = await dio.get(ApiConstants.eventById(id));
-      return EventModel.fromJson(response.data['data']);
+      return _eventFromResponse(response);
     } on DioException catch (e) {
       throw ServerException(
-        e.response?.data['message'] ?? e.message ?? 'Gagal mempublish event',
+        _extractErrorMessage(e, 'Gagal mempublish event'),
         statusCode: e.response?.statusCode,
       );
     }
@@ -179,10 +201,10 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
       await dio.patch(ApiConstants.cancelEvent(id));
       // Fetch ulang karena backend return void
       final response = await dio.get(ApiConstants.eventById(id));
-      return EventModel.fromJson(response.data['data']);
+      return _eventFromResponse(response);
     } on DioException catch (e) {
       throw ServerException(
-        e.response?.data['message'] ?? e.message ?? 'Gagal membatalkan event',
+        _extractErrorMessage(e, 'Gagal membatalkan event'),
         statusCode: e.response?.statusCode,
       );
     }
@@ -194,10 +216,10 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
       await dio.patch(ApiConstants.startEvent(id));
       // Fetch ulang karena backend return void
       final response = await dio.get(ApiConstants.eventById(id));
-      return EventModel.fromJson(response.data['data']);
+      return _eventFromResponse(response);
     } on DioException catch (e) {
       throw ServerException(
-        e.response?.data['message'] ?? e.message ?? 'Gagal memulai event',
+        _extractErrorMessage(e, 'Gagal memulai event'),
         statusCode: e.response?.statusCode,
       );
     }
@@ -209,10 +231,10 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
       await dio.patch(ApiConstants.completeEvent(id));
       // Fetch ulang karena backend return void
       final response = await dio.get(ApiConstants.eventById(id));
-      return EventModel.fromJson(response.data['data']);
+      return _eventFromResponse(response);
     } on DioException catch (e) {
       throw ServerException(
-        e.response?.data['message'] ?? e.message ?? 'Gagal menyelesaikan event',
+        _extractErrorMessage(e, 'Gagal menyelesaikan event'),
         statusCode: e.response?.statusCode,
       );
     }

@@ -110,7 +110,7 @@ class _Avatar extends StatelessWidget {
           ? Image.network(
               photoUrl!,
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => _InitialsFallback(_initials),
+              errorBuilder: (_, _, _) => _InitialsFallback(_initials),
             )
           : _InitialsFallback(_initials),
     );

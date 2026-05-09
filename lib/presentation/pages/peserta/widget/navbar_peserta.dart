@@ -41,13 +41,10 @@ class _NavbarPesertaState extends ConsumerState<NavbarPeserta> {
         type: BottomNavigationBarType.fixed,
         backgroundColor: colorScheme.primary,
         selectedItemColor: colorScheme.onPrimary,
-        unselectedItemColor: colorScheme.onPrimary.withOpacity(0.54),
+        unselectedItemColor: colorScheme.onPrimary.withValues(alpha: 0.54),
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
-            label: 'Acara',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.calendar_month), label: 'Acara'),
           BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Riwayat'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
         ],

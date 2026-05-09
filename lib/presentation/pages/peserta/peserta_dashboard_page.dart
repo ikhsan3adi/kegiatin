@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kegiatin/domain/enums/event_status.dart';
 import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
 import 'package:kegiatin/presentation/controllers/event_list_controller.dart';
 import 'package:kegiatin/presentation/pages/peserta/widget/peserta_card_event.dart';
 import 'package:kegiatin/presentation/widgets/kegiatin_app_bar.dart';
-import 'package:kegiatin/domain/enums/event_status.dart';
 
 class BerandaPage extends ConsumerWidget {
   const BerandaPage({super.key});
@@ -30,11 +30,7 @@ class BerandaPage extends ConsumerWidget {
                     children: [
                       Row(
                         children: [
-                          Image.asset(
-                            'assets/LogoKegiaTin 2.png',
-                            width: 32,
-                            height: 32,
-                          ),
+                          Image.asset('assets/LogoKegiaTin 2.png', width: 32, height: 32),
                           const SizedBox(width: 8),
                           Text(
                             'KEGIATIN',
@@ -60,7 +56,7 @@ class BerandaPage extends ConsumerWidget {
                   Text(
                     'Selamat Datang',
                     style: textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onPrimary.withOpacity(0.85),
+                      color: colorScheme.onPrimary.withValues(alpha: 0.85),
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -83,9 +79,7 @@ class BerandaPage extends ConsumerWidget {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Kegiatan Terkini',
-                  style: textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
                 ),
               ),
             ),
@@ -94,8 +88,8 @@ class BerandaPage extends ConsumerWidget {
               data: (paginatedResult) {
                 // Filter: Hanya tampilkan yang Berlangsung (ongoing) atau Segera (published)
                 final filteredEvents = paginatedResult.data.where((event) {
-                  return event.status == EventStatus.ongoing || 
-                         event.status == EventStatus.published;
+                  return event.status == EventStatus.ongoing ||
+                      event.status == EventStatus.published;
                 }).toList();
 
                 if (filteredEvents.isEmpty) {
@@ -104,9 +98,7 @@ class BerandaPage extends ConsumerWidget {
                       padding: const EdgeInsets.all(32.0),
                       child: Text(
                         'Belum ada kegiatan terbaru',
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
+                        style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
                       ),
                     ),
                   );

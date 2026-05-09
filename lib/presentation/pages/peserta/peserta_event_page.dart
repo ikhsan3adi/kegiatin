@@ -36,7 +36,7 @@ class AcaraPage extends ConsumerWidget {
                     Text(
                       '${events.length} Kegiatan Tersedia',
                       style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onPrimary.withOpacity(0.85),
+                        color: colorScheme.onPrimary.withValues(alpha: 0.85),
                       ),
                     ),
                   ],
@@ -49,9 +49,7 @@ class AcaraPage extends ConsumerWidget {
                     padding: const EdgeInsets.all(32.0),
                     child: Text(
                       'Belum ada kegiatan',
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
+                      style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
                     ),
                   ),
                 )

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kegiatin/presentation/providers/providers.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -17,19 +15,19 @@ class _OnboardingPageState extends State<OnboardingPage> {
   // Data untuk 3 slide
   final List<Map<String, String>> onboardingData = [
     {
-      "desc":
-          "Aplikasi manajemen kegiatan rutin biar semua jadi lebih rapi.",
-      "image": "assets/images/onboarding1.png",
+      'desc':
+          'Aplikasi manajemen kegiatan rutin biar semua jadi lebih rapi.',
+      'image': 'assets/images/onboarding1.png',
     },
     {
-      "desc":
-          "Atur kegiatan, presensi, dan materi dalam satu aplikasi.",
-      "image": "assets/images/onboarding2.png",
+      'desc':
+          'Atur kegiatan, presensi, dan materi dalam satu aplikasi.',
+      'image': 'assets/images/onboarding2.png',
     },
     {
-      "desc":
-          "Lebih praktis, terorganisir, dan gak ribet.",
-      "image": "assets/images/onboarding3.png",
+      'desc':
+          'Lebih praktis, terorganisir, dan gak ribet.',
+      'image': 'assets/images/onboarding3.png',
     },
   ];
 
@@ -96,7 +94,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           SizedBox(height: spacingMedium),
                           // Teks deskripsi
                           Text(
-                            onboardingData[index]["desc"]!,
+                            onboardingData[index]['desc']!,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 20,
@@ -112,7 +110,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                               maxHeight: imageHeight,
                             ),
                             child: Image.asset(
-                              onboardingData[index]["image"]!,
+                              onboardingData[index]['image']!,
                               fit: BoxFit.contain,
                             ),
                           ),
@@ -166,7 +164,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                             ),
                           ),
                           child: const Text(
-                            "Sign Up",
+                            'Sign Up',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
@@ -186,7 +184,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                             ),
                           ),
                           child: const Text(
-                            "Login",
+                            'Login',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),

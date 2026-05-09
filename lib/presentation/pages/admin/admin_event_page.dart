@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kegiatin/domain/entities/event.dart';
-import 'package:kegiatin/domain/enums/event_status.dart';
 import 'package:kegiatin/presentation/controllers/event_list_controller.dart';
 import 'package:kegiatin/presentation/pages/peserta/widget/peserta_card_event.dart';
 import 'package:kegiatin/presentation/widgets/kegiatin_app_bar.dart';

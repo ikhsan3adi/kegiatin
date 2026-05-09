@@ -350,7 +350,7 @@ class _ManualInputTabState extends State<ManualInputTab> {
               : ListView.separated(
                   padding: const EdgeInsets.fromLTRB(16, 4, 16, 80),
                   itemCount: filtered.length,
-                  separatorBuilder: (_, _i) => const SizedBox(height: 8),
+                  separatorBuilder: (_, i) => const SizedBox(height: 8),
                   itemBuilder: (context, i) => _PesertaCard(
                     entry: filtered[i],
                     onToggle: () => _toggleMark(filtered[i]),

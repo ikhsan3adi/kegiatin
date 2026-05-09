@@ -6,8 +6,6 @@ import 'package:kegiatin/core/network/dio_client.dart';
 import 'package:kegiatin/core/network/network_info.dart';
 import 'package:kegiatin/data/datasources/local/auth_local_datasource.dart';
 import 'package:kegiatin/data/datasources/remote/auth_remote_datasource.dart';
-import 'package:kegiatin/data/datasources/remote/event_remote_datasource.dart'
-    hide EventRemoteDataSource, EventRemoteDataSourceImpl;
 import 'package:kegiatin/data/repositories/auth_repository_impl.dart';
 import 'package:kegiatin/data/repositories/event_repository_impl.dart';
 import 'package:kegiatin/domain/repositories/auth_repository.dart';
@@ -18,8 +16,6 @@ import 'package:kegiatin/domain/usecases/login_usecase.dart';
 import 'package:kegiatin/domain/usecases/logout_usecase.dart';
 import 'package:kegiatin/domain/usecases/register_usecase.dart';
 import 'package:kegiatin/data/datasources/remote/event_remote_datasource.dart';
-import 'package:kegiatin/data/repositories/event_repository_impl.dart';
-import 'package:kegiatin/domain/repositories/event_repository.dart';
 import 'package:kegiatin/domain/usecases/get_event_by_id_usecase.dart';
 import 'package:kegiatin/domain/usecases/get_events_usecase.dart';
 import 'package:kegiatin/domain/usecases/publish_event_usecase.dart';
@@ -69,17 +65,17 @@ AuthRepository authRepository(Ref ref) => AuthRepositoryImpl(
   networkInfo: ref.watch(networkInfoProvider),
 );
 
-@riverpod
+@Riverpod(keepAlive: true)
 LoginUseCase loginUseCase(Ref ref) => LoginUseCase(ref.watch(authRepositoryProvider));
 
-@riverpod
+@Riverpod(keepAlive: true)
 RegisterUseCase registerUseCase(Ref ref) => RegisterUseCase(ref.watch(authRepositoryProvider));
 
-@riverpod
+@Riverpod(keepAlive: true)
 GetCurrentUserUseCase getCurrentUserUseCase(Ref ref) =>
     GetCurrentUserUseCase(ref.watch(authRepositoryProvider));
 
-@riverpod
+@Riverpod(keepAlive: true)
 LogoutUseCase logoutUseCase(Ref ref) => LogoutUseCase(ref.watch(authRepositoryProvider));
 
 // --- EVENT DI ---

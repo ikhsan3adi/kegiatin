@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -308,12 +308,12 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
   // ---------------------------------------------------------------------------
 
   String _formatTanggal(DateTime dt) {
-    final p = (int v) => v.toString().padLeft(2, '0');
+    String p(int v) => v.toString().padLeft(2, '0');
     return '${p(dt.day)}/${p(dt.month)}/${dt.year}';
   }
 
   String _formatJam(TimeOfDay t) {
-    final p = (int v) => v.toString().padLeft(2, '0');
+    String p(int v) => v.toString().padLeft(2, '0');
     return '${p(t.hour)}:${p(t.minute)}';
   }
 
@@ -353,7 +353,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SectionLabel(label: 'Informasi Kegiatan', icon: Icons.info_outline_rounded),
+                    const SectionLabel(label: 'Informasi Kegiatan', icon: Icons.info_outline_rounded),
                     const SizedBox(height: 12),
 
                     // â”€â”€ Nama Kegiatan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -387,7 +387,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                     // â”€â”€ Jenis Kegiatan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     CustomInputCard(
                       child: DropdownButtonFormField<EventType>(
-                        value: _tipe,
+                        initialValue: _tipe,
                         isExpanded: true,
                         style: textTheme.bodyMedium
                             ?.copyWith(color: colorScheme.onSurface),
@@ -488,7 +488,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                     const SizedBox(height: 20),
 
                     // â”€â”€ Waktu Kegiatan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-                    SectionLabel(label: 'Waktu Kegiatan', icon: Icons.schedule_outlined),
+                    const SectionLabel(label: 'Waktu Kegiatan', icon: Icons.schedule_outlined),
                     const SizedBox(height: 12),
 
                     // Tanggal Kegiatan (shared mulai & selesai)
@@ -583,13 +583,13 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                     // â”€â”€ Pengaturan Series â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     if (_tipe == EventType.series) ...[
                       const SizedBox(height: 20),
-                      SectionLabel(label: 'Pengaturan Series', icon: Icons.repeat_rounded),
+                      const SectionLabel(label: 'Pengaturan Series', icon: Icons.repeat_rounded),
                       const SizedBox(height: 12),
 
                       // Pola Pengulangan
                       CustomInputCard(
                         child: DropdownButtonFormField<_RepeatPattern>(
-                          value: _polaPengulangan,
+                          initialValue: _polaPengulangan,
                           isExpanded: true,
                           style: textTheme.bodyMedium
                               ?.copyWith(color: colorScheme.onSurface),
@@ -741,7 +741,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                     const SizedBox(height: 20),
 
                     // â”€â”€ Lokasi & Kontak â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-                    SectionLabel(label: 'Lokasi & Kontak', icon: Icons.place_outlined),
+                    const SectionLabel(label: 'Lokasi & Kontak', icon: Icons.place_outlined),
                     const SizedBox(height: 12),
 
                     // Lokasi
@@ -801,13 +801,13 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                     const SizedBox(height: 20),
 
                     // â”€â”€ Pengaturan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-                    SectionLabel(label: 'Pengaturan', icon: Icons.tune_rounded),
+                    const SectionLabel(label: 'Pengaturan', icon: Icons.tune_rounded),
                     const SizedBox(height: 12),
 
                     // Visibilitas
                     CustomInputCard(
                       child: DropdownButtonFormField<EventVisibility>(
-                        value: _visibilitas,
+                        initialValue: _visibilitas,
                         isExpanded: true,
                         style: textTheme.bodyMedium
                             ?.copyWith(color: colorScheme.onSurface),

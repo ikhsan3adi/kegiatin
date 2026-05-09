@@ -338,10 +338,10 @@ class PesertaEventDetailPage extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (icon != null) ...[
-                Icon(icon, size: 18, color: textColor),
-                const SizedBox(width: 8),
-              ],
+              ...[
+              Icon(icon, size: 18, color: textColor),
+              const SizedBox(width: 8),
+            ],
               Text(
                 text,
                 style: TextStyle(

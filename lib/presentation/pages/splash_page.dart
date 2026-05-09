@@ -19,7 +19,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
   }
 
   // LOGIC: Bagian ini tetap sama agar program tidak rusak
-  void _startSplashSequence() async {
+  Future<void> _startSplashSequence() async {
     await Future.delayed(const Duration(seconds: 5));
     if (!mounted) return;
 
@@ -53,17 +53,17 @@ class _SplashPageState extends ConsumerState<SplashPage> {
           return Container(
             width: double.infinity,
             height: double.infinity,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  const Color(0xFFD6E8F0), // Biru muda atas
+                  Color(0xFFD6E8F0), // Biru muda atas
                   Colors.white,
                   Colors.white,
-                  const Color(0xFFDAE9F1), // Biru muda bawah
+                  Color(0xFFDAE9F1), // Biru muda bawah
                 ],
-                stops: const [0.0, 0.25, 0.75, 1.0],
+                stops: [0.0, 0.25, 0.75, 1.0],
               ),
             ),
             child: SafeArea(
@@ -90,7 +90,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
                               FittedBox(
                                 fit: BoxFit.scaleDown,
                                 child: Text(
-                                  "KEGIATIN",
+                                  'KEGIATIN',
                                   maxLines: 1,
                                   softWrap: false,
                                   textAlign: TextAlign.center,
