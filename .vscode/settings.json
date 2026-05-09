@@ -20,7 +20,9 @@
     ".dart_tool": true,
     "*.iml": true,
     "*.lock": true,
-    ".metadata": true
+    ".metadata": true,
+    "**/*.g.dart": true,
+    "**/*.freezed.dart": true
   },
   "dart.lineLength": 100,
   "dart.renameFilesWithClasses": "prompt",

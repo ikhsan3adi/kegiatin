@@ -15,8 +15,7 @@ class QrScanPage extends ConsumerStatefulWidget {
   ConsumerState<QrScanPage> createState() => _QrScanPageState();
 }
 
-class _QrScanPageState extends ConsumerState<QrScanPage>
-    with SingleTickerProviderStateMixin {
+class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProviderStateMixin {
   late final TabController _tabController;
 
   /// Kegiatan yang dipilih admin di dropdown.
@@ -46,11 +45,7 @@ class _QrScanPageState extends ConsumerState<QrScanPage>
             const Icon(Icons.check_circle, color: Colors.white, size: 20),
             const SizedBox(width: 10),
             Expanded(
-              child: Text(
-                'QR terbaca: $value',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
+              child: Text('QR terbaca: $value', maxLines: 1, overflow: TextOverflow.ellipsis),
             ),
           ],
         ),
@@ -69,26 +64,23 @@ class _QrScanPageState extends ConsumerState<QrScanPage>
     final textTheme = Theme.of(context).textTheme;
 
     // Watch event list — ambil semua (limit tinggi) tanpa filter agar dropdown lengkap
-    final eventsAsync =
-        ref.watch(eventListProvider(limit: 100));
+    final eventsAsync = ref.watch(eventListProvider(limit: 100));
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
       body: Column(
         children: [
-          // Header melengkung 
+          // Header melengkung
           _ScanHeader(
             eventsAsync: eventsAsync,
             selectedEvent: _selectedEvent,
             totalScanned: _totalScanned,
-            onEventChanged: (event) =>
-                setState(() => _selectedEvent = event),
+            onEventChanged: (event) => setState(() => _selectedEvent = event),
             onBack: () => Navigator.of(context).pop(),
-            onRetry: () =>
-                ref.invalidate(eventListProvider(limit: 100)),
+            onRetry: () => ref.invalidate(eventListProvider(limit: 100)),
           ),
 
-          // TabBar 
+          // TabBar
           Container(
             decoration: BoxDecoration(
               color: colorScheme.surface,
@@ -106,9 +98,7 @@ class _QrScanPageState extends ConsumerState<QrScanPage>
               unselectedLabelColor: colorScheme.onSurfaceVariant,
               indicatorColor: colorScheme.primary,
               indicatorWeight: 3,
-              labelStyle: textTheme.labelLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+              labelStyle: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
               unselectedLabelStyle: textTheme.labelLarge,
               tabs: const [
                 Tab(text: 'Pindai QR'),
@@ -117,7 +107,7 @@ class _QrScanPageState extends ConsumerState<QrScanPage>
             ),
           ),
 
-          // Konten Tab 
+          // Konten Tab
           Expanded(
             child: TabBarView(
               controller: _tabController,
@@ -133,7 +123,7 @@ class _QrScanPageState extends ConsumerState<QrScanPage>
   }
 }
 
-// Header 
+// Header
 class _ScanHeader extends StatelessWidget {
   const _ScanHeader({
     required this.eventsAsync,
@@ -160,10 +150,7 @@ class _ScanHeader extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            KegiatinCustomTheme.appBarTop,
-            KegiatinCustomTheme.appBarBottom,
-          ],
+          colors: [KegiatinCustomTheme.appBarTop, KegiatinCustomTheme.appBarBottom],
         ),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(28),
@@ -226,7 +213,6 @@ class _ScanHeader extends StatelessWidget {
   }
 }
 
-
 /// Dropdown pemilih kegiatan dari database dengan state loading/error/data.
 class _EventDropdown extends StatelessWidget {
   const _EventDropdown({
@@ -250,9 +236,7 @@ class _EventDropdown extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.18),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.3),
-        ),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
       ),
       child: eventsAsync.when(
         loading: () => _buildLoadingState(textTheme),
@@ -272,18 +256,12 @@ class _EventDropdown extends StatelessWidget {
         children: [
           const Icon(Icons.event_note_outlined, size: 16, color: Colors.white70),
           const SizedBox(width: 8),
-          Text(
-            'Memuat kegiatan...',
-            style: textTheme.bodyMedium?.copyWith(color: Colors.white70),
-          ),
+          Text('Memuat kegiatan...', style: textTheme.bodyMedium?.copyWith(color: Colors.white70)),
           const Spacer(),
           const SizedBox(
             width: 16,
             height: 16,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              color: Colors.white70,
-            ),
+            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white70),
           ),
         ],
       ),
@@ -311,28 +289,20 @@ class _EventDropdown extends StatelessWidget {
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               minimumSize: Size.zero,
             ),
-            child: Text(
-              'Coba lagi',
-              style: textTheme.labelSmall?.copyWith(color: Colors.white),
-            ),
+            child: Text('Coba lagi', style: textTheme.labelSmall?.copyWith(color: Colors.white)),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildDropdown(
-    BuildContext context,
-    TextTheme textTheme,
-    List<Event> events,
-  ) {
+  Widget _buildDropdown(BuildContext context, TextTheme textTheme, List<Event> events) {
     if (events.isEmpty) {
       return SizedBox(
         height: 40,
         child: Row(
           children: [
-            const Icon(Icons.event_busy_outlined,
-                size: 16, color: Colors.white70),
+            const Icon(Icons.event_busy_outlined, size: 16, color: Colors.white70),
             const SizedBox(width: 8),
             Text(
               'Belum ada kegiatan tersedia',
@@ -344,8 +314,7 @@ class _EventDropdown extends StatelessWidget {
     }
 
     // Pastikan nilai selected masih valid setelah data dimuat
-    final validSelected =
-        events.any((e) => e.id == selected?.id) ? selected : null;
+    final validSelected = events.any((e) => e.id == selected?.id) ? selected : null;
 
     return DropdownButtonHideUnderline(
       child: DropdownButton<Event>(
@@ -361,8 +330,7 @@ class _EventDropdown extends StatelessWidget {
                 value: e,
                 child: Row(
                   children: [
-                    const Icon(Icons.event_note_outlined,
-                        size: 16, color: Colors.white70),
+                    const Icon(Icons.event_note_outlined, size: 16, color: Colors.white70),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -382,13 +350,9 @@ class _EventDropdown extends StatelessWidget {
         onChanged: onChanged,
         hint: Row(
           children: [
-            const Icon(Icons.event_note_outlined,
-                size: 16, color: Colors.white70),
+            const Icon(Icons.event_note_outlined, size: 16, color: Colors.white70),
             const SizedBox(width: 8),
-            Text(
-              'Pilih Kegiatan',
-              style: textTheme.bodyMedium?.copyWith(color: Colors.white70),
-            ),
+            Text('Pilih Kegiatan', style: textTheme.bodyMedium?.copyWith(color: Colors.white70)),
           ],
         ),
       ),

@@ -12,7 +12,6 @@ class QrScannerTab extends StatelessWidget {
 
     return Column(
       children: [
-        
         Expanded(
           child: Stack(
             fit: StackFit.expand,
@@ -21,17 +20,11 @@ class QrScannerTab extends StatelessWidget {
               const ColoredBox(color: Color(0xFF1A1A1A)),
 
               // Overlay viewfinder (blur luar + border sudut)
-              CustomPaint(
-                painter: _OverlayPainter(borderColor: colorScheme.primary),
-              ),
+              CustomPaint(painter: _OverlayPainter(borderColor: colorScheme.primary)),
 
               // Ikon QR di tengah area scan — sinkron dengan pusat viewfinder
               const Center(
-                child: Icon(
-                  Icons.qr_code_2_rounded,
-                  size: 80,
-                  color: Color(0x33FFFFFF),
-                ),
+                child: Icon(Icons.qr_code_2_rounded, size: 80, color: Color(0x33FFFFFF)),
               ),
 
               // Kontrol flash & flip — pojok kanan atas
@@ -40,11 +33,7 @@ class QrScannerTab extends StatelessWidget {
                 right: 12,
                 child: Column(
                   children: [
-                    _ControlButton(
-                      icon: Icons.flash_on_rounded,
-                      tooltip: 'Flash',
-                      onTap: () {},
-                    ),
+                    _ControlButton(icon: Icons.flash_on_rounded, tooltip: 'Flash', onTap: () {}),
                     const SizedBox(height: 8),
                     _ControlButton(
                       icon: Icons.flip_camera_ios_rounded,
@@ -65,9 +54,7 @@ class QrScannerTab extends StatelessWidget {
           alignment: Alignment.center,
           child: Text(
             'Arahkan kamera ke QR Code',
-            style: textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
+            style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
           ),
         ),
 
@@ -84,9 +71,7 @@ class QrScannerTab extends StatelessWidget {
                 backgroundColor: colorScheme.primary,
                 foregroundColor: colorScheme.onPrimary,
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
             ),
           ),
@@ -104,8 +89,7 @@ class _OverlayPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     // Responsif: 65 % sisi terpendek, maks 280 dp
-    final scanAreaSize =
-        (size.shortestSide * 0.65).clamp(120.0, 280.0);
+    final scanAreaSize = (size.shortestSide * 0.65).clamp(120.0, 280.0);
 
     // Viewfinder tepat di tengah canvas
     final scanRect = Rect.fromCenter(
@@ -115,13 +99,10 @@ class _OverlayPainter extends CustomPainter {
     );
 
     // Overlay gelap di luar area scan
-    final overlayPaint = Paint()
-      ..color = Colors.black.withValues(alpha: 0.60);
+    final overlayPaint = Paint()..color = Colors.black.withValues(alpha: 0.60);
     final path = Path()
       ..addRect(Rect.fromLTWH(0, 0, size.width, size.height))
-      ..addRRect(
-        RRect.fromRectAndRadius(scanRect, const Radius.circular(14)),
-      )
+      ..addRRect(RRect.fromRectAndRadius(scanRect, const Radius.circular(14)))
       ..fillType = PathFillType.evenOdd;
     canvas.drawPath(path, overlayPaint);
 
@@ -173,17 +154,12 @@ class _OverlayPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _OverlayPainter old) =>
-      old.borderColor != borderColor;
+  bool shouldRepaint(covariant _OverlayPainter old) => old.borderColor != borderColor;
 }
 
 /// Tombol ikon bulat semi-transparan.
 class _ControlButton extends StatelessWidget {
-  const _ControlButton({
-    required this.icon,
-    required this.tooltip,
-    required this.onTap,
-  });
+  const _ControlButton({required this.icon, required this.tooltip, required this.onTap});
 
   final IconData icon;
   final String tooltip;
@@ -198,10 +174,7 @@ class _ControlButton extends StatelessWidget {
         child: Container(
           width: 40,
           height: 40,
-          decoration: const BoxDecoration(
-            color: Colors.black45,
-            shape: BoxShape.circle,
-          ),
+          decoration: const BoxDecoration(color: Colors.black45, shape: BoxShape.circle),
           child: Icon(icon, color: Colors.white, size: 20),
         ),
       ),

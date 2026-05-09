@@ -17,7 +17,6 @@ enum EventVisibility {
 
   /// Returns the wire format string (SCREAMING_SNAKE_CASE) for API requests.
   /// e.g. [EventVisibility.inviteOnly] → `'INVITE_ONLY'`
-  String toJson() => name
-      .replaceAllMapped(RegExp(r'[A-Z]'), (m) => '_${m.group(0)!}')
-      .toUpperCase();
+  String toJson() =>
+      name.replaceAllMapped(RegExp(r'[A-Z]'), (m) => '_${m.group(0)!}').toUpperCase();
 }

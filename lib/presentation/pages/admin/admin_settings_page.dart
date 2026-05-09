@@ -25,9 +25,7 @@ class AdminSettingsPage extends StatelessWidget {
           Center(
             child: Text(
               'Konten pengaturan',
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
+              style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
             ),
           ),
         ],

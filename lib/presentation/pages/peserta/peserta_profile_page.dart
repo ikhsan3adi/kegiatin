@@ -18,10 +18,7 @@ class PesertaProfilePage extends ConsumerWidget {
         title: const Text('Keluar dari Aplikasi'),
         content: const Text('Sesi aktif akan dihapus. Yakin ingin keluar?'),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Batal'),
-          ),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Batal')),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             style: FilledButton.styleFrom(
@@ -79,11 +76,7 @@ class PesertaProfilePage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (user != null)
-                  ProfileCard(
-                    email: user.email,
-                    joinedAt: user.createdAt,
-                  ),
+                if (user != null) ProfileCard(email: user.email, joinedAt: user.createdAt),
                 const SizedBox(height: 24),
                 FilledButton.icon(
                   onPressed: () => _showLogoutDialog(context, ref),
@@ -91,9 +84,7 @@ class PesertaProfilePage extends ConsumerWidget {
                     backgroundColor: colorScheme.errorContainer,
                     foregroundColor: colorScheme.onErrorContainer,
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                   icon: const Icon(Icons.logout_rounded),
                   label: const Text(

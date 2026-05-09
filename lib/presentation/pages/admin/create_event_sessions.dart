@@ -4,11 +4,7 @@ import 'package:flutter/material.dart';
 ///
 /// Saat [isCustom] true, tampilkan badge "Ketuk untuk ubah".
 class SessionListHeader extends StatelessWidget {
-  const SessionListHeader({
-    super.key,
-    required this.count,
-    required this.isCustom,
-  });
+  const SessionListHeader({super.key, required this.count, required this.isCustom});
 
   final int count;
   final bool isCustom;
@@ -21,9 +17,7 @@ class SessionListHeader extends StatelessWidget {
       children: [
         Text(
           'Jadwal Sesi ($count pertemuan)',
-          style: textTheme.labelMedium?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-          ),
+          style: textTheme.labelMedium?.copyWith(color: colorScheme.onSurfaceVariant),
         ),
         if (isCustom) ...[
           const SizedBox(width: 6),
@@ -36,11 +30,7 @@ class SessionListHeader extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.touch_app_rounded,
-                  size: 10,
-                  color: colorScheme.onTertiaryContainer,
-                ),
+                Icon(Icons.touch_app_rounded, size: 10, color: colorScheme.onTertiaryContainer),
                 const SizedBox(width: 3),
                 Text(
                   'Ketuk untuk ubah',
@@ -138,10 +128,7 @@ class SessionDateGrid extends StatelessWidget {
       );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: rows,
-    );
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: rows);
   }
 }
 
@@ -172,22 +159,15 @@ class SessionChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg = isCustom
-        ? colorScheme.secondaryContainer
-        : colorScheme.primaryContainer;
-    final fg = isCustom
-        ? colorScheme.onSecondaryContainer
-        : colorScheme.onPrimaryContainer;
+    final bg = isCustom ? colorScheme.secondaryContainer : colorScheme.primaryContainer;
+    final fg = isCustom ? colorScheme.onSecondaryContainer : colorScheme.onPrimaryContainer;
 
     final chip = Container(
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(8),
         border: isCustom
-            ? Border.all(
-                color: colorScheme.secondary.withValues(alpha: 0.4),
-                width: 1,
-              )
+            ? Border.all(color: colorScheme.secondary.withValues(alpha: 0.4), width: 1)
             : null,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
@@ -196,10 +176,7 @@ class SessionChip extends StatelessWidget {
           Container(
             width: 18,
             height: 18,
-            decoration: BoxDecoration(
-              color: fg.withValues(alpha: 0.15),
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: fg.withValues(alpha: 0.15), shape: BoxShape.circle),
             alignment: Alignment.center,
             child: Text(
               '${index + 1}',
@@ -214,15 +191,11 @@ class SessionChip extends StatelessWidget {
           Expanded(
             child: Text(
               formatDate(date),
-              style: textTheme.labelSmall?.copyWith(
-                color: fg,
-                fontWeight: FontWeight.w500,
-              ),
+              style: textTheme.labelSmall?.copyWith(color: fg, fontWeight: FontWeight.w500),
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          if (isCustom)
-            Icon(Icons.edit_outlined, size: 11, color: fg.withValues(alpha: 0.7)),
+          if (isCustom) Icon(Icons.edit_outlined, size: 11, color: fg.withValues(alpha: 0.7)),
         ],
       ),
     );
@@ -231,11 +204,7 @@ class SessionChip extends StatelessWidget {
 
     return Material(
       color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
-        child: chip,
-      ),
+      child: InkWell(onTap: onTap, borderRadius: BorderRadius.circular(8), child: chip),
     );
   }
 }

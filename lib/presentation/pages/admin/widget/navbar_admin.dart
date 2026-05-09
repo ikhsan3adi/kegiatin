@@ -24,7 +24,6 @@ class _NavbarAdminState extends ConsumerState<NavbarAdmin> {
     AdminSettingsPage(),
   ];
 
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -34,7 +33,6 @@ class _NavbarAdminState extends ConsumerState<NavbarAdmin> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -52,9 +50,7 @@ class _NavbarAdminState extends ConsumerState<NavbarAdmin> {
                 onPressed: () => context.push('/admin/create-event'),
                 backgroundColor: KegiatinCustomTheme.appBarBottom,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 elevation: 4.0,
                 tooltip: 'Tambah Kegiatan',
                 child: const Icon(Icons.add, size: 28),
@@ -78,8 +74,7 @@ class _NavbarAdminState extends ConsumerState<NavbarAdmin> {
       // --- Navigasi Bawah ---
       bottomNavigationBar: BottomAppBar(
         color: colorScheme.primary, // Menggunakan primary color untuk navigasi
-        shape:
-            const CircularNotchedRectangle(), // Membuat efek potongan/lengkungan
+        shape: const CircularNotchedRectangle(), // Membuat efek potongan/lengkungan
         notchMargin: 8.0, // Jarak antara FAB dan lengkungan navigasi
         clipBehavior: Clip.antiAlias,
         child: SizedBox(
@@ -93,12 +88,7 @@ class _NavbarAdminState extends ConsumerState<NavbarAdmin> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     _buildNavItem(Icons.home, 'Dashboard', 0, colorScheme),
-                    _buildNavItem(
-                      Icons.calendar_month,
-                      'Kegiatan',
-                      1,
-                      colorScheme,
-                    ),
+                    _buildNavItem(Icons.calendar_month, 'Kegiatan', 1, colorScheme),
                   ],
                 ),
               ),
@@ -123,12 +113,7 @@ class _NavbarAdminState extends ConsumerState<NavbarAdmin> {
   }
 
   // Fungsi pembantu (helper) untuk membuat item navigasi agar kode lebih rapi
-  Widget _buildNavItem(
-    IconData icon,
-    String label,
-    int index,
-    ColorScheme colorScheme,
-  ) {
+  Widget _buildNavItem(IconData icon, String label, int index, ColorScheme colorScheme) {
     final isSelected = _selectedIndex == index;
     final activeColor = colorScheme.onPrimary;
     final inactiveColor = colorScheme.onPrimary.withValues(alpha: 0.54);

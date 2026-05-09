@@ -30,7 +30,7 @@ class AuthRepositoryImpl implements AuthRepository {
       final response = await remoteDataSource.login(email, password);
       await localDataSource.saveTokens(response.accessToken, response.refreshToken);
       await localDataSource.saveUser(response.user);
-      return Right(response.toEntity());
+      return Right(response);
     } on UnauthorizedException catch (e) {
       return Left(AuthFailure(e.message));
     } on ServerException catch (e) {
@@ -48,7 +48,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
     try {
       final userModel = await remoteDataSource.register(input);
-      return Right(userModel.toEntity());
+      return Right(userModel);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message, statusCode: e.statusCode));
     } catch (e) {
@@ -60,23 +60,23 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, User>> getCurrentUser() async {
     if (!await networkInfo.isConnected) {
       final cached = await localDataSource.getCachedUser();
-      if (cached != null) return Right(cached.toEntity());
+      if (cached != null) return Right(cached);
       return const Left(NetworkFailure());
     }
 
     try {
       final userModel = await remoteDataSource.getCurrentUser();
       await localDataSource.saveUser(userModel);
-      return Right(userModel.toEntity());
+      return Right(userModel);
     } on UnauthorizedException catch (e) {
       return Left(AuthFailure(e.message));
     } on ServerException catch (e) {
       final cached = await localDataSource.getCachedUser();
-      if (cached != null) return Right(cached.toEntity());
+      if (cached != null) return Right(cached);
       return Left(ServerFailure(e.message, statusCode: e.statusCode));
     } catch (e) {
       final cached = await localDataSource.getCachedUser();
-      if (cached != null) return Right(cached.toEntity());
+      if (cached != null) return Right(cached);
       return Left(ServerFailure(e.toString()));
     }
   }

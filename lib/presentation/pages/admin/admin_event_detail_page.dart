@@ -5,19 +5,16 @@ import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/enums/event_status.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
 import 'package:kegiatin/domain/enums/event_visibility.dart';
+import 'package:kegiatin/presentation/controllers/complete_event_controller.dart';
 import 'package:kegiatin/presentation/controllers/event_list_controller.dart';
 import 'package:kegiatin/presentation/controllers/publish_event_controller.dart';
 import 'package:kegiatin/presentation/controllers/start_event_controller.dart';
-import 'package:kegiatin/presentation/controllers/complete_event_controller.dart';
 import 'package:kegiatin/presentation/widgets/kegiatin_app_bar.dart';
 
 class AdminEventDetailPage extends ConsumerWidget {
   final Event event;
 
-  const AdminEventDetailPage({
-    super.key,
-    required this.event,
-  });
+  const AdminEventDetailPage({super.key, required this.event});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,9 +28,9 @@ class AdminEventDetailPage extends ConsumerWidget {
           ),
         );
       } else if (next is AsyncData && next.value != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Kegiatan berhasil di-publish!')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Kegiatan berhasil di-publish!')));
         ref.invalidate(eventListProvider);
         context.pop();
       }
@@ -49,9 +46,9 @@ class AdminEventDetailPage extends ConsumerWidget {
           ),
         );
       } else if (next is AsyncData && next.value != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Kegiatan berhasil dimulai!')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Kegiatan berhasil dimulai!')));
         ref.invalidate(eventListProvider);
         context.pop();
       }
@@ -67,9 +64,9 @@ class AdminEventDetailPage extends ConsumerWidget {
           ),
         );
       } else if (next is AsyncData && next.value != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Kegiatan berhasil diselesaikan!')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Kegiatan berhasil diselesaikan!')));
         ref.invalidate(eventListProvider);
         context.pop();
       }
@@ -86,8 +83,7 @@ class AdminEventDetailPage extends ConsumerWidget {
     final textTheme = Theme.of(context).textTheme;
 
     // Ambil sesi pertama untuk info waktu
-    final firstSession =
-        event.sessions.isNotEmpty ? event.sessions.first : null;
+    final firstSession = event.sessions.isNotEmpty ? event.sessions.first : null;
     final startTime = firstSession?.startTime;
     final dateStr = startTime != null
         ? "${startTime.year}-${startTime.month.toString().padLeft(2, '0')}-${startTime.day.toString().padLeft(2, '0')} . ${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}"
@@ -97,7 +93,6 @@ class AdminEventDetailPage extends ConsumerWidget {
       backgroundColor: colorScheme.surfaceContainerHighest,
       body: Column(
         children: [
-          // Header Section
           KegiatinAppBar(
             height: null,
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
@@ -146,23 +141,35 @@ class AdminEventDetailPage extends ConsumerWidget {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    Icon(Icons.access_time, size: 14, color: colorScheme.onPrimary.withValues(alpha: 0.8)),
+                    Icon(
+                      Icons.access_time,
+                      size: 14,
+                      color: colorScheme.onPrimary.withValues(alpha: 0.8),
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       dateStr,
-                      style: textTheme.bodySmall?.copyWith(color: colorScheme.onPrimary.withValues(alpha: 0.8)),
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onPrimary.withValues(alpha: 0.8),
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    Icon(Icons.location_on_outlined, size: 14, color: colorScheme.onPrimary.withValues(alpha: 0.8)),
+                    Icon(
+                      Icons.location_on_outlined,
+                      size: 14,
+                      color: colorScheme.onPrimary.withValues(alpha: 0.8),
+                    ),
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
                         event.location,
-                        style: textTheme.bodySmall?.copyWith(color: colorScheme.onPrimary.withValues(alpha: 0.8)),
+                        style: textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onPrimary.withValues(alpha: 0.8),
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -216,14 +223,15 @@ class AdminEventDetailPage extends ConsumerWidget {
                       children: [
                         Row(
                           children: [
-                            Icon(Icons.menu_book_outlined,
-                                size: 20, color: colorScheme.onSurfaceVariant),
+                            Icon(
+                              Icons.menu_book_outlined,
+                              size: 20,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
                             const SizedBox(width: 12),
                             Text(
                               'Deskripsi Kegiatan',
-                              style: textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
@@ -260,38 +268,31 @@ class AdminEventDetailPage extends ConsumerWidget {
                       children: [
                         Text(
                           'Detail',
-                          style: textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 16),
                         _buildDetailRow(
-                            context, 
-                            'Visibilitas', 
-                            event.visibility == EventVisibility.open ? 'Publik' : 'Internal'
+                          context,
+                          'Visibilitas',
+                          event.visibility == EventVisibility.open ? 'Publik' : 'Internal',
                         ),
                         const SizedBox(height: 16),
                         _buildDetailRow(
-                            context,
-                            'Tipe Kegiatan',
-                            event.type == EventType.series
-                                ? 'Rutin'
-                                : 'Tunggal'),
-                        const SizedBox(height: 16),
-                        _buildDetailRow(
-                            context, 
-                            'Narahubung', 
-                            event.contactPerson
+                          context,
+                          'Tipe Kegiatan',
+                          event.type == EventType.series ? 'Rutin' : 'Tunggal',
                         ),
+                        const SizedBox(height: 16),
+                        _buildDetailRow(context, 'Narahubung', event.contactPerson),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 40), 
+                  const SizedBox(height: 40),
                 ],
               ),
             ),
           ),
-          
+
           // Bottom Actions untuk Admin
           _buildAdminActionBottomBar(context, ref, isPublishing, isStarting, isCompleting),
         ],
@@ -299,7 +300,13 @@ class AdminEventDetailPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildAdminActionBottomBar(BuildContext context, WidgetRef ref, bool isPublishing, bool isStarting, bool isCompleting) {
+  Widget _buildAdminActionBottomBar(
+    BuildContext context,
+    WidgetRef ref,
+    bool isPublishing,
+    bool isStarting,
+    bool isCompleting,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDraft = event.status == EventStatus.draft;
     final isPublished = event.status == EventStatus.published;
@@ -325,9 +332,9 @@ class AdminEventDetailPage extends ConsumerWidget {
             Expanded(
               child: FilledButton.icon(
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Simulasi: Pergi ke edit...')),
-                  );
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(const SnackBar(content: Text('Simulasi: Pergi ke edit...')));
                 },
                 icon: const Icon(Icons.edit_outlined, size: 18),
                 label: const Text('Edit'),
@@ -345,12 +352,12 @@ class AdminEventDetailPage extends ConsumerWidget {
             if (isDraft) ...[
               Expanded(
                 child: FilledButton.icon(
-                  onPressed: isPublishing 
-                    ? null 
-                    : () {
-                        // Jalankan fungsi publish
-                        ref.read(publishEventControllerProvider.notifier).publish(event.id);
-                      },
+                  onPressed: isPublishing
+                      ? null
+                      : () {
+                          // Jalankan fungsi publish
+                          ref.read(publishEventControllerProvider.notifier).publish(event.id);
+                        },
                   icon: isPublishing
                       ? const SizedBox(
                           width: 18,
@@ -374,11 +381,11 @@ class AdminEventDetailPage extends ConsumerWidget {
             if (isPublished) ...[
               Expanded(
                 child: FilledButton.icon(
-                  onPressed: isStarting 
-                    ? null 
-                    : () {
-                        ref.read(startEventControllerProvider.notifier).start(event.id);
-                      },
+                  onPressed: isStarting
+                      ? null
+                      : () {
+                          ref.read(startEventControllerProvider.notifier).start(event.id);
+                        },
                   icon: isStarting
                       ? const SizedBox(
                           width: 18,
@@ -402,11 +409,11 @@ class AdminEventDetailPage extends ConsumerWidget {
             if (isOngoing) ...[
               Expanded(
                 child: FilledButton.icon(
-                  onPressed: isCompleting 
-                    ? null 
-                    : () {
-                        ref.read(completeEventControllerProvider.notifier).complete(event.id);
-                      },
+                  onPressed: isCompleting
+                      ? null
+                      : () {
+                          ref.read(completeEventControllerProvider.notifier).complete(event.id);
+                        },
                   icon: isCompleting
                       ? const SizedBox(
                           width: 18,
@@ -429,9 +436,9 @@ class AdminEventDetailPage extends ConsumerWidget {
             // Tombol Hapus (Hanya Icon agar ringkas)
             FilledButton(
               onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Simulasi: Kegiatan dihapus...')),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text('Simulasi: Kegiatan dihapus...')));
               },
               style: FilledButton.styleFrom(
                 backgroundColor: colorScheme.errorContainer,
@@ -453,10 +460,7 @@ class AdminEventDetailPage extends ConsumerWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 14),
-        ),
+        Text(label, style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 14)),
         Text(
           value,
           style: TextStyle(color: colorScheme.onSurface, fontSize: 14, fontWeight: FontWeight.w500),
@@ -472,17 +476,10 @@ class AdminEventDetailPage extends ConsumerWidget {
   }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(16),
-      ),
+      decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(16)),
       child: Text(
         text,
-        style: TextStyle(
-          color: textColor,
-          fontSize: 11,
-          fontWeight: FontWeight.bold,
-        ),
+        style: TextStyle(color: textColor, fontSize: 11, fontWeight: FontWeight.bold),
       ),
     );
   }

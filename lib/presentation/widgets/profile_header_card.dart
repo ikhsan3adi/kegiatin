@@ -31,7 +31,7 @@ class ProfileHeaderCard extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     // Card semi-transparan — gradien AppBar di belakangnya masih terlihat.
-    const cardBg = Color(0x26FFFFFF);   // white 15% opacity
+    const cardBg = Color(0x26FFFFFF); // white 15% opacity
     const cardBorder = Color(0x40FFFFFF); // white 25% opacity
 
     return Container(
@@ -62,12 +62,7 @@ class ProfileHeaderCard extends StatelessWidget {
                 ),
                 if (npa != null) ...[
                   const SizedBox(height: 2),
-                  Text(
-                    'NPA-$npa',
-                    style: textTheme.bodySmall?.copyWith(
-                      color: Colors.white70,
-                    ),
-                  ),
+                  Text('NPA-$npa', style: textTheme.bodySmall?.copyWith(color: Colors.white70)),
                 ],
                 const SizedBox(height: 6),
                 _RoleBadge(role: role),
@@ -126,10 +121,9 @@ class _InitialsFallback extends StatelessWidget {
     return Center(
       child: Text(
         initials,
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.w700,
-            ),
+        style: Theme.of(
+          context,
+        ).textTheme.titleMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.w700),
       ),
     );
   }
@@ -141,9 +135,9 @@ class _RoleBadge extends StatelessWidget {
   final UserRole role;
 
   String get _label => switch (role) {
-        UserRole.admin => 'Admin',
-        UserRole.member => 'Anggota',
-      };
+    UserRole.admin => 'Admin',
+    UserRole.member => 'Anggota',
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -156,10 +150,9 @@ class _RoleBadge extends StatelessWidget {
       ),
       child: Text(
         _label,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-            ),
+        style: Theme.of(
+          context,
+        ).textTheme.labelSmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
       ),
     );
   }

@@ -12,11 +12,10 @@ import 'package:kegiatin/presentation/widgets/custom_input_card.dart';
 import 'package:kegiatin/presentation/widgets/dropdown_item_row.dart';
 import 'package:kegiatin/presentation/widgets/gradient_header.dart';
 import 'package:kegiatin/presentation/widgets/section_label.dart';
+
 import 'create_event_sessions.dart';
 
-// ---------------------------------------------------------------------------
-// Enum internal untuk pola pengulangan Series Event
-// ---------------------------------------------------------------------------
+// Enum internal untuk pola pengulangan Series Even
 enum _RepeatPattern { mingguan, bulanan, custom }
 
 /// Batas atas jumlah sesi untuk mencegah rendering yang berat.
@@ -70,9 +69,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
     super.dispose();
   }
 
-  // ---------------------------------------------------------------------------
   // Date / Time Helpers
-  // ---------------------------------------------------------------------------
 
   Future<void> _pickTanggal() async {
     final picked = await showDatePicker(
@@ -106,34 +103,21 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
   }
 
   Future<void> _pickJamSelesai() async {
-    final initial = _jamSelesai ??
+    final initial =
+        _jamSelesai ??
         (_jamMulai != null
-            ? TimeOfDay(
-                hour: (_jamMulai!.hour + 1) % 24,
-                minute: _jamMulai!.minute,
-              )
+            ? TimeOfDay(hour: (_jamMulai!.hour + 1) % 24, minute: _jamMulai!.minute)
             : TimeOfDay.now());
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: initial,
-    );
+    final picked = await showTimePicker(context: context, initialTime: initial);
     if (picked == null || !mounted) return;
     setState(() => _jamSelesai = picked);
   }
 
   /// Bangun DateTime penuh dari [_tanggal] + [time].
-  DateTime _buildDateTime(TimeOfDay time) => DateTime(
-        _tanggal!.year,
-        _tanggal!.month,
-        _tanggal!.day,
-        time.hour,
-        time.minute,
-      );
+  DateTime _buildDateTime(TimeOfDay time) =>
+      DateTime(_tanggal!.year, _tanggal!.month, _tanggal!.day, time.hour, time.minute);
 
-
-  // ---------------------------------------------------------------------------
   // Series Session Generation
-  // ---------------------------------------------------------------------------
 
   /// Generate ulang daftar sesi berdasarkan pola.
   ///
@@ -177,11 +161,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
       switch (_polaPengulangan) {
         case _RepeatPattern.bulanan:
           final m = _tanggal!.month + i;
-          next = DateTime(
-            _tanggal!.year + (m - 1) ~/ 12,
-            ((m - 1) % 12) + 1,
-            _tanggal!.day,
-          );
+          next = DateTime(_tanggal!.year + (m - 1) ~/ 12, ((m - 1) % 12) + 1, _tanggal!.day);
         case _RepeatPattern.mingguan:
         case null:
           next = _tanggal!.add(Duration(days: 7 * i));
@@ -205,14 +185,11 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
     );
     if (picked == null || !mounted) return;
     setState(() {
-      _generatedSessions = List<DateTime>.from(_generatedSessions)
-        ..[index] = picked;
+      _generatedSessions = List<DateTime>.from(_generatedSessions)..[index] = picked;
     });
   }
 
-  // ---------------------------------------------------------------------------
   // Submit
-  // ---------------------------------------------------------------------------
 
   Future<void> _onSimpan() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
@@ -252,14 +229,10 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
           .map(
             (tanggalSesi) => SessionInput(
               title: _namaController.text.trim(),
-              startTime: tanggalSesi.copyWith(
-                hour: _jamMulai!.hour,
-                minute: _jamMulai!.minute,
-              ),
-              endTime: tanggalSesi.copyWith(
-                hour: _jamMulai!.hour,
-                minute: _jamMulai!.minute,
-              ).add(durasi),
+              startTime: tanggalSesi.copyWith(hour: _jamMulai!.hour, minute: _jamMulai!.minute),
+              endTime: tanggalSesi
+                  .copyWith(hour: _jamMulai!.hour, minute: _jamMulai!.minute)
+                  .add(durasi),
               location: _lokasiController.text.trim(),
             ),
           )
@@ -276,8 +249,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
       sessions: sessions,
     );
 
-    final errorMsg =
-        await ref.read(createEventControllerProvider.notifier).submit(input);
+    final errorMsg = await ref.read(createEventControllerProvider.notifier).submit(input);
 
     if (!mounted) return;
 
@@ -285,9 +257,9 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
       _showError(errorMsg);
     } else {
       ref.read(createEventControllerProvider.notifier).reset();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Kegiatan berhasil dibuat')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Kegiatan berhasil dibuat')));
       context.pop();
     }
   }
@@ -296,16 +268,11 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
+        SnackBar(content: Text(message), backgroundColor: Theme.of(context).colorScheme.error),
       );
   }
 
-  // ---------------------------------------------------------------------------
   // Formatting Helpers
-  // ---------------------------------------------------------------------------
 
   String _formatTanggal(DateTime dt) {
     String p(int v) => v.toString().padLeft(2, '0');
@@ -319,15 +286,23 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
 
   String _formatDateShort(DateTime dt) {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
-      'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'Mei',
+      'Jun',
+      'Jul',
+      'Agu',
+      'Sep',
+      'Okt',
+      'Nov',
+      'Des',
     ];
     return '${dt.day} ${months[dt.month - 1]} ${dt.year}';
   }
 
-  // ---------------------------------------------------------------------------
   // Build
-  // ---------------------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -353,7 +328,10 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SectionLabel(label: 'Informasi Kegiatan', icon: Icons.info_outline_rounded),
+                    const SectionLabel(
+                      label: 'Informasi Kegiatan',
+                      icon: Icons.info_outline_rounded,
+                    ),
                     const SizedBox(height: 12),
 
                     // â”€â”€ Nama Kegiatan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -361,25 +339,25 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                       child: TextFormField(
                         controller: _namaController,
                         style: textTheme.bodyMedium,
-                        decoration: InputDecoration.collapsed(
-                          hintText: 'Nama Kegiatan',
-                          hintStyle: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ).copyWith(
-                          prefixIcon: Icon(
-                            Icons.event_outlined,
-                            size: 18,
-                            color: colorScheme.primary,
-                          ),
-                          prefixIconConstraints: const BoxConstraints(
-                            minWidth: 36,
-                            minHeight: 0,
-                          ),
-                        ),
+                        decoration:
+                            InputDecoration.collapsed(
+                              hintText: 'Nama Kegiatan',
+                              hintStyle: textTheme.bodyMedium?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ).copyWith(
+                              prefixIcon: Icon(
+                                Icons.event_outlined,
+                                size: 18,
+                                color: colorScheme.primary,
+                              ),
+                              prefixIconConstraints: const BoxConstraints(
+                                minWidth: 36,
+                                minHeight: 0,
+                              ),
+                            ),
                         textInputAction: TextInputAction.next,
-                        validator: (v) =>
-                            (v == null || v.trim().isEmpty) ? 'Wajib diisi' : null,
+                        validator: (v) => (v == null || v.trim().isEmpty) ? 'Wajib diisi' : null,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -389,8 +367,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                       child: DropdownButtonFormField<EventType>(
                         initialValue: _tipe,
                         isExpanded: true,
-                        style: textTheme.bodyMedium
-                            ?.copyWith(color: colorScheme.onSurface),
+                        style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
                         decoration: InputDecoration.collapsed(
                           hintText: 'Jenis Kegiatan',
                           hintStyle: textTheme.bodyMedium?.copyWith(
@@ -415,9 +392,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                                       icon: t == EventType.single
                                           ? Icons.event_outlined
                                           : Icons.event_repeat_outlined,
-                                      iconColor: t == EventType.single
-                                          ? cs.primary
-                                          : cs.secondary,
+                                      iconColor: t == EventType.single ? cs.primary : cs.secondary,
                                       label: _labelTipe(t),
                                       textStyle: tt.bodyMedium,
                                     );
@@ -435,21 +410,21 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                         selectedItemBuilder: (ctx) {
                           final tt = Theme.of(ctx).textTheme;
                           final cs = Theme.of(ctx).colorScheme;
-                          return EventType.values.map((t) => Align(
-                            alignment: Alignment.centerLeft,
-                            child: DropdownItemRow(
-                              icon: t == EventType.single
-                                  ? Icons.event_outlined
-                                  : Icons.event_repeat_outlined,
-                              iconColor: t == EventType.single
-                                  ? cs.primary
-                                  : cs.secondary,
-                              label: _labelTipe(t),
-                              textStyle: tt.bodyMedium?.copyWith(
-                                color: cs.onSurface,
-                              ),
-                            ),
-                          )).toList();
+                          return EventType.values
+                              .map(
+                                (t) => Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: DropdownItemRow(
+                                    icon: t == EventType.single
+                                        ? Icons.event_outlined
+                                        : Icons.event_repeat_outlined,
+                                    iconColor: t == EventType.single ? cs.primary : cs.secondary,
+                                    label: _labelTipe(t),
+                                    textStyle: tt.bodyMedium?.copyWith(color: cs.onSurface),
+                                  ),
+                                ),
+                              )
+                              .toList();
                         },
                         validator: (v) => v == null ? 'Wajib dipilih' : null,
                       ),
@@ -462,27 +437,27 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                         controller: _deskripsiController,
                         maxLines: 3,
                         style: textTheme.bodyMedium,
-                        decoration: InputDecoration.collapsed(
-                          hintText: 'Deskripsi Kegiatan',
-                          hintStyle: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ).copyWith(
-                          prefixIcon: Padding(
-                            padding: const EdgeInsets.only(top: 2),
-                            child: Icon(
-                              Icons.notes_rounded,
-                              size: 18,
-                              color: colorScheme.tertiary,
+                        decoration:
+                            InputDecoration.collapsed(
+                              hintText: 'Deskripsi Kegiatan',
+                              hintStyle: textTheme.bodyMedium?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ).copyWith(
+                              prefixIcon: Padding(
+                                padding: const EdgeInsets.only(top: 2),
+                                child: Icon(
+                                  Icons.notes_rounded,
+                                  size: 18,
+                                  color: colorScheme.tertiary,
+                                ),
+                              ),
+                              prefixIconConstraints: const BoxConstraints(
+                                minWidth: 36,
+                                minHeight: 0,
+                              ),
                             ),
-                          ),
-                          prefixIconConstraints: const BoxConstraints(
-                            minWidth: 36,
-                            minHeight: 0,
-                          ),
-                        ),
-                        validator: (v) =>
-                            (v == null || v.trim().isEmpty) ? 'Wajib diisi' : null,
+                        validator: (v) => (v == null || v.trim().isEmpty) ? 'Wajib diisi' : null,
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -504,9 +479,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                             ),
                             const SizedBox(width: 12),
                             Text(
-                              _tanggal != null
-                                  ? _formatTanggal(_tanggal!)
-                                  : 'Tanggal Kegiatan',
+                              _tanggal != null ? _formatTanggal(_tanggal!) : 'Tanggal Kegiatan',
                               style: textTheme.bodyMedium?.copyWith(
                                 color: _tanggal != null
                                     ? colorScheme.onSurface
@@ -535,9 +508,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    _jamMulai != null
-                                        ? _formatJam(_jamMulai!)
-                                        : 'Jam Mulai',
+                                    _jamMulai != null ? _formatJam(_jamMulai!) : 'Jam Mulai',
                                     style: textTheme.bodyMedium?.copyWith(
                                       color: _jamMulai != null
                                           ? colorScheme.onSurface
@@ -563,9 +534,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    _jamSelesai != null
-                                        ? _formatJam(_jamSelesai!)
-                                        : 'Jam Selesai',
+                                    _jamSelesai != null ? _formatJam(_jamSelesai!) : 'Jam Selesai',
                                     style: textTheme.bodyMedium?.copyWith(
                                       color: _jamSelesai != null
                                           ? colorScheme.onSurface
@@ -591,8 +560,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                         child: DropdownButtonFormField<_RepeatPattern>(
                           initialValue: _polaPengulangan,
                           isExpanded: true,
-                          style: textTheme.bodyMedium
-                              ?.copyWith(color: colorScheme.onSurface),
+                          style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
                           decoration: InputDecoration.collapsed(
                             hintText: 'Pola Pengulangan',
                             hintStyle: textTheme.bodyMedium?.copyWith(
@@ -617,20 +585,18 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                                       icon: switch (p) {
                                         _RepeatPattern.mingguan =>
                                           Icons.calendar_view_week_outlined,
-                                        _RepeatPattern.bulanan =>
-                                          Icons.calendar_month_outlined,
-                                        _RepeatPattern.custom =>
-                                          Icons.tune_rounded,
+                                        _RepeatPattern.bulanan => Icons.calendar_month_outlined,
+                                        _RepeatPattern.custom => Icons.tune_rounded,
                                       },
                                       iconColor: switch (p) {
                                         _RepeatPattern.mingguan => cs.primary,
-                                        _RepeatPattern.bulanan  => cs.tertiary,
-                                        _RepeatPattern.custom   => cs.secondary,
+                                        _RepeatPattern.bulanan => cs.tertiary,
+                                        _RepeatPattern.custom => cs.secondary,
                                       },
                                       label: switch (p) {
                                         _RepeatPattern.mingguan => 'Mingguan',
-                                        _RepeatPattern.bulanan  => 'Bulanan',
-                                        _RepeatPattern.custom   => 'Custom',
+                                        _RepeatPattern.bulanan => 'Bulanan',
+                                        _RepeatPattern.custom => 'Custom',
                                       },
                                       textStyle: tt.bodyMedium,
                                     );
@@ -646,37 +612,35 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                           selectedItemBuilder: (ctx) {
                             final tt = Theme.of(ctx).textTheme;
                             final cs = Theme.of(ctx).colorScheme;
-                            return _RepeatPattern.values.map((p) => Align(
-                              alignment: Alignment.centerLeft,
-                              child: DropdownItemRow(
-                                icon: switch (p) {
-                                  _RepeatPattern.mingguan =>
-                                    Icons.calendar_view_week_outlined,
-                                  _RepeatPattern.bulanan =>
-                                    Icons.calendar_month_outlined,
-                                  _RepeatPattern.custom =>
-                                    Icons.tune_rounded,
-                                },
-                                iconColor: switch (p) {
-                                  _RepeatPattern.mingguan => cs.primary,
-                                  _RepeatPattern.bulanan  => cs.tertiary,
-                                  _RepeatPattern.custom   => cs.secondary,
-                                },
-                                label: switch (p) {
-                                  _RepeatPattern.mingguan => 'Mingguan',
-                                  _RepeatPattern.bulanan  => 'Bulanan',
-                                  _RepeatPattern.custom   => 'Custom',
-                                },
-                                textStyle: tt.bodyMedium?.copyWith(
-                                  color: cs.onSurface,
-                                ),
-                              ),
-                            )).toList();
+                            return _RepeatPattern.values
+                                .map(
+                                  (p) => Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: DropdownItemRow(
+                                      icon: switch (p) {
+                                        _RepeatPattern.mingguan =>
+                                          Icons.calendar_view_week_outlined,
+                                        _RepeatPattern.bulanan => Icons.calendar_month_outlined,
+                                        _RepeatPattern.custom => Icons.tune_rounded,
+                                      },
+                                      iconColor: switch (p) {
+                                        _RepeatPattern.mingguan => cs.primary,
+                                        _RepeatPattern.bulanan => cs.tertiary,
+                                        _RepeatPattern.custom => cs.secondary,
+                                      },
+                                      label: switch (p) {
+                                        _RepeatPattern.mingguan => 'Mingguan',
+                                        _RepeatPattern.bulanan => 'Bulanan',
+                                        _RepeatPattern.custom => 'Custom',
+                                      },
+                                      textStyle: tt.bodyMedium?.copyWith(color: cs.onSurface),
+                                    ),
+                                  ),
+                                )
+                                .toList();
                           },
                           validator: (v) =>
-                              (_tipe == EventType.series && v == null)
-                                  ? 'Wajib dipilih'
-                                  : null,
+                              (_tipe == EventType.series && v == null) ? 'Wajib dipilih' : null,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -686,26 +650,25 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                         child: TextFormField(
                           controller: _jumlahPertemuanController,
                           keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
+                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                           style: textTheme.bodyMedium,
-                          decoration: InputDecoration.collapsed(
-                            hintText: 'Jumlah Pertemuan (maks. $_kMaxSesi)',
-                            hintStyle: textTheme.bodyMedium?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                          ).copyWith(
-                            prefixIcon: Icon(
-                              Icons.format_list_numbered_rounded,
-                              size: 18,
-                              color: colorScheme.primary,
-                            ),
-                            prefixIconConstraints: const BoxConstraints(
-                              minWidth: 36,
-                              minHeight: 0,
-                            ),
-                          ),
+                          decoration:
+                              InputDecoration.collapsed(
+                                hintText: 'Jumlah Pertemuan (maks. $_kMaxSesi)',
+                                hintStyle: textTheme.bodyMedium?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ).copyWith(
+                                prefixIcon: Icon(
+                                  Icons.format_list_numbered_rounded,
+                                  size: 18,
+                                  color: colorScheme.primary,
+                                ),
+                                prefixIconConstraints: const BoxConstraints(
+                                  minWidth: 36,
+                                  minHeight: 0,
+                                ),
+                              ),
                           onChanged: (_) => setState(_regenerateSessions),
                           validator: (v) {
                             if (_tipe != EventType.series) return null;
@@ -749,25 +712,25 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                       child: TextFormField(
                         controller: _lokasiController,
                         style: textTheme.bodyMedium,
-                        decoration: InputDecoration.collapsed(
-                          hintText: 'Lokasi Pelaksanaan',
-                          hintStyle: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ).copyWith(
-                          prefixIcon: Icon(
-                            Icons.location_on_outlined,
-                            size: 18,
-                            color: colorScheme.tertiary,
-                          ),
-                          prefixIconConstraints: const BoxConstraints(
-                            minWidth: 36,
-                            minHeight: 0,
-                          ),
-                        ),
+                        decoration:
+                            InputDecoration.collapsed(
+                              hintText: 'Lokasi Pelaksanaan',
+                              hintStyle: textTheme.bodyMedium?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ).copyWith(
+                              prefixIcon: Icon(
+                                Icons.location_on_outlined,
+                                size: 18,
+                                color: colorScheme.tertiary,
+                              ),
+                              prefixIconConstraints: const BoxConstraints(
+                                minWidth: 36,
+                                minHeight: 0,
+                              ),
+                            ),
                         textInputAction: TextInputAction.next,
-                        validator: (v) =>
-                            (v == null || v.trim().isEmpty) ? 'Wajib diisi' : null,
+                        validator: (v) => (v == null || v.trim().isEmpty) ? 'Wajib diisi' : null,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -777,25 +740,25 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                       child: TextFormField(
                         controller: _narahubungController,
                         style: textTheme.bodyMedium,
-                        decoration: InputDecoration.collapsed(
-                          hintText: 'Narahubung',
-                          hintStyle: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ).copyWith(
-                          prefixIcon: Icon(
-                            Icons.person_outline_rounded,
-                            size: 18,
-                            color: colorScheme.secondary,
-                          ),
-                          prefixIconConstraints: const BoxConstraints(
-                            minWidth: 36,
-                            minHeight: 0,
-                          ),
-                        ),
+                        decoration:
+                            InputDecoration.collapsed(
+                              hintText: 'Narahubung',
+                              hintStyle: textTheme.bodyMedium?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ).copyWith(
+                              prefixIcon: Icon(
+                                Icons.person_outline_rounded,
+                                size: 18,
+                                color: colorScheme.secondary,
+                              ),
+                              prefixIconConstraints: const BoxConstraints(
+                                minWidth: 36,
+                                minHeight: 0,
+                              ),
+                            ),
                         textInputAction: TextInputAction.next,
-                        validator: (v) =>
-                            (v == null || v.trim().isEmpty) ? 'Wajib diisi' : null,
+                        validator: (v) => (v == null || v.trim().isEmpty) ? 'Wajib diisi' : null,
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -809,8 +772,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                       child: DropdownButtonFormField<EventVisibility>(
                         initialValue: _visibilitas,
                         isExpanded: true,
-                        style: textTheme.bodyMedium
-                            ?.copyWith(color: colorScheme.onSurface),
+                        style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
                         decoration: InputDecoration.collapsed(
                           hintText: 'Visibilitas',
                           hintStyle: textTheme.bodyMedium?.copyWith(
@@ -850,21 +812,23 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                         selectedItemBuilder: (ctx) {
                           final tt = Theme.of(ctx).textTheme;
                           final cs = Theme.of(ctx).colorScheme;
-                          return EventVisibility.values.map((vis) => Align(
-                            alignment: Alignment.centerLeft,
-                            child: DropdownItemRow(
-                              icon: vis == EventVisibility.open
-                                  ? Icons.public_rounded
-                                  : Icons.lock_outline_rounded,
-                              iconColor: vis == EventVisibility.open
-                                  ? cs.tertiary
-                                  : cs.secondary,
-                              label: _labelVisibilitas(vis),
-                              textStyle: tt.bodyMedium?.copyWith(
-                                color: cs.onSurface,
-                              ),
-                            ),
-                          )).toList();
+                          return EventVisibility.values
+                              .map(
+                                (vis) => Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: DropdownItemRow(
+                                    icon: vis == EventVisibility.open
+                                        ? Icons.public_rounded
+                                        : Icons.lock_outline_rounded,
+                                    iconColor: vis == EventVisibility.open
+                                        ? cs.tertiary
+                                        : cs.secondary,
+                                    label: _labelVisibilitas(vis),
+                                    textStyle: tt.bodyMedium?.copyWith(color: cs.onSurface),
+                                  ),
+                                ),
+                              )
+                              .toList();
                         },
                         validator: (v) => v == null ? 'Wajib dipilih' : null,
                       ),
@@ -879,11 +843,10 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                         onPressed: isLoading ? null : _onSimpan,
                         style: FilledButton.styleFrom(
                           backgroundColor: KegiatinCustomTheme.appBarTop,
-                          disabledBackgroundColor:
-                              KegiatinCustomTheme.appBarTop.withValues(alpha: 0.6),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                          disabledBackgroundColor: KegiatinCustomTheme.appBarTop.withValues(
+                            alpha: 0.6,
                           ),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
                         child: isLoading
                             ? const SizedBox(
@@ -914,17 +877,15 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
     );
   }
 
-  // ---------------------------------------------------------------------------
   // Label Helpers
-  // ---------------------------------------------------------------------------
 
   String _labelTipe(EventType t) => switch (t) {
-        EventType.single => 'Single Event',
-        EventType.series => 'Series Event',
-      };
+    EventType.single => 'Single Event',
+    EventType.series => 'Series Event',
+  };
 
   String _labelVisibilitas(EventVisibility v) => switch (v) {
-        EventVisibility.open => 'Terbuka untuk Umum',
-        EventVisibility.inviteOnly => 'Undangan Saja',
-      };
+    EventVisibility.open => 'Terbuka untuk Umum',
+    EventVisibility.inviteOnly => 'Undangan Saja',
+  };
 }

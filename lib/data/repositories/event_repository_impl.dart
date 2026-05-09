@@ -31,12 +31,14 @@ class EventRepositoryImpl implements EventRepository {
         type: type,
         search: search,
       );
-      return Right(PaginatedResult<Event>(
-        data: result.data.map((m) => m.toEntity()).toList(),
-        total: result.total,
-        page: result.page,
-        limit: result.limit,
-      ));
+      return Right(
+        PaginatedResult<Event>(
+          data: result.data.toList(),
+          total: result.total,
+          page: result.page,
+          limit: result.limit,
+        ),
+      );
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message, statusCode: e.statusCode));
     } catch (e) {
@@ -48,7 +50,7 @@ class EventRepositoryImpl implements EventRepository {
   Future<Either<Failure, Event>> getEventById(String id) async {
     try {
       final result = await remoteDataSource.getEventById(id);
-      return Right(result.toEntity());
+      return Right(result);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message, statusCode: e.statusCode));
     } catch (e) {
@@ -60,7 +62,7 @@ class EventRepositoryImpl implements EventRepository {
   Future<Either<Failure, Event>> createEvent(CreateEventInput input) async {
     try {
       final result = await remoteDataSource.createEvent(input);
-      return Right(result.toEntity());
+      return Right(result);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message, statusCode: e.statusCode));
     } catch (e) {
@@ -72,7 +74,7 @@ class EventRepositoryImpl implements EventRepository {
   Future<Either<Failure, Event>> updateEvent(String id, UpdateEventInput input) async {
     try {
       final result = await remoteDataSource.updateEvent(id, input);
-      return Right(result.toEntity());
+      return Right(result);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message, statusCode: e.statusCode));
     } catch (e) {
@@ -96,7 +98,7 @@ class EventRepositoryImpl implements EventRepository {
   Future<Either<Failure, Event>> publishEvent(String id) async {
     try {
       final result = await remoteDataSource.publishEvent(id);
-      return Right(result.toEntity());
+      return Right(result);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message, statusCode: e.statusCode));
     } catch (e) {
@@ -108,7 +110,7 @@ class EventRepositoryImpl implements EventRepository {
   Future<Either<Failure, Event>> cancelEvent(String id) async {
     try {
       final result = await remoteDataSource.cancelEvent(id);
-      return Right(result.toEntity());
+      return Right(result);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message, statusCode: e.statusCode));
     } catch (e) {
@@ -120,7 +122,7 @@ class EventRepositoryImpl implements EventRepository {
   Future<Either<Failure, Event>> startEvent(String id) async {
     try {
       final result = await remoteDataSource.startEvent(id);
-      return Right(result.toEntity());
+      return Right(result);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message, statusCode: e.statusCode));
     } catch (e) {
@@ -132,7 +134,7 @@ class EventRepositoryImpl implements EventRepository {
   Future<Either<Failure, Event>> completeEvent(String id) async {
     try {
       final result = await remoteDataSource.completeEvent(id);
-      return Right(result.toEntity());
+      return Right(result);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message, statusCode: e.statusCode));
     } catch (e) {

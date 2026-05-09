@@ -198,128 +198,133 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                                     validator: (v) =>
                                         (v == null || v.isEmpty) ? 'Nama wajib diisi' : null,
                                   ),
-                                
-                              const SizedBox(height: 16),
-                              TextFormField(
-                                controller: _emailController,
-                                keyboardType: TextInputType.emailAddress,
-                                textInputAction: TextInputAction.next,
-                                decoration: InputDecoration(
-                                  labelText: 'Email',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 14,
-                                  ),
-                                ),
-                                validator: (v) {
-                                  if (v == null || v.isEmpty) return 'Email wajib diisi';
-                                  if (!v.contains('@')) return 'Format email tidak valid';
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(height: 16),
-                              TextFormField(
-                                controller: _passwordController,
-                                obscureText: _obscurePassword,
-                                textInputAction: TextInputAction.done,
-                                decoration: InputDecoration(
-                                  labelText: 'Password',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 14,
-                                  ),
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      _obscurePassword ? Icons.visibility_off : Icons.visibility,
+
+                                  const SizedBox(height: 16),
+                                  TextFormField(
+                                    controller: _emailController,
+                                    keyboardType: TextInputType.emailAddress,
+                                    textInputAction: TextInputAction.next,
+                                    decoration: InputDecoration(
+                                      labelText: 'Email',
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 14,
+                                      ),
                                     ),
-                                    onPressed: () =>
-                                        setState(() => _obscurePassword = !_obscurePassword),
+                                    validator: (v) {
+                                      if (v == null || v.isEmpty) return 'Email wajib diisi';
+                                      if (!v.contains('@')) return 'Format email tidak valid';
+                                      return null;
+                                    },
                                   ),
-                                ),
-                                validator: (v) {
-                                  if (v == null || v.isEmpty) return 'Password wajib diisi';
-                                  if (v.length < 6) return 'Minimal 6 karakter';
-                                  return null;
-                                },
-                              ),
-                              if (_userType == 'ANGGOTA') ...[
-                                const SizedBox(height: 16),
-                                TextFormField(
-                                  controller: _npaController,
-                                  decoration: InputDecoration(
-                                    labelText: 'NPA',
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
+                                  const SizedBox(height: 16),
+                                  TextFormField(
+                                    controller: _passwordController,
+                                    obscureText: _obscurePassword,
+                                    textInputAction: TextInputAction.done,
+                                    decoration: InputDecoration(
+                                      labelText: 'Password',
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 14,
+                                      ),
+                                      suffixIcon: IconButton(
+                                        icon: Icon(
+                                          _obscurePassword
+                                              ? Icons.visibility_off
+                                              : Icons.visibility,
+                                        ),
+                                        onPressed: () =>
+                                            setState(() => _obscurePassword = !_obscurePassword),
+                                      ),
                                     ),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 14,
-                                    ),
+                                    validator: (v) {
+                                      if (v == null || v.isEmpty) return 'Password wajib diisi';
+                                      if (v.length < 6) return 'Minimal 6 karakter';
+                                      return null;
+                                    },
                                   ),
-                                  validator: (v) {
-                                    if (_userType == 'ANGGOTA' && (v == null || v.isEmpty)) {
-                                      return 'NPA wajib diisi untuk anggota';
-                                    }
-                                    return null;
-                                  },
-                                ),
-                              ],
-                              const SizedBox(height: 28),
-                              FilledButton(
-                                onPressed: authState.isLoading ? null : _handleRegister,
-                                child: authState.isLoading
-                                    ? const SizedBox(
-                                        height: 20,
-                                        width: 20,
-                                        child: CircularProgressIndicator(strokeWidth: 2),
-                                      )
-                                    : const Text('SIGN UP'),
-                              ),
-                              const SizedBox(height: 16),
-                              Row(
-                                children: [
-                                  Expanded(child: Divider(color: Colors.grey.shade300)),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                                    child: Text(
-                                      'OR',
-                                      style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                                  if (_userType == 'ANGGOTA') ...[
+                                    const SizedBox(height: 16),
+                                    TextFormField(
+                                      controller: _npaController,
+                                      decoration: InputDecoration(
+                                        labelText: 'NPA',
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        contentPadding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 14,
+                                        ),
+                                      ),
+                                      validator: (v) {
+                                        if (_userType == 'ANGGOTA' && (v == null || v.isEmpty)) {
+                                          return 'NPA wajib diisi untuk anggota';
+                                        }
+                                        return null;
+                                      },
                                     ),
+                                  ],
+                                  const SizedBox(height: 28),
+                                  FilledButton(
+                                    onPressed: authState.isLoading ? null : _handleRegister,
+                                    child: authState.isLoading
+                                        ? const SizedBox(
+                                            height: 20,
+                                            width: 20,
+                                            child: CircularProgressIndicator(strokeWidth: 2),
+                                          )
+                                        : const Text('SIGN UP'),
                                   ),
-                                  Expanded(child: Divider(color: Colors.grey.shade300)),
+                                  const SizedBox(height: 16),
+                                  Row(
+                                    children: [
+                                      Expanded(child: Divider(color: Colors.grey.shade300)),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                                        child: Text(
+                                          'OR',
+                                          style: TextStyle(
+                                            color: Colors.grey.shade600,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(child: Divider(color: Colors.grey.shade300)),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+                                  OutlinedButton.icon(
+                                    onPressed: () {
+                                      // TODO: Implement Google Sign In
+                                    },
+                                    icon: const Icon(Icons.g_mobiledata),
+                                    label: const Text('Sign in with Google'),
+                                  ),
+                                  const SizedBox(height: 24),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'Already have account? ',
+                                        style: TextStyle(color: Colors.grey.shade600),
+                                      ),
+                                      TextButton(
+                                        onPressed: () => context.go('/login'),
+                                        child: const Text('Login'),
+                                      ),
+                                    ],
+                                  ),
                                 ],
                               ),
-                              const SizedBox(height: 16),
-                              OutlinedButton.icon(
-                                onPressed: () {
-                                  // TODO: Implement Google Sign In
-                                },
-                                icon: const Icon(Icons.g_mobiledata),
-                                label: const Text('Sign in with Google'),
-                              ),
-                              const SizedBox(height: 24),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'Already have account? ',
-                                    style: TextStyle(color: Colors.grey.shade600),
-                                  ),
-                                  TextButton(
-                                    onPressed: () => context.go('/login'),
-                                    child: const Text('Login'),
-                                  ),
-                                ],
-                              ),
-                            ]    
                             ),
-                          )
                           ),
                         ],
                       ),

@@ -6,9 +6,5 @@ class AuthResponse {
   final String accessToken;
   final String refreshToken;
 
-  const AuthResponse({
-    required this.user,
-    required this.accessToken,
-    required this.refreshToken,
-  });
+  const AuthResponse({required this.user, required this.accessToken, required this.refreshToken});
 }

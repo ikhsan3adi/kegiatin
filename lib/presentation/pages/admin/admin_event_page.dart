@@ -50,7 +50,7 @@ class AdminEventPage extends ConsumerWidget {
               ],
             ),
           ),
-          
+
           eventsState.when(
             data: (paginatedData) {
               final events = paginatedData.data;
@@ -61,9 +61,7 @@ class AdminEventPage extends ConsumerWidget {
                     padding: const EdgeInsets.all(32.0),
                     child: Text(
                       'Belum ada kegiatan',
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
+                      style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
                     ),
                   ),
                 );
@@ -84,10 +82,7 @@ class AdminEventPage extends ConsumerWidget {
               );
             },
             loading: () => const Center(
-              child: Padding(
-                padding: EdgeInsets.all(32.0),
-                child: CircularProgressIndicator(),
-              ),
+              child: Padding(padding: EdgeInsets.all(32.0), child: CircularProgressIndicator()),
             ),
             error: (e, _) => Center(
               child: Padding(

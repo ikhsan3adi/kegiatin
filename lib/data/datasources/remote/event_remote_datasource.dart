@@ -71,18 +71,15 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
       final response = await dio.get(ApiConstants.events, queryParameters: queryParams);
 
       final responseBody = _asMap(response.data);
-      final data = (responseBody['data'] as List)
-          .map((json) {
-            final item = _asMap(json);
-            // Menangani struktur dari backend sementara (nested 'event' dan 'sessions')
-            if (item.containsKey('event') && item.containsKey('sessions')) {
-              final eventJson = _asMap(item['event']);
-              eventJson['sessions'] = item['sessions'];
-              return EventModel.fromJson(eventJson);
-            }
-            return EventModel.fromJson(item);
-          })
-          .toList();
+      final data = (responseBody['data'] as List).map((json) {
+        final item = _asMap(json);
+        if (item.containsKey('event') && item.containsKey('sessions')) {
+          final eventJson = _asMap(item['event']);
+          eventJson['sessions'] = item['sessions'];
+          return EventModel.fromJson(eventJson);
+        }
+        return EventModel.fromJson(item);
+      }).toList();
 
       final meta = _asMap(responseBody['meta']);
 
@@ -118,7 +115,6 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
   @override
   Future<EventModel> createEvent(CreateEventInput input) async {
     try {
-      // NOTE: Sesuaikan dengan struktur JSON yang diinginkan CreateEventDto
       final data = {
         'title': input.title,
         'description': input.description,
@@ -127,13 +123,17 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
         'location': input.location,
         'contactPerson': input.contactPerson,
         'imageUrl': input.imageUrl,
-        'sessions': input.sessions.map((s) => {
-          'title': s.title,
-          'startTime': s.startTime.toIso8601String(),
-          'endTime': s.endTime.toIso8601String(),
-          'location': s.location,
-          'capacity': s.capacity,
-        }).toList(),
+        'sessions': input.sessions
+            .map(
+              (s) => {
+                'title': s.title,
+                'startTime': s.startTime.toIso8601String(),
+                'endTime': s.endTime.toIso8601String(),
+                'location': s.location,
+                'capacity': s.capacity,
+              },
+            )
+            .toList(),
       };
 
       final response = await dio.post(ApiConstants.events, data: data);
@@ -184,7 +184,7 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
   Future<EventModel> publishEvent(String id) async {
     try {
       await dio.patch(ApiConstants.publishEvent(id));
-      // Fetch ulang karena backend return void
+
       final response = await dio.get(ApiConstants.eventById(id));
       return _eventFromResponse(response);
     } on DioException catch (e) {
@@ -199,7 +199,7 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
   Future<EventModel> cancelEvent(String id) async {
     try {
       await dio.patch(ApiConstants.cancelEvent(id));
-      // Fetch ulang karena backend return void
+
       final response = await dio.get(ApiConstants.eventById(id));
       return _eventFromResponse(response);
     } on DioException catch (e) {
@@ -214,7 +214,7 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
   Future<EventModel> startEvent(String id) async {
     try {
       await dio.patch(ApiConstants.startEvent(id));
-      // Fetch ulang karena backend return void
+
       final response = await dio.get(ApiConstants.eventById(id));
       return _eventFromResponse(response);
     } on DioException catch (e) {
@@ -229,7 +229,7 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
   Future<EventModel> completeEvent(String id) async {
     try {
       await dio.patch(ApiConstants.completeEvent(id));
-      // Fetch ulang karena backend return void
+
       final response = await dio.get(ApiConstants.eventById(id));
       return _eventFromResponse(response);
     } on DioException catch (e) {

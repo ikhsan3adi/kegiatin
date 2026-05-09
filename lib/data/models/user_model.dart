@@ -6,7 +6,7 @@ part 'user_model.freezed.dart';
 part 'user_model.g.dart';
 
 @freezed
-abstract class UserModel with _$UserModel {
+abstract class UserModel with _$UserModel implements User {
   const UserModel._();
 
   const factory UserModel({
@@ -22,18 +22,6 @@ abstract class UserModel with _$UserModel {
   }) = _UserModel;
 
   factory UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
-
-  User toEntity() => User(
-    id: id,
-    email: email,
-    displayName: displayName,
-    role: role,
-    npa: npa,
-    cabang: cabang,
-    photoUrl: photoUrl,
-    emailVerified: emailVerified,
-    createdAt: createdAt,
-  );
 }
 
 extension UserX on User {

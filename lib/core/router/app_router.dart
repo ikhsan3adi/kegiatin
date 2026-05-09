@@ -68,7 +68,7 @@ GoRouter appRouter(Ref ref) {
 
       if (!isLoggedIn && (isAuth || isOnboarding)) return null;
 
-      // Blok kode pengecekan "hasSeenOnboarding" saat di splash DIHAPUS 
+      // Blok kode pengecekan "hasSeenOnboarding" saat di splash DIHAPUS
       // dan dipindahkan ke dalam logic splash_page.dart agar bisa menunggu 3 detik.
 
       // Auth resolved, not logged in, trying to access protected route
@@ -86,10 +86,7 @@ GoRouter appRouter(Ref ref) {
         path: '/admin',
         builder: (_, _) => const AdminHomePage(),
         routes: [
-          GoRoute(
-            path: 'create-event',
-            builder: (_, _) => const CreateEventPage(),
-          ),
+          GoRoute(path: 'create-event', builder: (_, _) => const CreateEventPage()),
           GoRoute(
             path: 'event-detail',
             builder: (context, state) {
@@ -97,14 +94,11 @@ GoRouter appRouter(Ref ref) {
               return AdminEventDetailPage(event: event);
             },
           ),
-          GoRoute(
-            path: 'scan',
-            builder: (_, _) => const QrScanPage(),
-          ),
+          GoRoute(path: 'scan', builder: (_, _) => const QrScanPage()),
         ],
       ),
       GoRoute(
-        path: '/peserta', 
+        path: '/peserta',
         builder: (_, _) => const PesertaHomePage(),
         routes: [
           GoRoute(

@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:hive_ce/hive.dart';
 import 'package:kegiatin/core/constants/db_constants.dart';
 import 'package:kegiatin/data/models/user_model.dart';
@@ -43,7 +44,6 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
     final raw = authBox.get(DbConstants.cachedUserKey);
     if (raw == null) return null;
 
-    // Mendukung format lama (Map) dan format baru (JSON string)
     final Map<String, dynamic> json;
     if (raw is String) {
       json = Map<String, dynamic>.from(jsonDecode(raw) as Map);

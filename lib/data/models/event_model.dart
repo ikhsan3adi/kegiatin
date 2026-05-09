@@ -1,15 +1,15 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:kegiatin/data/models/session_model.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/enums/event_status.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
 import 'package:kegiatin/domain/enums/event_visibility.dart';
-import 'package:kegiatin/data/models/session_model.dart';
 
 part 'event_model.freezed.dart';
 part 'event_model.g.dart';
 
 @freezed
-abstract class EventModel with _$EventModel {
+abstract class EventModel with _$EventModel implements Event {
   const EventModel._();
 
   const factory EventModel({
@@ -29,38 +29,22 @@ abstract class EventModel with _$EventModel {
   }) = _EventModel;
 
   factory EventModel.fromJson(Map<String, dynamic> json) => _$EventModelFromJson(json);
-
-  Event toEntity() => Event(
-        id: id,
-        title: title,
-        description: description,
-        type: type,
-        status: status,
-        visibility: visibility,
-        location: location,
-        contactPerson: contactPerson,
-        imageUrl: imageUrl,
-        createdBy: createdBy,
-        sessions: sessions.map((s) => s.toEntity()).toList(),
-        createdAt: createdAt,
-        updatedAt: updatedAt,
-      );
 }
 
 extension EventX on Event {
   EventModel toModel() => EventModel(
-        id: id,
-        title: title,
-        description: description,
-        type: type,
-        status: status,
-        visibility: visibility,
-        location: location,
-        contactPerson: contactPerson,
-        imageUrl: imageUrl,
-        createdBy: createdBy,
-        sessions: sessions.map((s) => s.toModel()).toList(),
-        createdAt: createdAt,
-        updatedAt: updatedAt,
-      );
+    id: id,
+    title: title,
+    description: description,
+    type: type,
+    status: status,
+    visibility: visibility,
+    location: location,
+    contactPerson: contactPerson,
+    imageUrl: imageUrl,
+    createdBy: createdBy,
+    sessions: sessions.map((s) => s.toModel()).toList(),
+    createdAt: createdAt,
+    updatedAt: updatedAt,
+  );
 }

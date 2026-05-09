@@ -6,11 +6,7 @@ import 'package:kegiatin/presentation/widgets/section_label.dart';
 /// Menerima parameter individual agar widget tetap reusable tanpa bergantung
 /// pada entitas [User] secara langsung.
 class ProfileCard extends StatelessWidget {
-  const ProfileCard({
-    super.key,
-    required this.email,
-    required this.joinedAt,
-  });
+  const ProfileCard({super.key, required this.email, required this.joinedAt});
 
   /// Alamat email pengguna.
   final String email;
@@ -28,9 +24,7 @@ class ProfileCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.5),
-        ),
+        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
         boxShadow: [
           BoxShadow(
             color: colorScheme.shadow.withValues(alpha: 0.04),
@@ -98,10 +92,7 @@ class _ContactRow extends StatelessWidget {
         Container(
           width: 40,
           height: 40,
-          decoration: BoxDecoration(
-            color: iconBgColor,
-            borderRadius: BorderRadius.circular(10),
-          ),
+          decoration: BoxDecoration(color: iconBgColor, borderRadius: BorderRadius.circular(10)),
           child: Icon(icon, size: 20, color: iconColor),
         ),
         const SizedBox(width: 14),
@@ -111,9 +102,7 @@ class _ContactRow extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: textTheme.labelSmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
+                style: textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant),
               ),
               const SizedBox(height: 1),
               Text(

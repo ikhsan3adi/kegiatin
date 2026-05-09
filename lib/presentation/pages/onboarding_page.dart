@@ -12,21 +12,17 @@ class _OnboardingPageState extends State<OnboardingPage> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  // Data untuk 3 slide
   final List<Map<String, String>> onboardingData = [
     {
-      'desc':
-          'Aplikasi manajemen kegiatan rutin biar semua jadi lebih rapi.',
+      'desc': 'Aplikasi manajemen kegiatan rutin biar semua jadi lebih rapi.',
       'image': 'assets/images/onboarding1.png',
     },
     {
-      'desc':
-          'Atur kegiatan, presensi, dan materi dalam satu aplikasi.',
+      'desc': 'Atur kegiatan, presensi, dan materi dalam satu aplikasi.',
       'image': 'assets/images/onboarding2.png',
     },
     {
-      'desc':
-          'Lebih praktis, terorganisir, dan gak ribet.',
+      'desc': 'Lebih praktis, terorganisir, dan gak ribet.',
       'image': 'assets/images/onboarding3.png',
     },
   ];
@@ -51,12 +47,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
               children: [
                 // Branding kiri atas: logo + teks KEGIATIN
                 Padding(
-                  padding: const EdgeInsets.only(
-                    left: 20,
-                    top: 12,
-                    right: 20,
-                    bottom: 4,
-                  ),
+                  padding: const EdgeInsets.only(left: 20, top: 12, right: 20, bottom: 4),
                   child: Row(
                     children: [
                       Image.asset(
@@ -84,8 +75,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   flex: 4,
                   child: PageView.builder(
                     controller: _pageController,
-                    onPageChanged: (index) =>
-                        setState(() => _currentPage = index),
+                    onPageChanged: (index) => setState(() => _currentPage = index),
                     itemCount: onboardingData.length,
                     itemBuilder: (context, index) => Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 28),
@@ -106,9 +96,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           const Spacer(),
                           // Gambar ilustrasi (center)
                           ConstrainedBox(
-                            constraints: BoxConstraints(
-                              maxHeight: imageHeight,
-                            ),
+                            constraints: BoxConstraints(maxHeight: imageHeight),
                             child: Image.asset(
                               onboardingData[index]['image']!,
                               fit: BoxFit.contain,
@@ -142,12 +130,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
                 SizedBox(height: spacingMedium),
 
-                // Tombol Login & Sign Up
                 Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: spacingSmall,
-                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: spacingSmall),
                   child: Column(
                     children: [
                       SizedBox(
@@ -156,12 +140,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
                         child: ElevatedButton(
                           onPressed: () => context.go('/register'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primary,
+                            backgroundColor: Theme.of(context).colorScheme.primary,
                             foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
                           child: const Text(
                             'Sign Up',
@@ -176,17 +157,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
                         child: OutlinedButton(
                           onPressed: () => context.go('/login'),
                           style: OutlinedButton.styleFrom(
-                            side: BorderSide(
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                            side: BorderSide(color: Theme.of(context).colorScheme.primary),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
-                          child: const Text(
-                            'Login',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
+                          child: const Text('Login', style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
                       ),
                     ],

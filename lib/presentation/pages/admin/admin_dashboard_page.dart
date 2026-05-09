@@ -26,11 +26,7 @@ class AdminDashboardPage extends ConsumerWidget {
                     children: [
                       Row(
                         children: [
-                          Image.asset(
-                            'assets/LogoKegiaTin 2.png',
-                            width: 32,
-                            height: 32,
-                          ),
+                          Image.asset('assets/LogoKegiaTin 2.png', width: 32, height: 32),
                           const SizedBox(width: 8),
                           Text(
                             'KEGIATIN',
@@ -82,9 +78,7 @@ class AdminDashboardPage extends ConsumerWidget {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Dashboard Admin',
-                  style: textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
                 ),
               ),
             ),
@@ -92,9 +86,7 @@ class AdminDashboardPage extends ConsumerWidget {
             Center(
               child: Text(
                 'Belum ada kegiatan terbaru',
-                style: textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
+                style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
               ),
             ),
           ],

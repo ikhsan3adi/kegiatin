@@ -10,10 +10,7 @@ class ActivityRecord {
   final Event event;
   final List<SessionAttendance> attendancePerSession;
 
-  const ActivityRecord({
-    required this.event,
-    this.attendancePerSession = const [],
-  });
+  const ActivityRecord({required this.event, this.attendancePerSession = const []});
 }
 
 /// Status kehadiran peserta pada satu sesi dalam konteks activity history.
@@ -22,9 +19,5 @@ class SessionAttendance {
   final AttendanceStatus status;
   final DateTime? checkedInAt;
 
-  const SessionAttendance({
-    required this.session,
-    required this.status,
-    this.checkedInAt,
-  });
+  const SessionAttendance({required this.session, required this.status, this.checkedInAt});
 }

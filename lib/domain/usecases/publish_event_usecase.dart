@@ -10,6 +10,5 @@ class PublishEventUseCase extends UseCase<Event, String> {
   PublishEventUseCase(this.repository);
 
   @override
-  Future<Either<Failure, Event>> call(String input) =>
-      repository.publishEvent(input);
+  Future<Either<Failure, Event>> call(String input) => repository.publishEvent(input);
 }

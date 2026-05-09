@@ -9,10 +9,7 @@ import 'package:kegiatin/presentation/widgets/kegiatin_app_bar.dart';
 class PesertaEventDetailPage extends StatelessWidget {
   final Event event;
 
-  const PesertaEventDetailPage({
-    super.key,
-    required this.event,
-  });
+  const PesertaEventDetailPage({super.key, required this.event});
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +17,7 @@ class PesertaEventDetailPage extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     // Ambil sesi pertama untuk info waktu
-    final firstSession =
-        event.sessions.isNotEmpty ? event.sessions.first : null;
+    final firstSession = event.sessions.isNotEmpty ? event.sessions.first : null;
     final startTime = firstSession?.startTime;
     final dateStr = startTime != null
         ? "${startTime.year}-${startTime.month.toString().padLeft(2, '0')}-${startTime.day.toString().padLeft(2, '0')} . ${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}"
@@ -87,23 +83,35 @@ class PesertaEventDetailPage extends StatelessWidget {
                 // Baris Waktu & Lokasi
                 Row(
                   children: [
-                    Icon(Icons.access_time, size: 14, color: colorScheme.onPrimary.withValues(alpha: 0.8)),
+                    Icon(
+                      Icons.access_time,
+                      size: 14,
+                      color: colorScheme.onPrimary.withValues(alpha: 0.8),
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       dateStr,
-                      style: textTheme.bodySmall?.copyWith(color: colorScheme.onPrimary.withValues(alpha: 0.8)),
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onPrimary.withValues(alpha: 0.8),
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    Icon(Icons.location_on_outlined, size: 14, color: colorScheme.onPrimary.withValues(alpha: 0.8)),
+                    Icon(
+                      Icons.location_on_outlined,
+                      size: 14,
+                      color: colorScheme.onPrimary.withValues(alpha: 0.8),
+                    ),
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
                         event.location,
-                        style: textTheme.bodySmall?.copyWith(color: colorScheme.onPrimary.withValues(alpha: 0.8)),
+                        style: textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onPrimary.withValues(alpha: 0.8),
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -157,14 +165,15 @@ class PesertaEventDetailPage extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            Icon(Icons.menu_book_outlined,
-                                size: 20, color: colorScheme.onSurfaceVariant),
+                            Icon(
+                              Icons.menu_book_outlined,
+                              size: 20,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
                             const SizedBox(width: 12),
                             Text(
                               'Deskripsi Kegiatan',
-                              style: textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
@@ -201,39 +210,29 @@ class PesertaEventDetailPage extends StatelessWidget {
                       children: [
                         Text(
                           'Detail',
-                          style: textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 16),
                         _buildDetailRow(
-                            context, 
-                            'Visibilitas', 
-                            event.visibility == EventVisibility.open ? 'Publik' : 'Internal'
+                          context,
+                          'Visibilitas',
+                          event.visibility == EventVisibility.open ? 'Publik' : 'Internal',
                         ),
                         const SizedBox(height: 16),
                         _buildDetailRow(
-                            context,
-                            'Tipe Kegiatan',
-                            event.type == EventType.series
-                                ? 'Rutin'
-                                : 'Tunggal'),
-                        const SizedBox(height: 16),
-                        _buildDetailRow(
-                            context, 
-                            'Narahubung', 
-                            event.contactPerson
+                          context,
+                          'Tipe Kegiatan',
+                          event.type == EventType.series ? 'Rutin' : 'Tunggal',
                         ),
+                        const SizedBox(height: 16),
+                        _buildDetailRow(context, 'Narahubung', event.contactPerson),
                       ],
                     ),
                   ),
                   const SizedBox(height: 24),
 
                   // Tombol Aksi (Daftar / Lihat QR)
-                  SizedBox(
-                    width: double.infinity,
-                    child: _buildActionButton(context),
-                  ),
+                  SizedBox(width: double.infinity, child: _buildActionButton(context)),
                   const SizedBox(height: 40), // Ruang bawah
                 ],
               ),
@@ -249,10 +248,7 @@ class PesertaEventDetailPage extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 14),
-        ),
+        Text(label, style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 14)),
         Text(
           value,
           style: TextStyle(color: colorScheme.onSurface, fontSize: 14, fontWeight: FontWeight.w500),
@@ -268,17 +264,10 @@ class PesertaEventDetailPage extends StatelessWidget {
   }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(16),
-      ),
+      decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(16)),
       child: Text(
         text,
-        style: TextStyle(
-          color: textColor,
-          fontSize: 11,
-          fontWeight: FontWeight.bold,
-        ),
+        style: TextStyle(color: textColor, fontSize: 11, fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -328,9 +317,9 @@ class PesertaEventDetailPage extends StatelessWidget {
       borderRadius: BorderRadius.circular(24),
       child: InkWell(
         onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Simulasi: Aksi tombol ditekan')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Simulasi: Aksi tombol ditekan')));
         },
         borderRadius: BorderRadius.circular(24),
         child: Padding(
@@ -338,17 +327,10 @@ class PesertaEventDetailPage extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ...[
-              Icon(icon, size: 18, color: textColor),
-              const SizedBox(width: 8),
-            ],
+              ...[Icon(icon, size: 18, color: textColor), const SizedBox(width: 8)],
               Text(
                 text,
-                style: TextStyle(
-                  color: textColor,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                ),
+                style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 15),
               ),
             ],
           ),

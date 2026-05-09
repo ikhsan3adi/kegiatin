@@ -15,10 +15,11 @@ class _SplashPageState extends ConsumerState<SplashPage> {
   @override
   void initState() {
     super.initState();
-    _startSplashSequence();
+    // _startSplashSequence();
   }
 
   // LOGIC: Bagian ini tetap sama agar program tidak rusak
+  // ignore: unused_element
   Future<void> _startSplashSequence() async {
     await Future.delayed(const Duration(seconds: 5));
     if (!mounted) return;
@@ -103,11 +104,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
                                 ),
                               ),
                               const SizedBox(height: 8),
-                              Divider(
-                                color: brandColor,
-                                thickness: 3,
-                                height: 3,
-                              ),
+                              Divider(color: brandColor, thickness: 3, height: 3),
                             ],
                           ),
                         ),
@@ -117,36 +114,24 @@ class _SplashPageState extends ConsumerState<SplashPage> {
                     // Bintang atas (di atas logo, center)
                     Positioned(
                       top: -(logoSize * 0.3),
-                      child: _buildStar(
-                        starSize * 0.75,
-                        brandColor.withValues(alpha: 0.25),
-                      ),
+                      child: _buildStar(starSize * 0.75, brandColor.withValues(alpha: 0.25)),
                     ),
                     // Bintang kiri (sejajar tengah logo)
                     Positioned(
                       left: -(w * 0.12),
                       top: logoSize * 0.15,
-                      child: _buildStar(
-                        starSize,
-                        brandColor.withValues(alpha: 0.3),
-                      ),
+                      child: _buildStar(starSize, brandColor.withValues(alpha: 0.3)),
                     ),
                     // Bintang kanan (sejajar tengah logo, simetris dengan kiri)
                     Positioned(
                       right: -(w * 0.12),
                       top: logoSize * 0.15,
-                      child: _buildStar(
-                        starSize,
-                        brandColor.withValues(alpha: 0.3),
-                      ),
+                      child: _buildStar(starSize, brandColor.withValues(alpha: 0.3)),
                     ),
                     // Bintang bawah (di bawah garis, center)
                     Positioned(
                       bottom: -(h * 0.070),
-                      child: _buildStar(
-                        starSize * 0.75,
-                        brandColor.withValues(alpha: 0.25),
-                      ),
+                      child: _buildStar(starSize * 0.75, brandColor.withValues(alpha: 0.25)),
                     ),
                   ],
                 ),
@@ -160,10 +145,6 @@ class _SplashPageState extends ConsumerState<SplashPage> {
 
   /// Widget bintang dekoratif
   Widget _buildStar(double size, Color color) {
-    return Icon(
-      Icons.star_rounded,
-      size: size,
-      color: color,
-    );
+    return Icon(Icons.star_rounded, size: size, color: color);
   }
 }

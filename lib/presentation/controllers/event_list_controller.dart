@@ -21,16 +21,8 @@ class EventList extends _$EventList {
 
   Future<PaginatedResult<Event>> _fetchEvents() async {
     final useCase = ref.watch(getEventsUseCaseProvider);
-    final result = await useCase(GetEventsUseCaseParams(
-      page: page,
-      limit: limit,
-      search: search,
-      // mapping status dan type dari String ke Enum dapat dilakukan di sini jika diperlukan
-    ));
+    final result = await useCase(GetEventsUseCaseParams(page: page, limit: limit, search: search));
 
-    return result.fold(
-      (failure) => throw Exception(failure.message),
-      (data) => data,
-    );
+    return result.fold((failure) => throw Exception(failure.message), (data) => data);
   }
 }

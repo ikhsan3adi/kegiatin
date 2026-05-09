@@ -15,9 +15,6 @@ class EventDetail extends _$EventDetail {
     final useCase = ref.watch(getEventByIdUseCaseProvider);
     final result = await useCase(id);
 
-    return result.fold(
-      (failure) => throw Exception(failure.message),
-      (data) => data,
-    );
+    return result.fold((failure) => throw Exception(failure.message), (data) => data);
   }
 }

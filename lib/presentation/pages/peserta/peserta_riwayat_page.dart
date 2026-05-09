@@ -25,9 +25,7 @@ class RiwayatPage extends StatelessWidget {
           Center(
             child: Text(
               'Belum ada riwayat',
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
+              style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
             ),
           ),
         ],
@@ -60,9 +58,7 @@ class ProfilPage extends StatelessWidget {
           Center(
             child: Text(
               'Konten profil',
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
+              style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
             ),
           ),
         ],

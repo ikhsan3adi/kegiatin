@@ -32,7 +32,7 @@ class AuthController extends _$AuthController {
       }
       // Network/server error — stay logged in with cached user.
       final cached = await localDS.getCachedUser();
-      return cached?.toEntity();
+      return cached;
     }, (user) => user);
   }
 

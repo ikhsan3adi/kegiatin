@@ -6,7 +6,7 @@ part 'session_model.freezed.dart';
 part 'session_model.g.dart';
 
 @freezed
-abstract class SessionModel with _$SessionModel {
+abstract class SessionModel with _$SessionModel implements Session {
   const SessionModel._();
 
   const factory SessionModel({
@@ -22,30 +22,18 @@ abstract class SessionModel with _$SessionModel {
   }) = _SessionModel;
 
   factory SessionModel.fromJson(Map<String, dynamic> json) => _$SessionModelFromJson(json);
-
-  Session toEntity() => Session(
-        id: id,
-        eventId: eventId,
-        title: title,
-        startTime: startTime,
-        endTime: endTime,
-        location: location,
-        order: order,
-        status: status,
-        capacity: capacity,
-      );
 }
 
 extension SessionX on Session {
   SessionModel toModel() => SessionModel(
-        id: id,
-        eventId: eventId,
-        title: title,
-        startTime: startTime,
-        endTime: endTime,
-        location: location,
-        order: order,
-        status: status,
-        capacity: capacity,
-      );
+    id: id,
+    eventId: eventId,
+    title: title,
+    startTime: startTime,
+    endTime: endTime,
+    location: location,
+    order: order,
+    status: status,
+    capacity: capacity,
+  );
 }

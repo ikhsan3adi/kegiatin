@@ -6,7 +6,7 @@ part 'auth_response_model.freezed.dart';
 part 'auth_response_model.g.dart';
 
 @freezed
-abstract class AuthResponseModel with _$AuthResponseModel {
+abstract class AuthResponseModel with _$AuthResponseModel implements AuthResponse {
   const AuthResponseModel._();
 
   const factory AuthResponseModel({
@@ -17,7 +17,4 @@ abstract class AuthResponseModel with _$AuthResponseModel {
 
   factory AuthResponseModel.fromJson(Map<String, dynamic> json) =>
       _$AuthResponseModelFromJson(json);
-
-  AuthResponse toEntity() =>
-      AuthResponse(user: user.toEntity(), accessToken: accessToken, refreshToken: refreshToken);
 }

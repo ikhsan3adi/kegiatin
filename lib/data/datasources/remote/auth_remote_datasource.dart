@@ -21,10 +21,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<AuthResponseModel> login(String email, String password) async {
     try {
-      final response = await dio.post(ApiConstants.login, data: {
-        'email': email,
-        'password': password,
-      });
+      final response = await dio.post(
+        ApiConstants.login,
+        data: {'email': email, 'password': password},
+      );
       final responseData = response.data as Map<String, dynamic>;
       final payload = responseData['data'] as Map<String, dynamic>;
       return AuthResponseModel(
@@ -45,13 +45,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<UserModel> register(RegisterInput input) async {
     try {
-      final response = await dio.post(ApiConstants.register, data: {
-        'email': input.email,
-        'password': input.password,
-        'displayName': input.displayName,
-        'userType': input.userType,
-        if (input.npa != null) 'npa': input.npa,
-      });
+      final response = await dio.post(
+        ApiConstants.register,
+        data: {
+          'email': input.email,
+          'password': input.password,
+          'displayName': input.displayName,
+          'userType': input.userType,
+          if (input.npa != null) 'npa': input.npa,
+        },
+      );
       final responseData = response.data as Map<String, dynamic>;
       final payload = responseData['data'] as Map<String, dynamic>;
       return UserModel.fromJson(payload);
@@ -73,7 +76,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       if (e.response?.statusCode == 401) throw const UnauthorizedException();
       final data = e.response?.data;
       final message = (data is Map<String, dynamic>) ? data['message'] : null;
-      throw ServerException(message ?? 'Gagal mengambil data user', statusCode: e.response?.statusCode);
+      throw ServerException(
+        message ?? 'Gagal mengambil data user',
+        statusCode: e.response?.statusCode,
+      );
     }
   }
 

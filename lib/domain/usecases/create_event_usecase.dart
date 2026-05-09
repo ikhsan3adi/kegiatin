@@ -11,6 +11,5 @@ class CreateEventUseCase extends UseCase<Event, CreateEventInput> {
   CreateEventUseCase(this.repository);
 
   @override
-  Future<Either<Failure, Event>> call(CreateEventInput input) =>
-      repository.createEvent(input);
+  Future<Either<Failure, Event>> call(CreateEventInput input) => repository.createEvent(input);
 }

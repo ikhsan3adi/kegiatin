@@ -39,9 +39,7 @@ class _ManualInputTabState extends State<ManualInputTab> {
   List<_PesertaEntry> get _filtered {
     if (_query.isEmpty) return _peserta;
     final q = _query.toLowerCase();
-    return _peserta
-        .where((p) => p.name.toLowerCase().contains(q))
-        .toList();
+    return _peserta.where((p) => p.name.toLowerCase().contains(q)).toList();
   }
 
   // ── Dialog tambah peserta ────────────────────────────────────────────────
@@ -58,18 +56,13 @@ class _ManualInputTabState extends State<ManualInputTab> {
         final colorScheme = Theme.of(ctx).colorScheme;
         final textTheme = Theme.of(ctx).textTheme;
 
-        InputDecoration fieldDeco({
-          required String label,
-          String? hint,
-          IconData? icon,
-        }) =>
+        InputDecoration fieldDeco({required String label, String? hint, IconData? icon}) =>
             InputDecoration(
               labelText: label,
               hintText: hint,
               prefixIcon: icon != null ? Icon(icon) : null,
               filled: true,
-              fillColor:
-                  colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+              fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
@@ -83,13 +76,10 @@ class _ManualInputTabState extends State<ManualInputTab> {
         return StatefulBuilder(
           builder: (ctx, setDialogState) {
             return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               title: Text(
                 'Tambah Peserta',
-                style:
-                    textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
               ),
               // SingleChildScrollView mencegah overflow saat NPA field muncul
               content: SingleChildScrollView(
@@ -114,9 +104,7 @@ class _ManualInputTabState extends State<ManualInputTab> {
                     // SegmentedButton tidak membuka overlay — aman di dalam dialog
                     Text(
                       'Status Keanggotaan',
-                      style: textTheme.labelMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
+                      style: textTheme.labelMedium?.copyWith(color: colorScheme.onSurfaceVariant),
                     ),
                     const SizedBox(height: 8),
                     SegmentedButton<bool>(
@@ -139,10 +127,8 @@ class _ManualInputTabState extends State<ManualInputTab> {
                         if (!v) npaController.clear();
                       },
                       style: SegmentedButton.styleFrom(
-                        selectedBackgroundColor:
-                            colorScheme.primaryContainer,
-                        selectedForegroundColor:
-                            colorScheme.onPrimaryContainer,
+                        selectedBackgroundColor: colorScheme.primaryContainer,
+                        selectedForegroundColor: colorScheme.onPrimaryContainer,
                       ),
                     ),
 
@@ -171,9 +157,7 @@ class _ManualInputTabState extends State<ManualInputTab> {
                   style: FilledButton.styleFrom(
                     backgroundColor: KegiatinCustomTheme.appBarBottom,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   onPressed: () {
                     if (nameController.text.trim().isEmpty) {
@@ -241,14 +225,8 @@ class _ManualInputTabState extends State<ManualInputTab> {
                   style: textTheme.bodyMedium,
                   decoration: InputDecoration(
                     hintText: 'Input Nama Anggota',
-                    hintStyle: textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: colorScheme.onSurfaceVariant,
-                      size: 20,
-                    ),
+                    hintStyle: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+                    prefixIcon: Icon(Icons.search, color: colorScheme.onSurfaceVariant, size: 20),
                     suffixIcon: _query.isNotEmpty
                         ? IconButton(
                             icon: const Icon(Icons.clear, size: 18),
@@ -259,12 +237,8 @@ class _ManualInputTabState extends State<ManualInputTab> {
                           )
                         : null,
                     filled: true,
-                    fillColor: colorScheme.surfaceContainerHighest
-                        .withValues(alpha: 0.5),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
+                    fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
@@ -275,10 +249,7 @@ class _ManualInputTabState extends State<ManualInputTab> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: colorScheme.primary,
-                        width: 1.5,
-                      ),
+                      borderSide: BorderSide(color: colorScheme.primary, width: 1.5),
                     ),
                   ),
                 ),
@@ -291,13 +262,8 @@ class _ManualInputTabState extends State<ManualInputTab> {
                 style: FilledButton.styleFrom(
                   backgroundColor: KegiatinCustomTheme.appBarBottom,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 18,
-                    vertical: 14,
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
                 ),
               ),
             ],
@@ -313,9 +279,7 @@ class _ManualInputTabState extends State<ManualInputTab> {
               _peserta.isEmpty
                   ? 'Belum ada anggota ditambahkan'
                   : 'Anggota Terdaftar: ${_peserta.length}',
-              style: textTheme.labelMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
+              style: textTheme.labelMedium?.copyWith(color: colorScheme.onSurfaceVariant),
             ),
           ),
         ),
@@ -328,9 +292,7 @@ class _ManualInputTabState extends State<ManualInputTab> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        _peserta.isEmpty
-                            ? Icons.group_add_outlined
-                            : Icons.person_search_outlined,
+                        _peserta.isEmpty ? Icons.group_add_outlined : Icons.person_search_outlined,
                         size: 48,
                         color: colorScheme.outlineVariant,
                       ),
@@ -339,9 +301,7 @@ class _ManualInputTabState extends State<ManualInputTab> {
                         _peserta.isEmpty
                             ? 'Tekan "Tambah" untuk mencatat peserta'
                             : 'Peserta tidak ditemukan',
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
+                        style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -351,10 +311,8 @@ class _ManualInputTabState extends State<ManualInputTab> {
                   padding: const EdgeInsets.fromLTRB(16, 4, 16, 80),
                   itemCount: filtered.length,
                   separatorBuilder: (_, i) => const SizedBox(height: 8),
-                  itemBuilder: (context, i) => _PesertaCard(
-                    entry: filtered[i],
-                    onToggle: () => _toggleMark(filtered[i]),
-                  ),
+                  itemBuilder: (context, i) =>
+                      _PesertaCard(entry: filtered[i], onToggle: () => _toggleMark(filtered[i])),
                 ),
         ),
       ],
@@ -368,12 +326,7 @@ class _ManualInputTabState extends State<ManualInputTab> {
 /// [isPresent] bersifat mutable agar status hadir bisa diubah in-place
 /// tanpa mengganggu urutan daftar.
 class _PesertaEntry {
-  _PesertaEntry({
-    required this.name,
-    required this.initials,
-    required this.isAnggota,
-    this.npa,
-  });
+  _PesertaEntry({required this.name, required this.initials, required this.isAnggota, this.npa});
 
   final String name;
   final String initials;
@@ -385,7 +338,7 @@ class _PesertaEntry {
   bool isPresent = false;
 }
 
-// Card 
+// Card
 
 class _PesertaCard extends StatelessWidget {
   const _PesertaCard({required this.entry, required this.onToggle});
@@ -403,9 +356,7 @@ class _PesertaCard extends StatelessWidget {
       duration: const Duration(milliseconds: 250),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: marked
-            ? colorScheme.primaryContainer.withValues(alpha: 0.4)
-            : colorScheme.surface,
+        color: marked ? colorScheme.primaryContainer.withValues(alpha: 0.4) : colorScheme.surface,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: marked
@@ -443,20 +394,16 @@ class _PesertaCard extends StatelessWidget {
               children: [
                 Text(
                   entry.name,
-                  style: textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   entry.isAnggota
                       ? (entry.npa != null && entry.npa!.isNotEmpty
-                          ? 'NPA ${entry.npa}'
-                          : 'Anggota')
+                            ? 'NPA ${entry.npa}'
+                            : 'Anggota')
                       : 'Non-Anggota',
-                  style: textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
+                  style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
                 ),
               ],
             ),
@@ -467,11 +414,7 @@ class _PesertaCard extends StatelessWidget {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.check_circle_rounded,
-                  color: colorScheme.primary,
-                  size: 18,
-                ),
+                Icon(Icons.check_circle_rounded, color: colorScheme.primary, size: 18),
                 const SizedBox(width: 4),
                 Text(
                   'Hadir',
@@ -488,13 +431,8 @@ class _PesertaCard extends StatelessWidget {
               style: OutlinedButton.styleFrom(
                 side: BorderSide(color: colorScheme.primary),
                 foregroundColor: colorScheme.primary,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 6,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 minimumSize: Size.zero,
               ),

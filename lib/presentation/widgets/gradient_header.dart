@@ -2,12 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kegiatin/core/theme/custom.dart';
 
 class GradientHeader extends StatelessWidget {
-  const GradientHeader({
-    super.key,
-    required this.onBack,
-    required this.title,
-    this.subtitle,
-  });
+  const GradientHeader({super.key, required this.onBack, required this.title, this.subtitle});
 
   /// Callback dipanggil saat tombol kembali ditekan.
   final VoidCallback onBack;
@@ -33,13 +28,7 @@ class GradientHeader extends StatelessWidget {
           bottomLeft: Radius.circular(28),
           bottomRight: Radius.circular(28),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Color(0x4D0F3F7A),
-            blurRadius: 12,
-            offset: Offset(0, 4),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Color(0x4D0F3F7A), blurRadius: 12, offset: Offset(0, 4))],
       ),
       child: SafeArea(
         bottom: false,

@@ -11,6 +11,5 @@ class RegisterUseCase extends UseCase<User, RegisterInput> {
   RegisterUseCase(this._repository);
 
   @override
-  Future<Either<Failure, User>> call(RegisterInput input) =>
-      _repository.register(input);
+  Future<Either<Failure, User>> call(RegisterInput input) => _repository.register(input);
 }

@@ -10,6 +10,5 @@ class GetCurrentUserUseCase extends UseCase<User, NoInput> {
   GetCurrentUserUseCase(this._repository);
 
   @override
-  Future<Either<Failure, User>> call(NoInput input) =>
-      _repository.getCurrentUser();
+  Future<Either<Failure, User>> call(NoInput input) => _repository.getCurrentUser();
 }
