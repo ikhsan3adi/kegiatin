@@ -3,12 +3,12 @@ import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/enums/event_status.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
 
-class CardEvent extends StatelessWidget {
+class PesertaCardEvent extends StatelessWidget {
   final Event event;
   final VoidCallback? onTap;
   final bool showActionButton;
 
-  const CardEvent({super.key, required this.event, this.onTap, this.showActionButton = false});
+  const PesertaCardEvent({super.key, required this.event, this.onTap, this.showActionButton = false});
 
   @override
   Widget build(BuildContext context) {

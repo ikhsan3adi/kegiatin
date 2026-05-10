@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/core/theme/custom.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/entities/paginated_result.dart';
-import 'package:kegiatin/presentation/controllers/event_list_controller.dart';
+import 'package:kegiatin/presentation/controllers/event/event_list_controller.dart';
 import 'package:kegiatin/presentation/pages/admin/widget/manual_input_tab.dart';
 import 'package:kegiatin/presentation/pages/admin/widget/qr_scanner_tab.dart';
 
@@ -64,7 +64,7 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
     final textTheme = Theme.of(context).textTheme;
 
     // Watch event list — ambil semua (limit tinggi) tanpa filter agar dropdown lengkap
-    final eventsAsync = ref.watch(eventListProvider(limit: 100));
+    final eventsAsync = ref.watch(eventListControllerProvider(limit: 100));
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -77,7 +77,7 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
             totalScanned: _totalScanned,
             onEventChanged: (event) => setState(() => _selectedEvent = event),
             onBack: () => Navigator.of(context).pop(),
-            onRetry: () => ref.invalidate(eventListProvider(limit: 100)),
+            onRetry: () => ref.invalidate(eventListControllerProvider(limit: 100)),
           ),
 
           // TabBar

@@ -5,7 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'event_detail_controller.g.dart';
 
 @riverpod
-class EventDetail extends _$EventDetail {
+class EventDetailController extends _$EventDetailController {
   @override
   FutureOr<Event> build(String id) async {
     return _fetchEventById(id);

@@ -5,10 +5,10 @@ import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/enums/event_status.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
 import 'package:kegiatin/domain/enums/event_visibility.dart';
-import 'package:kegiatin/presentation/controllers/complete_event_controller.dart';
-import 'package:kegiatin/presentation/controllers/event_list_controller.dart';
-import 'package:kegiatin/presentation/controllers/publish_event_controller.dart';
-import 'package:kegiatin/presentation/controllers/start_event_controller.dart';
+import 'package:kegiatin/presentation/controllers/event/complete_event_controller.dart';
+import 'package:kegiatin/presentation/controllers/event/event_list_controller.dart';
+import 'package:kegiatin/presentation/controllers/event/publish_event_controller.dart';
+import 'package:kegiatin/presentation/controllers/event/start_event_controller.dart';
 import 'package:kegiatin/presentation/widgets/kegiatin_app_bar.dart';
 
 class AdminEventDetailPage extends ConsumerWidget {
@@ -31,7 +31,7 @@ class AdminEventDetailPage extends ConsumerWidget {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(const SnackBar(content: Text('Kegiatan berhasil di-publish!')));
-        ref.invalidate(eventListProvider);
+        ref.invalidate(eventListControllerProvider);
         context.pop();
       }
     });
@@ -49,7 +49,7 @@ class AdminEventDetailPage extends ConsumerWidget {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(const SnackBar(content: Text('Kegiatan berhasil dimulai!')));
-        ref.invalidate(eventListProvider);
+        ref.invalidate(eventListControllerProvider);
         context.pop();
       }
     });
@@ -67,7 +67,7 @@ class AdminEventDetailPage extends ConsumerWidget {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(const SnackBar(content: Text('Kegiatan berhasil diselesaikan!')));
-        ref.invalidate(eventListProvider);
+        ref.invalidate(eventListControllerProvider);
         context.pop();
       }
     });

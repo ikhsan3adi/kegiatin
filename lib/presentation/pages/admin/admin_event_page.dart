@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kegiatin/presentation/controllers/event_list_controller.dart';
+import 'package:kegiatin/presentation/controllers/event/event_list_controller.dart';
 import 'package:kegiatin/presentation/pages/peserta/widget/peserta_card_event.dart';
 import 'package:kegiatin/presentation/widgets/kegiatin_app_bar.dart';
 
@@ -14,7 +14,7 @@ class AdminEventPage extends ConsumerWidget {
     final textTheme = Theme.of(context).textTheme;
 
     // Fetch events (for UI purposes we use the existing provider)
-    final eventsState = ref.watch(eventListProvider());
+    final eventsState = ref.watch(eventListControllerProvider());
 
     return SingleChildScrollView(
       child: Column(
@@ -73,7 +73,7 @@ class AdminEventPage extends ConsumerWidget {
                 itemCount: events.length,
                 itemBuilder: (context, index) {
                   final event = events[index];
-                  return CardEvent(
+                  return PesertaCardEvent(
                     event: event,
                     showActionButton: false,
                     onTap: () => context.push('/admin/event-detail', extra: event),

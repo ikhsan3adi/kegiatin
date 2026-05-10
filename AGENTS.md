@@ -30,10 +30,20 @@ lib/
   core/          # constants, errors, extensions, network, theme, utils
   domain/        # entities, enums, usecases, repository interfaces (pure Dart)
   data/          # models (freezed), datasources (remote+local), repository impls
-  presentation/  # pages, widgets, controllers (Riverpod providers)
+  presentation/  # pages, widgets, controllers, providers (Riverpod DI / wiring)
 ```
 
 Dependency rule: `presentation/ -> domain/ <- data/`. Domain must not import from data or presentation.
+
+### Presentation conventions
+
+- **Layer-first stays strict:** under `presentation/` use only `controllers/`, `pages/`, `widgets/`, and `providers/` (dependency injection / Riverpod provider wiring). Do not introduce parallel “layers” per role.
+- **Admin vs peserta is UI scope, not a layer:** express role-specific screens with **folder + naming** under `pages/` (e.g. `pages/admin/`, `pages/peserta/`), not by duplicating entire `controllers/` or `widgets/` trees per role without rules.
+- **File and class names align:** for scoped screens use `{scope}_{feature}_page.dart` with a matching `ScopeFeaturePage` class (e.g. `peserta_dashboard_page.dart` → `PesertaDashboardPage`). Prefer scope prefix over UI-only labels (“Beranda”, “Acara”) in **type names**; labels stay in UI strings.
+- **One public widget per file** when practical; avoid orphan or duplicate placeholder widgets in the same file as another page.
+- **Splitting `providers/`:** keep DI in [`presentation/providers/`](lib/presentation/providers/) as [`core_providers.dart`](lib/presentation/providers/core_providers.dart) (prefs, Hive, network, Dio), [`auth_providers.dart`](lib/presentation/providers/auth_providers.dart), [`event_providers.dart`](lib/presentation/providers/event_providers.dart), re-exported from [`providers.dart`](lib/presentation/providers/providers.dart). Split by **technical domain**, not by admin vs peserta folders.
+- **Riverpod:** document `keepAlive` for long-lived DI and auth-related providers; default `@riverpod` for screen-scoped async notifiers unless there is an explicit reason.
+- **Controllers:** prefer the suffix **`Controller`** on `@riverpod` / `@Riverpod` notifier classes (e.g. `EventListController`, `CreateEventController`). Group **event-related** UI notifiers under [`presentation/controllers/event/`](lib/presentation/controllers/event/) (list/detail/create/publish/start/complete). Auth stays under [`presentation/controllers/auth/`](lib/presentation/controllers/auth/).
 
 ## Key Technical Decisions
 

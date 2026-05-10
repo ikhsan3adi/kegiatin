@@ -16,9 +16,9 @@ class _NavbarPesertaState extends ConsumerState<NavbarPeserta> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = const [
-    BerandaPage(),
-    AcaraPage(),
-    RiwayatPage(),
+    PesertaDashboardPage(),
+    PesertaEventPage(),
+    PesertaRiwayatPage(),
     PesertaProfilePage(),
   ];
 
