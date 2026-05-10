@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/domain/enums/event_status.dart';
 import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
 import 'package:kegiatin/presentation/controllers/event/event_list_controller.dart';
-import 'package:kegiatin/presentation/pages/peserta/widget/peserta_card_event.dart';
+import 'package:kegiatin/presentation/widgets/event_list_card.dart';
 import 'package:kegiatin/presentation/widgets/kegiatin_app_bar.dart';
 
 class PesertaDashboardPage extends ConsumerWidget {
@@ -109,7 +109,7 @@ class PesertaDashboardPage extends ConsumerWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: filteredEvents.length, // Tampilkan semua yang lolos filter
                   itemBuilder: (context, index) {
-                    return PesertaCardEvent(event: filteredEvents[index]);
+                    return EventListCard(event: filteredEvents[index]);
                   },
                 );
               },

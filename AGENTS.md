@@ -41,6 +41,7 @@ Dependency rule: `presentation/ -> domain/ <- data/`. Domain must not import fro
 - **Admin vs peserta is UI scope, not a layer:** express role-specific screens with **folder + naming** under `pages/` (e.g. `pages/admin/`, `pages/peserta/`), not by duplicating entire `controllers/` or `widgets/` trees per role without rules.
 - **File and class names align:** for scoped screens use `{scope}_{feature}_page.dart` with a matching `ScopeFeaturePage` class (e.g. `peserta_dashboard_page.dart` → `PesertaDashboardPage`). Prefer scope prefix over UI-only labels (“Beranda”, “Acara”) in **type names**; labels stay in UI strings.
 - **One public widget per file** when practical; avoid orphan or duplicate placeholder widgets in the same file as another page.
+- **Widget placement:** shared UI used from **multiple screens** or **both admin and peserta** lives under [`presentation/widgets/`](lib/presentation/widgets/) (e.g. [`event_list_card.dart`](lib/presentation/widgets/event_list_card.dart)). Widgets **only** used inside one role’s shell or one flow stay next to those pages under `pages/<admin|peserta>/widget/` (singular `widget`).
 - **Splitting `providers/`:** keep DI in [`presentation/providers/`](lib/presentation/providers/) as [`core_providers.dart`](lib/presentation/providers/core_providers.dart) (prefs, Hive, network, Dio), [`auth_providers.dart`](lib/presentation/providers/auth_providers.dart), [`event_providers.dart`](lib/presentation/providers/event_providers.dart), re-exported from [`providers.dart`](lib/presentation/providers/providers.dart). Split by **technical domain**, not by admin vs peserta folders.
 - **Riverpod:** document `keepAlive` for long-lived DI and auth-related providers; default `@riverpod` for screen-scoped async notifiers unless there is an explicit reason.
 - **Controllers:** prefer the suffix **`Controller`** on `@riverpod` / `@Riverpod` notifier classes (e.g. `EventListController`, `CreateEventController`). Group **event-related** UI notifiers under [`presentation/controllers/event/`](lib/presentation/controllers/event/) (list/detail/create/publish/start/complete). Auth stays under [`presentation/controllers/auth/`](lib/presentation/controllers/auth/).
@@ -52,7 +53,7 @@ Dependency rule: `presentation/ -> domain/ <- data/`. Domain must not import fro
 - **HTTP:** `dio` with interceptors for JWT injection and token refresh.
 - **Models:** `freezed` + `json_serializable`. Run `build_runner` after any model change.
 - **Error handling:** `fpdart` `Either<Failure, T>` in use cases. `Failure` is a sealed class.
-- **Routing:** `go_router` with `MaterialApp.router`.
+- **Routing:** `go_router` with `MaterialApp.router`. Event detail routes use path params `/admin/event-detail/:eventId` and `/peserta/event-detail/:eventId`; load with `eventDetailControllerProvider(eventId)` — do not pass `Event` via `extra` for those routes.
 - **QR:** `mobile_scanner` (scan), `qr_flutter` (render). NOT `qr_code_scanner` (unmaintained).
 - **Testing mocks:** `mocktail`, NOT `mockito`.
 - **Notifications:** Client-local only (Hive box). Not stored server-side. Delivery mechanism TBD (FCM vs WebSocket).

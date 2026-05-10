@@ -1,22 +1,74 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/enums/event_status.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
 import 'package:kegiatin/domain/enums/event_visibility.dart';
+import 'package:kegiatin/presentation/controllers/event/event_detail_controller.dart';
 import 'package:kegiatin/presentation/widgets/kegiatin_app_bar.dart';
 
-class PesertaEventDetailPage extends StatelessWidget {
-  final Event event;
+class PesertaEventDetailPage extends ConsumerWidget {
+  const PesertaEventDetailPage({super.key, required this.eventId});
 
-  const PesertaEventDetailPage({super.key, required this.event});
+  /// UUID dari route `/peserta/event-detail/:eventId`.
+  final String eventId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final asyncEvent = ref.watch(eventDetailControllerProvider(eventId));
+
+    return asyncEvent.when(
+      loading: () => _pesertaDetailFallbackScaffold(
+        context,
+        const Center(child: CircularProgressIndicator()),
+      ),
+      error: (error, _) => _pesertaDetailFallbackScaffold(
+        context,
+        Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('$error', textAlign: TextAlign.center),
+                const SizedBox(height: 16),
+                FilledButton(
+                  onPressed: () => ref.invalidate(eventDetailControllerProvider(eventId)),
+                  child: const Text('Coba lagi'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      data: (event) => _PesertaEventDetailContent(event: event),
+    );
+  }
+}
+
+Widget _pesertaDetailFallbackScaffold(BuildContext context, Widget body) {
+  final colorScheme = Theme.of(context).colorScheme;
+  return Scaffold(
+    backgroundColor: colorScheme.surfaceContainerHighest,
+    appBar: AppBar(
+      leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
+      backgroundColor: colorScheme.surfaceContainerHighest,
+    ),
+    body: body,
+  );
+}
+
+class _PesertaEventDetailContent extends StatelessWidget {
+  const _PesertaEventDetailContent({required this.event});
+
+  final Event event;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    // Ambil sesi pertama untuk info waktu
     final firstSession = event.sessions.isNotEmpty ? event.sessions.first : null;
     final startTime = firstSession?.startTime;
     final dateStr = startTime != null
@@ -27,15 +79,13 @@ class PesertaEventDetailPage extends StatelessWidget {
       backgroundColor: colorScheme.surfaceContainerHighest,
       body: Column(
         children: [
-          // Header Section menggunakan KegiatinAppBar
           KegiatinAppBar(
-            height: null, // Membiarkan tinggi mengikuti konten untuk menghindari overflow
+            height: null,
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Tombol Back
                 InkWell(
                   onTap: () => context.pop(),
                   borderRadius: BorderRadius.circular(24),
@@ -49,8 +99,6 @@ class PesertaEventDetailPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
-
-                // Baris Badge / Label
                 Row(
                   children: [
                     _buildBadge(
@@ -67,8 +115,6 @@ class PesertaEventDetailPage extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 12),
-
-                // Judul Kegiatan
                 Text(
                   event.title,
                   style: textTheme.titleLarge?.copyWith(
@@ -79,8 +125,6 @@ class PesertaEventDetailPage extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 8),
-
-                // Baris Waktu & Lokasi
                 Row(
                   children: [
                     Icon(
@@ -121,8 +165,6 @@ class PesertaEventDetailPage extends StatelessWidget {
               ],
             ),
           ),
-
-          // Tab "Info"
           Container(
             width: double.infinity,
             color: colorScheme.surface,
@@ -138,14 +180,11 @@ class PesertaEventDetailPage extends StatelessWidget {
               ),
             ),
           ),
-
-          // Scrollable Body
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  // Deskripsi Card
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
@@ -189,8 +228,6 @@ class PesertaEventDetailPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // Detail Card
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
@@ -230,10 +267,8 @@ class PesertaEventDetailPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-
-                  // Tombol Aksi (Daftar / Lihat QR)
                   SizedBox(width: double.infinity, child: _buildActionButton(context)),
-                  const SizedBox(height: 40), // Ruang bawah
+                  const SizedBox(height: 40),
                 ],
               ),
             ),
@@ -249,9 +284,12 @@ class PesertaEventDetailPage extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(label, style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 14)),
-        Text(
-          value,
-          style: TextStyle(color: colorScheme.onSurface, fontSize: 14, fontWeight: FontWeight.w500),
+        Flexible(
+          child: Text(
+            value,
+            textAlign: TextAlign.end,
+            style: TextStyle(color: colorScheme.onSurface, fontSize: 14, fontWeight: FontWeight.w500),
+          ),
         ),
       ],
     );
@@ -305,7 +343,6 @@ class PesertaEventDetailPage extends StatelessWidget {
       text = 'Lihat QR Saya';
       icon = Icons.qr_code_2;
     } else {
-      // Default: Published / Draft
       bgColor = colorScheme.primaryContainer;
       textColor = colorScheme.onPrimaryContainer;
       text = 'Daftar Kegiatan';
