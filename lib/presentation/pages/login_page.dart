@@ -87,7 +87,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       Text(
                         'KEGIATIN',
                         style: textTheme.labelMedium?.copyWith(
-                          color: Colors.white,
+                          color: KegiatinCustomTheme.onGradient,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 1.5,
                         ),
@@ -107,11 +107,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             height: 120,
                             margin: const EdgeInsets.only(bottom: 16),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: colorScheme.surface,
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.grey.withValues(alpha: 0.2),
+                                  color: colorScheme.shadow.withValues(alpha: 0.2),
                                   blurRadius: 8,
                                   offset: const Offset(0, 2),
                                 ),
@@ -121,11 +121,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           ),
                           Container(
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: colorScheme.surface,
                               borderRadius: BorderRadius.circular(20),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.grey.withValues(alpha: 0.1),
+                                  color: colorScheme.shadow.withValues(alpha: 0.1),
                                   blurRadius: 12,
                                   offset: const Offset(0, 4),
                                 ),
@@ -231,7 +231,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                     children: [
                                       Text(
                                         "Don't have an account? ",
-                                        style: TextStyle(color: Colors.grey.shade600),
+                                        style: TextStyle(color: colorScheme.onSurfaceVariant),
                                       ),
                                       TextButton(
                                         onPressed: () => context.go('/register'),

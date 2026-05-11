@@ -854,13 +854,13 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                                 height: 22,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2.5,
-                                  color: Colors.white,
+                                  color: KegiatinCustomTheme.onGradient,
                                 ),
                               )
                             : Text(
                                 'Simpan Kegiatan',
                                 style: textTheme.labelLarge?.copyWith(
-                                  color: Colors.white,
+                                  color: KegiatinCustomTheme.onGradient,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),

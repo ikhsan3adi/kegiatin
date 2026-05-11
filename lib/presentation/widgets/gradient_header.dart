@@ -28,7 +28,13 @@ class GradientHeader extends StatelessWidget {
           bottomLeft: Radius.circular(28),
           bottomRight: Radius.circular(28),
         ),
-        boxShadow: [BoxShadow(color: Color(0x4D0F3F7A), blurRadius: 12, offset: Offset(0, 4))],
+        boxShadow: [
+          BoxShadow(
+            color: KegiatinCustomTheme.gradientShadow,
+            blurRadius: 12,
+            offset: Offset(0, 4),
+          ),
+        ],
       ),
       child: SafeArea(
         bottom: false,
@@ -38,7 +44,7 @@ class GradientHeader extends StatelessWidget {
             children: [
               IconButton(
                 onPressed: onBack,
-                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                icon: const Icon(Icons.arrow_back, color: KegiatinCustomTheme.onGradient),
                 tooltip: 'Kembali',
               ),
               const SizedBox(width: 4),
@@ -49,7 +55,7 @@ class GradientHeader extends StatelessWidget {
                   Text(
                     title,
                     style: textTheme.titleLarge?.copyWith(
-                      color: Colors.white,
+                      color: KegiatinCustomTheme.onGradient,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -57,7 +63,7 @@ class GradientHeader extends StatelessWidget {
                     Text(
                       subtitle!,
                       style: textTheme.bodySmall?.copyWith(
-                        color: Colors.white.withValues(alpha: 0.85),
+                        color: KegiatinCustomTheme.onGradientDim,
                       ),
                     ),
                 ],

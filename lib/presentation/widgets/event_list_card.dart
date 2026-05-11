@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kegiatin/core/theme/custom.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/enums/event_status.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
@@ -136,7 +137,10 @@ class EventListCard extends StatelessWidget {
 
                   if (showActionButton) ...[
                     const SizedBox(height: 16),
-                    SizedBox(width: double.infinity, child: _buildActionButton(context)),
+                    SizedBox(
+                      width: double.infinity,
+                      child: _buildActionButton(context, colorScheme),
+                    ),
                   ],
                 ],
               ),
@@ -158,27 +162,26 @@ class EventListCard extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(BuildContext context) {
-    // Mocking state based on EventStatus for UI purposes
+  Widget _buildActionButton(BuildContext context, ColorScheme colorScheme) {
     Color bgColor;
     Color textColor;
     String text;
     IconData? icon;
 
     if (event.status == EventStatus.completed) {
-      bgColor = Colors.blue.shade100;
-      textColor = Colors.blue.shade700;
+      bgColor = colorScheme.primaryContainer;
+      textColor = colorScheme.onPrimaryContainer;
       text = 'Kehadiran Terverifikasi';
       icon = Icons.verified;
     } else if (event.status == EventStatus.ongoing) {
-      bgColor = Colors.lightGreen.shade300;
-      textColor = Colors.green.shade800;
+      bgColor = colorScheme.tertiaryContainer;
+      textColor = colorScheme.onTertiaryContainer;
       text = 'Lihat QR Saya';
       icon = Icons.qr_code_2;
     } else {
       // Default: Published / Draft
-      bgColor = Colors.orange.shade100;
-      textColor = Colors.orange.shade800;
+      bgColor = colorScheme.secondaryContainer;
+      textColor = colorScheme.onSecondaryContainer;
       text = 'Detail Kegiatan';
       icon = Icons.assignment_outlined;
     }
@@ -242,13 +245,13 @@ class EventListCard extends StatelessWidget {
   Color _getStatusColor(EventStatus status, ColorScheme colorScheme) {
     switch (status) {
       case EventStatus.ongoing:
-        return const Color(0xFF2E7D32); // Hijau (Berlangsung)
+        return KegiatinCustomTheme.statusOngoing;
       case EventStatus.published:
-        return colorScheme.primary; // Warna utama (Segera/Published)
+        return colorScheme.primary;
       case EventStatus.completed:
-        return colorScheme.outline; // Abu-abu (Selesai)
+        return colorScheme.outline;
       case EventStatus.cancelled:
-        return colorScheme.error; // Merah (Batal)
+        return colorScheme.error;
       default:
         return colorScheme.secondary;
     }

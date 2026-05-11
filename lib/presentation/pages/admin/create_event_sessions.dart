@@ -203,7 +203,7 @@ class SessionChip extends StatelessWidget {
     if (!isCustom) return chip;
 
     return Material(
-      color: Colors.transparent,
+      type: MaterialType.transparency,
       child: InkWell(onTap: onTap, borderRadius: BorderRadius.circular(8), child: chip),
     );
   }

@@ -71,50 +71,11 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     return Scaffold(
       body: Stack(
         children: [
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              height: 280,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [KegiatinCustomTheme.appBarTop, KegiatinCustomTheme.appBarBottom],
-                ),
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(48),
-                  bottomRight: Radius.circular(48),
-                ),
-              ),
-            ),
-          ),
+          _buildGradientHeader(),
           SafeArea(
             child: Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                  child: Row(
-                    children: [
-                      Image.asset(
-                        'assets/LogoKegiaTin 2.png',
-                        width: 24,
-                        height: 24,
-                        fit: BoxFit.contain,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'KEGIATIN',
-                        style: textTheme.labelMedium?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.5,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                _buildBrandBar(textTheme),
                 Expanded(
                   child: Center(
                     child: SingleChildScrollView(
@@ -122,210 +83,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       child: Stack(
                         alignment: Alignment.topCenter,
                         children: [
-                          Container(
-                            margin: const EdgeInsets.only(top: 30, bottom: 24),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withValues(alpha: 0.1),
-                                  blurRadius: 12,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-                            child: Form(
-                              key: _formKey,
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  const SizedBox(height: 20),
-                                  Text(
-                                    'SIGN UP',
-                                    style: textTheme.titleLarge?.copyWith(
-                                      color: colorScheme.primary,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 36,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  const SizedBox(height: 24),
-                                  SegmentedButton<String>(
-                                    segments: const [
-                                      ButtonSegment(value: 'UMUM', label: Text('Umum')),
-                                      ButtonSegment(value: 'ANGGOTA', label: Text('Anggota')),
-                                    ],
-                                    selected: {_userType},
-                                    style: ButtonStyle(
-                                      backgroundColor: WidgetStateProperty.resolveWith<Color?>(
-                                        (states) => states.contains(WidgetState.selected)
-                                            ? KegiatinCustomTheme.selectionBlue
-                                            : Colors.white,
-                                      ),
-                                      foregroundColor: WidgetStateProperty.resolveWith<Color?>(
-                                        (states) => states.contains(WidgetState.selected)
-                                            ? Colors.white
-                                            : colorScheme.primary,
-                                      ),
-                                      side: WidgetStateProperty.resolveWith<BorderSide?>(
-                                        (states) => BorderSide(
-                                          color: states.contains(WidgetState.selected)
-                                              ? KegiatinCustomTheme.selectionBlue
-                                              : Colors.grey.shade300,
-                                        ),
-                                      ),
-                                    ),
-                                    onSelectionChanged: (selection) =>
-                                        setState(() => _userType = selection.first),
-                                  ),
-                                  const SizedBox(height: 24),
-                                  TextFormField(
-                                    controller: _nameController,
-                                    textInputAction: TextInputAction.next,
-                                    decoration: InputDecoration(
-                                      labelText: 'Nama Lengkap',
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 14,
-                                      ),
-                                    ),
-                                    validator: (v) =>
-                                        (v == null || v.isEmpty) ? 'Nama wajib diisi' : null,
-                                  ),
-
-                                  const SizedBox(height: 16),
-                                  TextFormField(
-                                    controller: _emailController,
-                                    keyboardType: TextInputType.emailAddress,
-                                    textInputAction: TextInputAction.next,
-                                    decoration: InputDecoration(
-                                      labelText: 'Email',
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 14,
-                                      ),
-                                    ),
-                                    validator: (v) {
-                                      if (v == null || v.isEmpty) return 'Email wajib diisi';
-                                      if (!v.contains('@')) return 'Format email tidak valid';
-                                      return null;
-                                    },
-                                  ),
-                                  const SizedBox(height: 16),
-                                  TextFormField(
-                                    controller: _passwordController,
-                                    obscureText: _obscurePassword,
-                                    textInputAction: TextInputAction.done,
-                                    decoration: InputDecoration(
-                                      labelText: 'Password',
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 14,
-                                      ),
-                                      suffixIcon: IconButton(
-                                        icon: Icon(
-                                          _obscurePassword
-                                              ? Icons.visibility_off
-                                              : Icons.visibility,
-                                        ),
-                                        onPressed: () =>
-                                            setState(() => _obscurePassword = !_obscurePassword),
-                                      ),
-                                    ),
-                                    validator: (v) {
-                                      if (v == null || v.isEmpty) return 'Password wajib diisi';
-                                      if (v.length < 6) return 'Minimal 6 karakter';
-                                      return null;
-                                    },
-                                  ),
-                                  if (_userType == 'ANGGOTA') ...[
-                                    const SizedBox(height: 16),
-                                    TextFormField(
-                                      controller: _npaController,
-                                      decoration: InputDecoration(
-                                        labelText: 'NPA',
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                        contentPadding: const EdgeInsets.symmetric(
-                                          horizontal: 16,
-                                          vertical: 14,
-                                        ),
-                                      ),
-                                      validator: (v) {
-                                        if (_userType == 'ANGGOTA' && (v == null || v.isEmpty)) {
-                                          return 'NPA wajib diisi untuk anggota';
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                  ],
-                                  const SizedBox(height: 28),
-                                  FilledButton(
-                                    onPressed: authState.isLoading ? null : _handleRegister,
-                                    child: authState.isLoading
-                                        ? const SizedBox(
-                                            height: 20,
-                                            width: 20,
-                                            child: CircularProgressIndicator(strokeWidth: 2),
-                                          )
-                                        : const Text('SIGN UP'),
-                                  ),
-                                  const SizedBox(height: 16),
-                                  Row(
-                                    children: [
-                                      Expanded(child: Divider(color: Colors.grey.shade300)),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                                        child: Text(
-                                          'OR',
-                                          style: TextStyle(
-                                            color: Colors.grey.shade600,
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                      ),
-                                      Expanded(child: Divider(color: Colors.grey.shade300)),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 16),
-                                  OutlinedButton.icon(
-                                    onPressed: () {
-                                      // TODO: Implement Google Sign In
-                                    },
-                                    icon: const Icon(Icons.g_mobiledata),
-                                    label: const Text('Sign in with Google'),
-                                  ),
-                                  const SizedBox(height: 24),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        'Already have account? ',
-                                        style: TextStyle(color: Colors.grey.shade600),
-                                      ),
-                                      TextButton(
-                                        onPressed: () => context.go('/login'),
-                                        child: const Text('Login'),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                          _buildFormCard(authState, colorScheme, textTheme),
                         ],
                       ),
                     ),
@@ -336,6 +94,238 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildGradientHeader() {
+    return Positioned(
+      top: 0, left: 0, right: 0,
+      child: Container(
+        height: 280,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter, end: Alignment.bottomCenter,
+            colors: [KegiatinCustomTheme.appBarTop, KegiatinCustomTheme.appBarBottom],
+          ),
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(48), bottomRight: Radius.circular(48),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBrandBar(TextTheme textTheme) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      child: Row(
+        children: [
+          Image.asset('assets/LogoKegiaTin 2.png', width: 24, height: 24, fit: BoxFit.contain),
+          const SizedBox(width: 8),
+          Text(
+            'KEGIATIN',
+            style: textTheme.labelMedium?.copyWith(
+              color: KegiatinCustomTheme.onGradient,
+              fontWeight: FontWeight.w800, letterSpacing: 1.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFormCard(
+    AsyncValue authState, ColorScheme colorScheme, TextTheme textTheme,
+  ) {
+    return Container(
+      margin: const EdgeInsets.only(top: 30, bottom: 24),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.shadow.withValues(alpha: 0.1),
+            blurRadius: 12, offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: 20),
+            Text(
+              'SIGN UP',
+              style: textTheme.titleLarge?.copyWith(
+                color: colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 36,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            _buildSegmentedButton(colorScheme),
+            const SizedBox(height: 24),
+            _buildNameField(),
+            const SizedBox(height: 16),
+            _buildEmailField(),
+            const SizedBox(height: 16),
+            _buildPasswordField(),
+            if (_userType == 'ANGGOTA') ...[
+              const SizedBox(height: 16),
+              _buildNpaField(),
+            ],
+            const SizedBox(height: 28),
+            _buildSubmitButton(authState),
+            const SizedBox(height: 16),
+            _buildDivider(colorScheme),
+            const SizedBox(height: 16),
+            OutlinedButton.icon(
+              onPressed: () { /* TODO: Implement Google Sign In */ },
+              icon: const Icon(Icons.g_mobiledata),
+              label: const Text('Sign in with Google'),
+            ),
+            const SizedBox(height: 24),
+            _buildLoginLink(colorScheme),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSegmentedButton(ColorScheme colorScheme) {
+    return SegmentedButton<String>(
+      segments: const [
+        ButtonSegment(value: 'UMUM', label: Text('Umum')),
+        ButtonSegment(value: 'ANGGOTA', label: Text('Anggota')),
+      ],
+      selected: {_userType},
+      style: ButtonStyle(
+        backgroundColor: WidgetStateProperty.resolveWith<Color?>(
+          (states) => states.contains(WidgetState.selected)
+              ? KegiatinCustomTheme.selectionBlue
+              : colorScheme.surface,
+        ),
+        foregroundColor: WidgetStateProperty.resolveWith<Color?>(
+          (states) => states.contains(WidgetState.selected)
+              ? KegiatinCustomTheme.onGradient
+              : colorScheme.primary,
+        ),
+        side: WidgetStateProperty.resolveWith<BorderSide?>(
+          (states) => BorderSide(
+            color: states.contains(WidgetState.selected)
+                ? KegiatinCustomTheme.selectionBlue
+                : colorScheme.outlineVariant,
+          ),
+        ),
+      ),
+      onSelectionChanged: (selection) => setState(() => _userType = selection.first),
+    );
+  }
+
+  Widget _buildNameField() {
+    return TextFormField(
+      controller: _nameController,
+      textInputAction: TextInputAction.next,
+      decoration: InputDecoration(
+        labelText: 'Nama Lengkap',
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      ),
+      validator: (v) => (v == null || v.isEmpty) ? 'Nama wajib diisi' : null,
+    );
+  }
+
+  Widget _buildEmailField() {
+    return TextFormField(
+      controller: _emailController,
+      keyboardType: TextInputType.emailAddress,
+      textInputAction: TextInputAction.next,
+      decoration: InputDecoration(
+        labelText: 'Email',
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      ),
+      validator: (v) {
+        if (v == null || v.isEmpty) return 'Email wajib diisi';
+        if (!v.contains('@')) return 'Format email tidak valid';
+        return null;
+      },
+    );
+  }
+
+  Widget _buildPasswordField() {
+    return TextFormField(
+      controller: _passwordController,
+      obscureText: _obscurePassword,
+      textInputAction: TextInputAction.done,
+      decoration: InputDecoration(
+        labelText: 'Password',
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        suffixIcon: IconButton(
+          icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
+          onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+        ),
+      ),
+      validator: (v) {
+        if (v == null || v.isEmpty) return 'Password wajib diisi';
+        if (v.length < 6) return 'Minimal 6 karakter';
+        return null;
+      },
+    );
+  }
+
+  Widget _buildNpaField() {
+    return TextFormField(
+      controller: _npaController,
+      decoration: InputDecoration(
+        labelText: 'NPA',
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      ),
+      validator: (v) {
+        if (_userType == 'ANGGOTA' && (v == null || v.isEmpty)) {
+          return 'NPA wajib diisi untuk anggota';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildSubmitButton(AsyncValue authState) {
+    return FilledButton(
+      onPressed: authState.isLoading ? null : _handleRegister,
+      child: authState.isLoading
+          ? const SizedBox(
+              height: 20, width: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : const Text('SIGN UP'),
+    );
+  }
+
+  Widget _buildDivider(ColorScheme colorScheme) {
+    return Row(
+      children: [
+        Expanded(child: Divider(color: colorScheme.outlineVariant)),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Text('OR', style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 12)),
+        ),
+        Expanded(child: Divider(color: colorScheme.outlineVariant)),
+      ],
+    );
+  }
+
+  Widget _buildLoginLink(ColorScheme colorScheme) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text('Already have account? ', style: TextStyle(color: colorScheme.onSurfaceVariant)),
+        TextButton(onPressed: () => context.go('/login'), child: const Text('Login')),
+      ],
     );
   }
 }

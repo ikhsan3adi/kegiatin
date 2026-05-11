@@ -29,10 +29,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final brandColor = Theme.of(context).colorScheme.primary;
+    final colorScheme = Theme.of(context).colorScheme;
+    final brandColor = colorScheme.primary;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -120,8 +121,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
                       width: _currentPage == index ? 24 : 8,
                       decoration: BoxDecoration(
                         color: _currentPage == index
-                            ? Theme.of(context).colorScheme.primary
-                            : Colors.grey,
+                            ? colorScheme.primary
+                            : colorScheme.outlineVariant,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -140,9 +141,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
                         child: ElevatedButton(
                           onPressed: () => context.go('/register'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).colorScheme.primary,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            backgroundColor: colorScheme.primary,
+                            foregroundColor: colorScheme.onPrimary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
                           child: const Text(
                             'Sign Up',
@@ -157,10 +160,15 @@ class _OnboardingPageState extends State<OnboardingPage> {
                         child: OutlinedButton(
                           onPressed: () => context.go('/login'),
                           style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: Theme.of(context).colorScheme.primary),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            side: BorderSide(color: colorScheme.primary),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
-                          child: const Text('Login', style: TextStyle(fontWeight: FontWeight.bold)),
+                          child: const Text(
+                            'Login',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ),
                     ],

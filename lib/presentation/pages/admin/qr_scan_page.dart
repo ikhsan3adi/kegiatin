@@ -42,14 +42,18 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.check_circle, color: Colors.white, size: 20),
+            const Icon(
+              Icons.check_circle,
+              color: KegiatinCustomTheme.onGradient,
+              size: 20,
+            ),
             const SizedBox(width: 10),
             Expanded(
               child: Text('QR terbaca: $value', maxLines: 1, overflow: TextOverflow.ellipsis),
             ),
           ],
         ),
-        backgroundColor: Colors.green.shade700,
+        backgroundColor: KegiatinCustomTheme.snackbarSuccess,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -170,7 +174,7 @@ class _ScanHeader extends StatelessWidget {
                   IconButton(
                     onPressed: onBack,
                     icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                    color: Colors.white,
+                    color: KegiatinCustomTheme.onGradient,
                     tooltip: 'Kembali',
                   ),
                   Column(
@@ -179,14 +183,14 @@ class _ScanHeader extends StatelessWidget {
                       Text(
                         'Pindai QR Presensi',
                         style: textTheme.titleMedium?.copyWith(
-                          color: Colors.white,
+                          color: KegiatinCustomTheme.onGradient,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
                       Text(
                         '$totalScanned sudah dipindai',
                         style: textTheme.bodySmall?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.85),
+                          color: KegiatinCustomTheme.onGradientDim,
                         ),
                       ),
                     ],
@@ -234,9 +238,9 @@ class _EventDropdown extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.18),
+        color: KegiatinCustomTheme.glassInput,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+        border: Border.all(color: KegiatinCustomTheme.glassInputBorder),
       ),
       child: eventsAsync.when(
         loading: () => _buildLoadingState(textTheme),
@@ -254,14 +258,18 @@ class _EventDropdown extends StatelessWidget {
       height: 40,
       child: Row(
         children: [
-          const Icon(Icons.event_note_outlined, size: 16, color: Colors.white70),
+          const Icon(Icons.event_note_outlined, size: 16, color: KegiatinCustomTheme.onGradientSecondary),
           const SizedBox(width: 8),
-          Text('Memuat kegiatan...', style: textTheme.bodyMedium?.copyWith(color: Colors.white70)),
+          Text(
+            'Memuat kegiatan...',
+            style: textTheme.bodyMedium?.copyWith(color: KegiatinCustomTheme.onGradientSecondary),
+          ),
           const Spacer(),
           const SizedBox(
-            width: 16,
-            height: 16,
-            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white70),
+            width: 16, height: 16,
+            child: CircularProgressIndicator(
+              strokeWidth: 2, color: KegiatinCustomTheme.onGradientSecondary,
+            ),
           ),
         ],
       ),
@@ -273,23 +281,26 @@ class _EventDropdown extends StatelessWidget {
       height: 40,
       child: Row(
         children: [
-          const Icon(Icons.error_outline, size: 16, color: Colors.white70),
+          const Icon(Icons.error_outline, size: 16, color: KegiatinCustomTheme.onGradientSecondary),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               'Gagal memuat kegiatan',
-              style: textTheme.bodyMedium?.copyWith(color: Colors.white70),
+              style: textTheme.bodyMedium?.copyWith(color: KegiatinCustomTheme.onGradientSecondary),
             ),
           ),
           TextButton(
             onPressed: onRetry,
             style: TextButton.styleFrom(
-              foregroundColor: Colors.white,
+              foregroundColor: KegiatinCustomTheme.onGradient,
               padding: EdgeInsets.zero,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               minimumSize: Size.zero,
             ),
-            child: Text('Coba lagi', style: textTheme.labelSmall?.copyWith(color: Colors.white)),
+            child: Text(
+              'Coba lagi',
+              style: textTheme.labelSmall?.copyWith(color: KegiatinCustomTheme.onGradient),
+            ),
           ),
         ],
       ),
@@ -302,11 +313,11 @@ class _EventDropdown extends StatelessWidget {
         height: 40,
         child: Row(
           children: [
-            const Icon(Icons.event_busy_outlined, size: 16, color: Colors.white70),
+            const Icon(Icons.event_busy_outlined, size: 16, color: KegiatinCustomTheme.onGradientSecondary),
             const SizedBox(width: 8),
             Text(
               'Belum ada kegiatan tersedia',
-              style: textTheme.bodyMedium?.copyWith(color: Colors.white70),
+              style: textTheme.bodyMedium?.copyWith(color: KegiatinCustomTheme.onGradientSecondary),
             ),
           ],
         ),
@@ -320,23 +331,27 @@ class _EventDropdown extends StatelessWidget {
       child: DropdownButton<Event>(
         value: validSelected,
         dropdownColor: KegiatinCustomTheme.appBarTop,
-        iconEnabledColor: Colors.white,
+        iconEnabledColor: KegiatinCustomTheme.onGradient,
         isExpanded: true,
         icon: const Icon(Icons.keyboard_arrow_down_rounded),
-        style: textTheme.bodyMedium?.copyWith(color: Colors.white),
+        style: textTheme.bodyMedium?.copyWith(color: KegiatinCustomTheme.onGradient),
         items: events
             .map(
               (e) => DropdownMenuItem<Event>(
                 value: e,
                 child: Row(
                   children: [
-                    const Icon(Icons.event_note_outlined, size: 16, color: Colors.white70),
+                    const Icon(
+                      Icons.event_note_outlined,
+                      size: 16,
+                      color: KegiatinCustomTheme.onGradientSecondary,
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         e.title,
                         style: textTheme.bodyMedium?.copyWith(
-                          color: Colors.white,
+                          color: KegiatinCustomTheme.onGradient,
                           fontWeight: FontWeight.w500,
                         ),
                         overflow: TextOverflow.ellipsis,
@@ -350,9 +365,16 @@ class _EventDropdown extends StatelessWidget {
         onChanged: onChanged,
         hint: Row(
           children: [
-            const Icon(Icons.event_note_outlined, size: 16, color: Colors.white70),
+            const Icon(
+              Icons.event_note_outlined,
+              size: 16,
+              color: KegiatinCustomTheme.onGradientSecondary,
+            ),
             const SizedBox(width: 8),
-            Text('Pilih Kegiatan', style: textTheme.bodyMedium?.copyWith(color: Colors.white70)),
+            Text(
+              'Pilih Kegiatan',
+              style: textTheme.bodyMedium?.copyWith(color: KegiatinCustomTheme.onGradientSecondary),
+            ),
           ],
         ),
       ),

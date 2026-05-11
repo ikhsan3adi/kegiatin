@@ -156,7 +156,7 @@ class _ManualInputTabState extends State<ManualInputTab> {
                 FilledButton(
                   style: FilledButton.styleFrom(
                     backgroundColor: KegiatinCustomTheme.appBarBottom,
-                    foregroundColor: Colors.white,
+                    foregroundColor: KegiatinCustomTheme.onGradient,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   onPressed: () {
@@ -261,7 +261,7 @@ class _ManualInputTabState extends State<ManualInputTab> {
                 label: const Text('Tambah'),
                 style: FilledButton.styleFrom(
                   backgroundColor: KegiatinCustomTheme.appBarBottom,
-                  foregroundColor: Colors.white,
+                  foregroundColor: KegiatinCustomTheme.onGradient,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
                 ),

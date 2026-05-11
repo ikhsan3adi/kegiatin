@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kegiatin/core/theme/custom.dart';
 
 class QrScannerTab extends StatelessWidget {
   const QrScannerTab({super.key, this.onDetect});
@@ -17,14 +18,18 @@ class QrScannerTab extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               // Background gelap pengganti preview kamera
-              const ColoredBox(color: Color(0xFF1A1A1A)),
+              const ColoredBox(color: KegiatinCustomTheme.scannerBackground),
 
               // Overlay viewfinder (blur luar + border sudut)
               CustomPaint(painter: _OverlayPainter(borderColor: colorScheme.primary)),
 
               // Ikon QR di tengah area scan — sinkron dengan pusat viewfinder
               const Center(
-                child: Icon(Icons.qr_code_2_rounded, size: 80, color: Color(0x33FFFFFF)),
+                child: Icon(
+                  Icons.qr_code_2_rounded,
+                  size: 80,
+                  color: KegiatinCustomTheme.scannerGhost,
+                ),
               ),
 
               // Kontrol flash & flip — pojok kanan atas
@@ -99,7 +104,8 @@ class _OverlayPainter extends CustomPainter {
     );
 
     // Overlay gelap di luar area scan
-    final overlayPaint = Paint()..color = Colors.black.withValues(alpha: 0.60);
+    final overlayPaint = Paint()
+      ..color = KegiatinCustomTheme.scannerBackground.withValues(alpha: 0.60);
     final path = Path()
       ..addRect(Rect.fromLTWH(0, 0, size.width, size.height))
       ..addRRect(RRect.fromRectAndRadius(scanRect, const Radius.circular(14)))
@@ -174,8 +180,11 @@ class _ControlButton extends StatelessWidget {
         child: Container(
           width: 40,
           height: 40,
-          decoration: const BoxDecoration(color: Colors.black45, shape: BoxShape.circle),
-          child: Icon(icon, color: Colors.white, size: 20),
+          decoration: const BoxDecoration(
+            color: KegiatinCustomTheme.scannerControl,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: KegiatinCustomTheme.onGradient, size: 20),
         ),
       ),
     );

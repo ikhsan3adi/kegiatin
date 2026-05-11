@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kegiatin/core/theme/custom.dart';
 import 'package:kegiatin/domain/enums/user_role.dart';
 
 /// Card header profil — menampilkan avatar, nama, NPA, dan badge peran.
@@ -30,17 +31,13 @@ class ProfileHeaderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    // Card semi-transparan — gradien AppBar di belakangnya masih terlihat.
-    const cardBg = Color(0x26FFFFFF); // white 15% opacity
-    const cardBorder = Color(0x40FFFFFF); // white 25% opacity
-
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: cardBg,
+        color: KegiatinCustomTheme.glassBackground,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: cardBorder, width: 1),
+        border: Border.all(color: KegiatinCustomTheme.glassBorder, width: 1),
       ),
       child: Row(
         children: [
@@ -54,7 +51,7 @@ class ProfileHeaderCard extends StatelessWidget {
                 Text(
                   displayName,
                   style: textTheme.titleMedium?.copyWith(
-                    color: Colors.white,
+                    color: KegiatinCustomTheme.onGradient,
                     fontWeight: FontWeight.w700,
                   ),
                   maxLines: 1,
@@ -62,7 +59,12 @@ class ProfileHeaderCard extends StatelessWidget {
                 ),
                 if (npa != null) ...[
                   const SizedBox(height: 2),
-                  Text('NPA-$npa', style: textTheme.bodySmall?.copyWith(color: Colors.white70)),
+                  Text(
+                    'NPA-$npa',
+                    style: textTheme.bodySmall?.copyWith(
+                      color: KegiatinCustomTheme.onGradientSecondary,
+                    ),
+                  ),
                 ],
                 const SizedBox(height: 6),
                 _RoleBadge(role: role),
@@ -97,8 +99,8 @@ class _Avatar extends StatelessWidget {
       height: 52,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: const Color(0x33FFFFFF), // white 20% opacity
-        border: Border.all(color: const Color(0x66FFFFFF), width: 1.5),
+        color: KegiatinCustomTheme.glassElement,
+        border: Border.all(color: KegiatinCustomTheme.glassElementBorder, width: 1.5),
       ),
       clipBehavior: Clip.antiAlias,
       child: photoUrl != null
@@ -123,7 +125,10 @@ class _InitialsFallback extends StatelessWidget {
         initials,
         style: Theme.of(
           context,
-        ).textTheme.titleMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.w700),
+        ).textTheme.titleMedium?.copyWith(
+          color: KegiatinCustomTheme.onGradient,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }
@@ -144,15 +149,18 @@ class _RoleBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
       decoration: BoxDecoration(
-        color: const Color(0x33FFFFFF), // white 20% opacity
+        color: KegiatinCustomTheme.glassElement,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0x59FFFFFF)), // white 35%
+        border: Border.all(color: KegiatinCustomTheme.glassBadgeBorder),
       ),
       child: Text(
         _label,
         style: Theme.of(
           context,
-        ).textTheme.labelSmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
+        ).textTheme.labelSmall?.copyWith(
+          color: KegiatinCustomTheme.onGradient,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }

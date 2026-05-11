@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kegiatin/core/theme/custom.dart';
 import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
 import 'package:kegiatin/presentation/providers/providers.dart';
 
@@ -39,7 +40,8 @@ class _SplashPageState extends ConsumerState<SplashPage> {
 
   @override
   Widget build(BuildContext context) {
-    final Color brandColor = Theme.of(context).colorScheme.primary;
+    final colorScheme = Theme.of(context).colorScheme;
+    final Color brandColor = colorScheme.primary;
 
     return Scaffold(
       body: LayoutBuilder(
@@ -54,17 +56,17 @@ class _SplashPageState extends ConsumerState<SplashPage> {
           return Container(
             width: double.infinity,
             height: double.infinity,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color(0xFFD6E8F0), // Biru muda atas
-                  Colors.white,
-                  Colors.white,
-                  Color(0xFFDAE9F1), // Biru muda bawah
+                  KegiatinCustomTheme.splashTop,
+                  colorScheme.surface,
+                  colorScheme.surface,
+                  KegiatinCustomTheme.splashBottom,
                 ],
-                stops: [0.0, 0.25, 0.75, 1.0],
+                stops: const [0.0, 0.25, 0.75, 1.0],
               ),
             ),
             child: SafeArea(

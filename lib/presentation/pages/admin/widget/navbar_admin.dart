@@ -49,7 +49,7 @@ class _NavbarAdminState extends ConsumerState<NavbarAdmin> {
                 heroTag: 'fab_tambah_kegiatan',
                 onPressed: () => context.push('/admin/create-event'),
                 backgroundColor: KegiatinCustomTheme.appBarBottom,
-                foregroundColor: Colors.white,
+                foregroundColor: KegiatinCustomTheme.onGradient,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 elevation: 4.0,
                 tooltip: 'Tambah Kegiatan',
