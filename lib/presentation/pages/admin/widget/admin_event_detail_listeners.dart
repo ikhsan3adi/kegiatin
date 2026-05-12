@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kegiatin/domain/entities/event.dart';
+import 'package:kegiatin/presentation/controllers/event/cancel_event_controller.dart';
 import 'package:kegiatin/presentation/controllers/event/complete_event_controller.dart';
 import 'package:kegiatin/presentation/controllers/event/event_list_controller.dart';
 import 'package:kegiatin/presentation/controllers/event/publish_event_controller.dart';
@@ -38,6 +39,9 @@ class AdminEventDetailListeners extends ConsumerWidget {
     });
     ref.listen(completeEventControllerProvider, (previous, next) {
       _handleAsyncEvent(next, onSuccess: () => onSuccess('Kegiatan berhasil diselesaikan!'), onError: onError);
+    });
+    ref.listen(cancelEventControllerProvider, (previous, next) {
+      _handleAsyncEvent(next, onSuccess: () => onSuccess('Kegiatan berhasil dibatalkan!'), onError: onError);
     });
 
     return child;

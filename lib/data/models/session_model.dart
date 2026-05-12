@@ -15,7 +15,7 @@ abstract class SessionModel with _$SessionModel implements Session {
     required String title,
     required DateTime startTime,
     required DateTime endTime,
-    required String location,
+    String? location,
     required int order,
     required SessionStatus status,
     int? capacity,

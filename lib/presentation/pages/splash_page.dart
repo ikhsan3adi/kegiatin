@@ -16,10 +16,9 @@ class _SplashPageState extends ConsumerState<SplashPage> {
   @override
   void initState() {
     super.initState();
-    // _startSplashSequence();
+    _startSplashSequence();
   }
 
-  // LOGIC: Bagian ini tetap sama agar program tidak rusak
   // ignore: unused_element
   Future<void> _startSplashSequence() async {
     await Future.delayed(const Duration(seconds: 5));
