@@ -25,7 +25,7 @@ GoRouter appRouter(Ref ref) {
   });
 
   return GoRouter(
-    initialLocation: '/splash',
+    initialLocation: '/',
     refreshListenable: refreshNotifier,
     redirect: (context, state) {
       final authState = ref.read(authControllerProvider);
@@ -34,13 +34,13 @@ GoRouter appRouter(Ref ref) {
       final isLoading = authState.isLoading;
       final isLoggedIn = authState.value != null;
 
-      final isSplash = location == '/splash';
+      final isSplash = location == '/';
       final isAuth = location == '/login' || location == '/register';
       final isOnboarding = location == '/onboarding';
 
       if (isLoading) {
         if (isSplash || isAuth || isOnboarding) return null;
-        return '/splash';
+        return '/';
       }
 
       // Auth resolved, user is logged in
@@ -77,7 +77,7 @@ GoRouter appRouter(Ref ref) {
       return null;
     },
     routes: [
-      GoRoute(path: '/splash', builder: (_, _) => const SplashPage()),
+      GoRoute(path: '/', builder: (_, _) => const SplashPage()),
       GoRoute(path: '/onboarding', builder: (_, _) => const OnboardingPage()),
       GoRoute(path: '/login', builder: (_, _) => const LoginPage()),
       GoRoute(path: '/register', builder: (_, _) => const RegisterPage()),

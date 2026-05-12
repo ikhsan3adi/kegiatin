@@ -73,11 +73,6 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
       final responseBody = _asMap(response.data);
       final data = (responseBody['data'] as List).map((json) {
         final item = _asMap(json);
-        if (item.containsKey('event') && item.containsKey('sessions')) {
-          final eventJson = _asMap(item['event']);
-          eventJson['sessions'] = item['sessions'];
-          return EventModel.fromJson(eventJson);
-        }
         return EventModel.fromJson(item);
       }).toList();
 
@@ -123,6 +118,7 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
         'location': input.location,
         'contactPerson': input.contactPerson,
         'imageUrl': input.imageUrl,
+        'maxParticipants': input.maxParticipants,
         'sessions': input.sessions
             .map(
               (s) => {
@@ -156,6 +152,7 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
         if (input.location != null) 'location': input.location,
         if (input.contactPerson != null) 'contactPerson': input.contactPerson,
         if (input.imageUrl != null) 'imageUrl': input.imageUrl,
+        if (input.maxParticipants != null) 'maxParticipants': input.maxParticipants,
       };
 
       final response = await dio.patch(ApiConstants.eventById(id), data: data);

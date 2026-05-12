@@ -30,10 +30,7 @@ export class EventRsvpController {
 
   @Get(':id/rsvp')
   @Roles(UserRole.ADMIN)
-  listByEvent(
-    @Param('id') eventId: string,
-    @Query() query: RsvpQueryDto,
-  ) {
+  listByEvent(@Param('id') eventId: string, @Query() query: RsvpQueryDto) {
     return this.rsvpService.listByEvent(eventId, {
       page: query.page,
       limit: query.limit,

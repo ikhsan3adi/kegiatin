@@ -83,10 +83,7 @@ export class DrizzleRsvpRepository implements IRsvpRepository {
         .orderBy(desc(rsvps.createdAt))
         .offset(offset)
         .limit(filter.limit),
-      this.db
-        .select({ total: count() })
-        .from(rsvps)
-        .where(whereClause),
+      this.db.select({ total: count() }).from(rsvps).where(whereClause),
     ]);
 
     return {
@@ -118,10 +115,7 @@ export class DrizzleRsvpRepository implements IRsvpRepository {
         .orderBy(desc(rsvps.createdAt))
         .offset(offset)
         .limit(filter.limit),
-      this.db
-        .select({ total: count() })
-        .from(rsvps)
-        .where(whereClause),
+      this.db.select({ total: count() }).from(rsvps).where(whereClause),
     ]);
 
     return {
