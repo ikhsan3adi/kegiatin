@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:kegiatin/presentation/widgets/kegiatin_app_bar.dart';
 
-class AdminSettingsPage extends StatelessWidget {
-  const AdminSettingsPage({super.key});
+class AdminMateriPage extends StatelessWidget {
+  const AdminMateriPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +14,7 @@ class AdminSettingsPage extends StatelessWidget {
         children: [
           KegiatinAppBar(
             child: Text(
-              'Pengaturan',
+              'Materi',
               style: textTheme.headlineSmall?.copyWith(
                 color: colorScheme.onPrimary,
                 fontWeight: FontWeight.bold,
@@ -24,7 +24,7 @@ class AdminSettingsPage extends StatelessWidget {
           const SizedBox(height: 16),
           Center(
             child: Text(
-              'Konten pengaturan',
+              'Konten materi',
               style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
             ),
           ),
