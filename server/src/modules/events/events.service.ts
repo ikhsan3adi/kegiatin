@@ -140,7 +140,7 @@ export class EventsService {
       );
     }
 
-    const event = await this.eventRepo.updateEvent(id, dto as Partial<IEvent>);
+    const event = await this.eventRepo.updateEvent(id, dto);
     const sessions = await this.eventRepo.findSessionsByEventId(id);
     return { ...event!, sessions };
   }
