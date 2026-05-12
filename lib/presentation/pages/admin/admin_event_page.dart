@@ -96,141 +96,147 @@ class _AdminEventPageState extends ConsumerState<AdminEventPage> {
       status: _selectedStatus,
     ));
 
-    return RefreshIndicator(
-      onRefresh: () async {
-        ref.invalidate(eventListControllerProvider(
-          search: _searchQuery.isEmpty ? null : _searchQuery,
-          status: _selectedStatus,
-        ));
-        try {
-          await ref.read(eventListControllerProvider(
-            search: _searchQuery.isEmpty ? null : _searchQuery,
-            status: _selectedStatus,
-          ).future);
-        } catch (_) {}
-      },
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            KegiatinAppBar(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      children: [
+        KegiatinAppBar(
+          height: null,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Kegiatan',
+                style: textTheme.headlineSmall?.copyWith(
+                  color: colorScheme.onPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+              eventsState.maybeWhen(
+                data: (paginatedData) => Text(
+                  '${paginatedData.data.length} Kegiatan Tersedia',
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onPrimary.withValues(alpha: 0.85),
+                  ),
+                ),
+                orElse: () => Text(
+                  'Memuat kegiatan...',
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onPrimary.withValues(alpha: 0.85),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _searchController,
+                onChanged: _onSearchChanged,
+                style: textTheme.bodyMedium,
+                decoration: InputDecoration(
+                  hintText: 'Cari Kegiatan...',
+                  hintStyle: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+                  prefixIcon: const Icon(Icons.search),
+                  filled: true,
+                  fillColor: colorScheme.surface,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(
+          width: double.infinity,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Container(
+              constraints: BoxConstraints(
+                minWidth: MediaQuery.of(context).size.width,
+              ),
+              alignment: Alignment.center,
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    'Kegiatan',
-                    style: textTheme.headlineSmall?.copyWith(
-                      color: colorScheme.onPrimary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  eventsState.maybeWhen(
-                    data: (paginatedData) => Text(
-                      '${paginatedData.data.length} Kegiatan Tersedia',
-                      style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onPrimary.withValues(alpha: 0.85),
-                      ),
-                    ),
-                    orElse: () => Text(
-                      'Memuat kegiatan...',
-                      style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onPrimary.withValues(alpha: 0.85),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _searchController,
-                    onChanged: _onSearchChanged,
-                    style: textTheme.bodyMedium,
-                    decoration: InputDecoration(
-                      hintText: 'Cari Kegiatan...',
-                      hintStyle: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
-                      prefixIcon: const Icon(Icons.search),
-                      filled: true,
-                      fillColor: colorScheme.surface,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
+                  _buildFilterChip('Semua', null, colorScheme, textTheme),
+                  const SizedBox(width: 8),
+                  _buildFilterChip('Berlangsung', 'ONGOING', colorScheme, textTheme),
+                  const SizedBox(width: 8),
+                  _buildFilterChip('Akan Datang', 'PUBLISHED', colorScheme, textTheme),
                 ],
               ),
             ),
-            
-            SizedBox(
-              width: double.infinity,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Container(
-                  constraints: BoxConstraints(
-                    minWidth: MediaQuery.of(context).size.width,
-                  ),
-                  alignment: Alignment.center,
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _buildFilterChip('Semua', null, colorScheme, textTheme),
-                      const SizedBox(width: 8),
-                      _buildFilterChip('Berlangsung', 'ONGOING', colorScheme, textTheme),
-                      const SizedBox(width: 8),
-                      _buildFilterChip('Akan Datang', 'PUBLISHED', colorScheme, textTheme),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+          ),
+        ),
+        Expanded(
+          child: RefreshIndicator(
+            onRefresh: () async {
+              ref.invalidate(eventListControllerProvider(
+                search: _searchQuery.isEmpty ? null : _searchQuery,
+                status: _selectedStatus,
+              ));
+              try {
+                await ref.read(eventListControllerProvider(
+                  search: _searchQuery.isEmpty ? null : _searchQuery,
+                  status: _selectedStatus,
+                ).future);
+              } catch (_) {}
+            },
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  eventsState.when(
+                    data: (paginatedData) {
+                      final events = paginatedData.data;
 
-            eventsState.when(
-              data: (paginatedData) {
-                final events = paginatedData.data;
+                      if (events.isEmpty) {
+                        return Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(32.0),
+                            child: Text(
+                              'Belum ada kegiatan',
+                              style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+                            ),
+                          ),
+                        );
+                      }
 
-                if (events.isEmpty) {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(32.0),
-                      child: Text(
-                        'Belum ada kegiatan',
-                        style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+                      return ListView.builder(
+                        padding: const EdgeInsets.only(top: 8),
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: events.length,
+                        itemBuilder: (context, index) {
+                          final event = events[index];
+                          return EventListCard(
+                            event: event,
+                            showActionButton: false,
+                            onTap: () => context.push('/admin/event-detail/${event.id}'),
+                          );
+                        },
+                      );
+                    },
+                    loading: () => const Center(
+                      child: Padding(padding: EdgeInsets.all(32.0), child: CircularProgressIndicator()),
+                    ),
+                    error: (e, _) => Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(32.0),
+                        child: Text('Gagal memuat kegiatan: $e'),
                       ),
                     ),
-                  );
-                }
-
-                return ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: events.length,
-                  itemBuilder: (context, index) {
-                    final event = events[index];
-                    return EventListCard(
-                      event: event,
-                      showActionButton: false,
-                      onTap: () => context.push('/admin/event-detail/${event.id}'),
-                    );
-                  },
-                );
-              },
-              loading: () => const Center(
-                child: Padding(padding: EdgeInsets.all(32.0), child: CircularProgressIndicator()),
-              ),
-              error: (e, _) => Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(32.0),
-                  child: Text('Gagal memuat kegiatan: $e'),
-                ),
+                  ),
+                  const SizedBox(height: 80), // Padding bawah agar tidak tertutup navbar
+                ],
               ),
             ),
-            const SizedBox(height: 80), // Padding bawah agar tidak tertutup navbar
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }
