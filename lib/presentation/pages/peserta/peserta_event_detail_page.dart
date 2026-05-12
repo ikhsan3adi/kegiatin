@@ -6,6 +6,8 @@ import 'package:kegiatin/domain/enums/event_status.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
 import 'package:kegiatin/domain/enums/event_visibility.dart';
 import 'package:kegiatin/presentation/controllers/event/event_detail_controller.dart';
+import 'package:kegiatin/presentation/controllers/rsvp/create_rsvp_controller.dart';
+import 'package:kegiatin/presentation/controllers/rsvp/my_rsvp_controller.dart';
 import 'package:kegiatin/presentation/widgets/kegiatin_app_bar.dart';
 
 class PesertaEventDetailPage extends ConsumerWidget {
@@ -59,15 +61,39 @@ Widget _pesertaDetailFallbackScaffold(BuildContext context, Widget body) {
   );
 }
 
-class _PesertaEventDetailContent extends StatelessWidget {
+class _PesertaEventDetailContent extends ConsumerWidget {
   const _PesertaEventDetailContent({required this.event});
 
   final Event event;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+
+    // Listen untuk menampilkan snackbar saat RSVP selesai.
+    ref.listen(createRsvpControllerProvider, (_, next) {
+      next.whenOrNull(
+        error: (err, _) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Gagal mendaftar: $err'),
+              backgroundColor: colorScheme.error,
+            ),
+          );
+        },
+        data: (rsvp) {
+          if (rsvp != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('Berhasil mendaftar ke kegiatan!'),
+                backgroundColor: colorScheme.primary,
+              ),
+            );
+          }
+        },
+      );
+    });
 
     final firstSession = event.sessions.isNotEmpty ? event.sessions.first : null;
     final startTime = firstSession?.startTime;
@@ -267,7 +293,10 @@ class _PesertaEventDetailContent extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  SizedBox(width: double.infinity, child: _buildActionButton(context)),
+                  SizedBox(
+                    width: double.infinity,
+                    child: _buildActionButton(context, ref),
+                  ),
                   const SizedBox(height: 40),
                 ],
               ),
@@ -325,49 +354,125 @@ class _PesertaEventDetailContent extends StatelessWidget {
     }
   }
 
-  Widget _buildActionButton(BuildContext context) {
+  Widget _buildActionButton(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-    Color bgColor;
-    Color textColor;
-    String text;
-    IconData? icon;
 
+    // Cek status RSVP dari cache (load async, default null = belum tahu).
+    final myRsvpAsync = ref.watch(myRsvpControllerProvider);
+    final createState = ref.watch(createRsvpControllerProvider);
+
+    final isCreating = createState.isLoading;
+    // Gunakan helper findByEventId dari controller untuk menghindari dynamic call.
+    final alreadyRsvp =
+        ref.watch(myRsvpControllerProvider.notifier).findByEventId(event.id) !=
+        null;
+
+    // Event selesai — tampilkan status kehadiran (bukan tombol daftar).
     if (event.status == EventStatus.completed) {
-      bgColor = colorScheme.secondaryContainer;
-      textColor = colorScheme.onSecondaryContainer;
-      text = 'Kehadiran Terverifikasi';
-      icon = Icons.verified;
-    } else if (event.status == EventStatus.ongoing) {
-      bgColor = colorScheme.tertiaryContainer;
-      textColor = colorScheme.onTertiaryContainer;
-      text = 'Lihat QR Saya';
-      icon = Icons.qr_code_2;
-    } else {
-      bgColor = colorScheme.primaryContainer;
-      textColor = colorScheme.onPrimaryContainer;
-      text = 'Daftar Kegiatan';
-      icon = Icons.assignment_outlined;
+      return _ActionChip(
+        icon: Icons.verified,
+        label: 'Kehadiran Terverifikasi',
+        backgroundColor: colorScheme.secondaryContainer,
+        foregroundColor: colorScheme.onSecondaryContainer,
+        onTap: null,
+      );
     }
 
+    // Event sedang berlangsung — tampilkan tombol QR (belum diimplementasi).
+    if (event.status == EventStatus.ongoing) {
+      return _ActionChip(
+        icon: Icons.qr_code_2,
+        label: 'Lihat QR Saya',
+        backgroundColor: colorScheme.tertiaryContainer,
+        foregroundColor: colorScheme.onTertiaryContainer,
+        onTap: alreadyRsvp ? () {} : null,
+      );
+    }
+
+    // Sudah RSVP — tombol disabled.
+    if (alreadyRsvp) {
+      return _ActionChip(
+        icon: Icons.check_circle_outline,
+        label: 'Sudah Terdaftar',
+        backgroundColor: colorScheme.surfaceContainerHighest,
+        foregroundColor: colorScheme.onSurfaceVariant,
+        onTap: null,
+      );
+    }
+
+    // RSVP sedang diproses — tombol loading.
+    if (isCreating) {
+      return _ActionChip(
+        icon: Icons.hourglass_top,
+        label: 'Mendaftar...',
+        backgroundColor: colorScheme.primaryContainer,
+        foregroundColor: colorScheme.onPrimaryContainer,
+        onTap: null,
+      );
+    }
+
+    // RSVP masih loading (cek cache) — disabled sementara.
+    if (myRsvpAsync.isLoading) {
+      return _ActionChip(
+        icon: Icons.assignment_outlined,
+        label: 'Daftar Kegiatan',
+        backgroundColor: colorScheme.primaryContainer,
+        foregroundColor: colorScheme.onPrimaryContainer,
+        onTap: null,
+      );
+    }
+
+    // Default: belum RSVP, event PUBLISHED.
+    return _ActionChip(
+      icon: Icons.assignment_outlined,
+      label: 'Daftar Kegiatan',
+      backgroundColor: colorScheme.primaryContainer,
+      foregroundColor: colorScheme.onPrimaryContainer,
+      onTap: () => ref
+          .read(createRsvpControllerProvider.notifier)
+          .createRsvp(event.id),
+    );
+  }
+}
+
+/// Tombol aksi bergaya chip yang digunakan di halaman detail event peserta.
+class _ActionChip extends StatelessWidget {
+  const _ActionChip({
+    required this.icon,
+    required this.label,
+    required this.backgroundColor,
+    required this.foregroundColor,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color backgroundColor;
+  final Color foregroundColor;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
     return Material(
-      color: bgColor,
+      color: backgroundColor,
       borderRadius: BorderRadius.circular(24),
       child: InkWell(
-        onTap: () {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('Simulasi: Aksi tombol ditekan')));
-        },
+        onTap: onTap,
         borderRadius: BorderRadius.circular(24),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 16),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ...[Icon(icon, size: 18, color: textColor), const SizedBox(width: 8)],
+              Icon(icon, size: 18, color: foregroundColor),
+              const SizedBox(width: 8),
               Text(
-                text,
-                style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 15),
+                label,
+                style: TextStyle(
+                  color: foregroundColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
               ),
             ],
           ),
