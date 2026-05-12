@@ -1,6 +1,7 @@
 import 'package:kegiatin/domain/entities/create_event_input.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/presentation/providers/providers.dart';
+import 'package:kegiatin/presentation/controllers/event/event_list_controller.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'create_event_controller.g.dart';
@@ -24,10 +25,12 @@ class CreateEventController extends _$CreateEventController {
       },
       (event) {
         state = AsyncData(event);
+        ref.invalidate(eventListControllerProvider);
         return null;
       },
     );
   }
+
 
   void reset() => state = const AsyncData(null);
 }
