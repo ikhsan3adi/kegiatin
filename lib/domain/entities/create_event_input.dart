@@ -10,6 +10,7 @@ class CreateEventInput {
   final String location;
   final String contactPerson;
   final String? imageUrl;
+  final int? maxParticipants;
   final List<SessionInput> sessions;
 
   const CreateEventInput({
@@ -20,6 +21,7 @@ class CreateEventInput {
     required this.location,
     required this.contactPerson,
     this.imageUrl,
+    this.maxParticipants,
     required this.sessions,
   });
 }

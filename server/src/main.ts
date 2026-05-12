@@ -38,7 +38,12 @@ async function bootstrap() {
     defaultVersion: VERSION_NEUTRAL,
   });
 
-  app.enableCors();
+  app.enableCors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders:
+      'Content-Type, Accept, Authorization, X-Requested-With, ngrok-skip-browser-warning',
+  });
 
   const config = app.get(ConfigService);
   const port = config.get<number>('PORT', 3000);

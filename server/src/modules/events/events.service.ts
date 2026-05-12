@@ -205,7 +205,9 @@ export class EventsService {
     if (!event) throw new NotFoundException('Event tidak ditemukan');
 
     if (event.status !== EventStatus.ONGOING) {
-      throw new BadRequestException('Hanya event ONGOING yang dapat diselesaikan');
+      throw new BadRequestException(
+        'Hanya event ONGOING yang dapat diselesaikan',
+      );
     }
 
     await this.eventRepo.updateEvent(id, { status: EventStatus.COMPLETED });
