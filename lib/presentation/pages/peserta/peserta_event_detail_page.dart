@@ -102,12 +102,14 @@ class _PesertaEventDetailContent extends StatelessWidget {
                 Row(
                   children: [
                     _buildBadge(
+                      context: context,
                       text: _getStatusText(event.status),
                       backgroundColor: colorScheme.secondaryContainer,
                       textColor: colorScheme.onSecondaryContainer,
                     ),
                     const SizedBox(width: 8),
                     _buildBadge(
+                      context: context,
                       text: event.type == EventType.series ? 'Rutin' : 'Tunggal',
                       backgroundColor: colorScheme.tertiaryContainer,
                       textColor: colorScheme.onTertiaryContainer,
@@ -283,12 +285,20 @@ class _PesertaEventDetailContent extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 14)),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
+        ),
         Flexible(
           child: Text(
             value,
             textAlign: TextAlign.end,
-            style: TextStyle(color: colorScheme.onSurface, fontSize: 14, fontWeight: FontWeight.w500),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurface,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
       ],
@@ -296,6 +306,7 @@ class _PesertaEventDetailContent extends StatelessWidget {
   }
 
   Widget _buildBadge({
+    required BuildContext context,
     required String text,
     required Color backgroundColor,
     required Color textColor,
@@ -305,7 +316,10 @@ class _PesertaEventDetailContent extends StatelessWidget {
       decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(16)),
       child: Text(
         text,
-        style: TextStyle(color: textColor, fontSize: 11, fontWeight: FontWeight.bold),
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          color: textColor,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }
@@ -367,7 +381,10 @@ class _PesertaEventDetailContent extends StatelessWidget {
               ...[Icon(icon, size: 18, color: textColor), const SizedBox(width: 8)],
               Text(
                 text,
-                style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 15),
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: textColor,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),

@@ -30,6 +30,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     final brandColor = colorScheme.primary;
 
     return Scaffold(
@@ -60,7 +61,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                       const SizedBox(width: 8),
                       Text(
                         'KEGIATIN',
-                        style: TextStyle(
+                        style: textTheme.displaySmall?.copyWith(
                           fontSize: logoSize * 0.5,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 1.5,
@@ -87,8 +88,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           Text(
                             onboardingData[index]['desc']!,
                             textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 20,
+                            style: textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.w500,
                               height: 1.4,
                               color: brandColor,
