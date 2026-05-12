@@ -79,7 +79,7 @@ class PesertaDashboardPage extends ConsumerWidget {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Kegiatan Terkini',
-                  style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                  style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ),
             ),

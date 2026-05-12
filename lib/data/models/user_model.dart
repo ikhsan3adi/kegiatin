@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:kegiatin/core/utils/json_utils.dart';
 import 'package:kegiatin/domain/entities/user.dart';
 import 'package:kegiatin/domain/enums/user_role.dart';
 
@@ -12,7 +13,7 @@ abstract class UserModel with _$UserModel implements User {
   const factory UserModel({
     required String id,
     required String email,
-    required String displayName,
+    @JsonKey(fromJson: stringFromJson) required String displayName,
     required UserRole role,
     String? npa,
     String? cabang,

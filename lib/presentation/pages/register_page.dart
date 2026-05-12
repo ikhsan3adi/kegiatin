@@ -124,7 +124,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
           const SizedBox(width: 8),
           Text(
             'KEGIATIN',
-            style: textTheme.labelMedium?.copyWith(
+            style: textTheme.titleMedium?.copyWith(
               color: KegiatinCustomTheme.onGradient,
               fontWeight: FontWeight.w800, letterSpacing: 1.5,
             ),
@@ -159,8 +159,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             const SizedBox(height: 20),
             Text(
               'SIGN UP',
-              style: textTheme.titleLarge?.copyWith(
-                color: colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 36,
+              style: textTheme.displaySmall?.copyWith(
+                color: colorScheme.primary,
+                fontWeight: FontWeight.w900,
+                letterSpacing: -0.5,
               ),
               textAlign: TextAlign.center,
             ),
@@ -179,7 +181,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             const SizedBox(height: 28),
             _buildSubmitButton(authState),
             const SizedBox(height: 16),
-            _buildDivider(colorScheme),
+            _buildDivider(colorScheme, textTheme),
             const SizedBox(height: 16),
             OutlinedButton.icon(
               onPressed: () { /* TODO: Implement Google Sign In */ },
@@ -306,13 +308,19 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     );
   }
 
-  Widget _buildDivider(ColorScheme colorScheme) {
+  Widget _buildDivider(ColorScheme colorScheme, TextTheme textTheme) {
     return Row(
       children: [
         Expanded(child: Divider(color: colorScheme.outlineVariant)),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Text('OR', style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 12)),
+          child: Text(
+            'OR',
+            style: textTheme.labelMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
         Expanded(child: Divider(color: colorScheme.outlineVariant)),
       ],

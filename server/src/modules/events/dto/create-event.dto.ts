@@ -1,4 +1,4 @@
-import { Transform, Type } from 'class-transformer';
+import { Type } from 'class-transformer';
 import {
   ArrayMinSize,
   IsDateString,
@@ -51,9 +51,9 @@ export class CreateEventDto {
   @IsEnum(EventVisibility)
   visibility: EventVisibility;
 
-  @IsOptional()
   @IsString()
-  location?: string;
+  @IsNotEmpty()
+  location: string;
 
   @IsOptional()
   @IsString()

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kegiatin/core/theme/custom.dart';
+import 'package:kegiatin/domain/entities/user.dart';
+import 'package:kegiatin/domain/enums/user_role.dart';
 import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
 import 'package:kegiatin/presentation/providers/providers.dart';
 
@@ -20,17 +22,27 @@ class _SplashPageState extends ConsumerState<SplashPage> {
   }
 
   // LOGIC: Bagian ini tetap sama agar program tidak rusak
-  // ignore: unused_element
   Future<void> _startSplashSequence() async {
-    await Future.delayed(const Duration(seconds: 5));
+    // Jalankan timer splash dan inisialisasi auth secara paralel.
+    // Ini memastikan splash tampil minimal 5 detik, tapi juga menunggu
+    // hingga status auth benar-benar ter-resolve (tidak mengandalkan .value yang bisa null saat loading).
+    final results = await Future.wait([
+      Future.delayed(const Duration(seconds: 2, milliseconds: 500)),
+      ref.read(authControllerProvider.future),
+    ]);
+
     if (!mounted) return;
 
-    final authState = ref.read(authControllerProvider);
-    final isLoggedIn = authState.value != null;
+    final user = results[1] as User?;
+    final isLoggedIn = user != null;
     final hasSeenOnboarding = ref.read(hasSeenOnboardingSyncProvider);
 
     if (isLoggedIn) {
-      context.go('/');
+      if (user.role == UserRole.admin) {
+        context.go('/admin');
+      } else {
+        context.go('/peserta');
+      }
     } else if (hasSeenOnboarding) {
       context.go('/login');
     } else {
@@ -41,6 +53,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     final Color brandColor = colorScheme.primary;
 
     return Scaffold(
@@ -97,7 +110,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
                                   maxLines: 1,
                                   softWrap: false,
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(
+                                  style: textTheme.displayMedium?.copyWith(
                                     fontSize: fontSize,
                                     fontWeight: FontWeight.w900,
                                     letterSpacing: 2.5,

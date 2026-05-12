@@ -18,6 +18,7 @@ class Event {
   final String location;
   final String contactPerson;
   final String? imageUrl;
+  final int? maxParticipants;
   final String createdBy;
   final List<Session> sessions;
   final DateTime createdAt;
@@ -33,6 +34,7 @@ class Event {
     required this.location,
     required this.contactPerson,
     this.imageUrl,
+    this.maxParticipants,
     required this.createdBy,
     this.sessions = const [],
     required this.createdAt,

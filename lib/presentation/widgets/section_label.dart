@@ -30,7 +30,7 @@ class SectionLabel extends StatelessWidget {
         ],
         Text(
           label,
-          style: textTheme.titleSmall?.copyWith(
+          style: textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.w700,
             color: colorScheme.onSurface,
           ),
