@@ -1,5 +1,6 @@
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/presentation/providers/providers.dart';
+import 'package:kegiatin/presentation/controllers/event/event_list_controller.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'publish_event_controller.g.dart';
@@ -23,6 +24,7 @@ class PublishEventController extends _$PublishEventController {
       },
       (event) {
         state = AsyncValue.data(event);
+        ref.invalidate(eventListControllerProvider);
       },
     );
   }

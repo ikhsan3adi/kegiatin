@@ -3,7 +3,7 @@ import { and, count, desc, eq, ilike, inArray } from 'drizzle-orm';
 import { uuidv7 } from 'uuidv7';
 import { DRIZZLE } from '../../../database/drizzle.provider';
 import type { DrizzleDB } from '../../../database/drizzle.provider';
-import { events, sessions } from '../../../database/schema';
+import { events, sessions, users } from '../../../database/schema';
 import { IEventRepository } from '../domain/event.repository';
 import {
   ICreateEventData,
@@ -192,6 +192,25 @@ export class DrizzleEventRepository implements IEventRepository {
 
   async deleteSessionsByEventId(eventId: string): Promise<void> {
     await this.db.delete(sessions).where(eq(sessions.eventId, eventId));
+  }
+
+  async findUserBriefById(userId: string): Promise<{
+    displayName: string;
+    npa: string | null;
+    cabang: string | null;
+    photoUrl: string | null;
+  } | null> {
+    const rows = await this.db
+      .select({
+        displayName: users.displayName,
+        npa: users.npa,
+        cabang: users.cabang,
+        photoUrl: users.photoUrl,
+      })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+    return rows[0] ?? null;
   }
 
   // ---------------------------------------------------------------------------

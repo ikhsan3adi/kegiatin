@@ -425,6 +425,55 @@ components:
           type: string
           format: date-time
           nullable: true
+    AttendanceUserSnippet:
+      type: object
+      properties:
+        displayName:
+          type: string
+        npa:
+          type: string
+          nullable: true
+        cabang:
+          type: string
+          nullable: true
+        photoUrl:
+          type: string
+          nullable: true
+    AttendanceListItemResponse:
+      allOf:
+        - $ref: "#/components/schemas/AttendanceResponse"
+        - type: object
+          properties:
+            user:
+              $ref: "#/components/schemas/AttendanceUserSnippet"
+    AttendanceLookupResponse:
+      type: object
+      required:
+        - validForSession
+        - rsvpId
+        - userId
+        - eventId
+        - sessionId
+        - user
+      properties:
+        validForSession:
+          type: boolean
+          description: |
+            true jika QR valid untuk session (event RSVP = event sesi, RSVP CONFIRMED,
+            jendela presensi terbuka). false jika token dikenali tetapi tidak memenuhi syarat — lihat `reason`.
+        rsvpId:
+          type: string
+        userId:
+          type: string
+        eventId:
+          type: string
+        sessionId:
+          type: string
+        user:
+          $ref: "#/components/schemas/AttendanceUserSnippet"
+        reason:
+          type: string
+          description: Penjelasan singkat ketika validForSession false (untuk UI).
     SyncResultResponse:
       type: object
       properties:
@@ -1131,6 +1180,46 @@ paths:
                       data:
                         $ref: "#/components/schemas/SyncResultResponse"
 
+  /attendance/lookup:
+    get:
+      tags: [Attendance]
+      summary: Lookup QR untuk session (Admin, fallback online)
+      description: |
+        Validasi `qrToken` terhadap `sessionId` tanpa menulis baris presensi.
+        Dipakai saat daftar RSVP tidak ada di cache lokal tetapi perangkat online.
+        404 jika sesi tidak ada atau token tidak dikenali di server.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: qrToken
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: sessionId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Data lookup; `validForSession` menandakan apakah scan akan diterima.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ApiResponse"
+                  - properties:
+                      data:
+                        $ref: "#/components/schemas/AttendanceLookupResponse"
+        "401":
+          description: Tidak terautentikasi
+        "403":
+          description: Bukan peran Admin
+        "404":
+          description: Sesi tidak ditemukan atau QR tidak dikenali
+
   /sessions/{id}/attendance:
     parameters:
       - name: id
@@ -1166,7 +1255,7 @@ paths:
                       data:
                         type: array
                         items:
-                          $ref: "#/components/schemas/AttendanceResponse"
+                          $ref: "#/components/schemas/AttendanceListItemResponse"
                       meta:
                         $ref: "#/components/schemas/PaginationMeta"
 

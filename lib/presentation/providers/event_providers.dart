@@ -1,6 +1,7 @@
 import 'package:kegiatin/data/datasources/remote/event_remote_datasource.dart';
 import 'package:kegiatin/data/repositories/event_repository_impl.dart';
 import 'package:kegiatin/domain/repositories/event_repository.dart';
+import 'package:kegiatin/domain/usecases/cancel_event_usecase.dart';
 import 'package:kegiatin/domain/usecases/complete_event_usecase.dart';
 import 'package:kegiatin/domain/usecases/create_event_usecase.dart';
 import 'package:kegiatin/domain/usecases/get_event_by_id_usecase.dart';
@@ -44,3 +45,7 @@ StartEventUseCase startEventUseCase(Ref ref) =>
 @riverpod
 CompleteEventUseCase completeEventUseCase(Ref ref) =>
     CompleteEventUseCase(ref.watch(eventRepositoryProvider));
+
+@riverpod
+CancelEventUseCase cancelEventUseCase(Ref ref) =>
+    CancelEventUseCase(ref.watch(eventRepositoryProvider));

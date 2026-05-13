@@ -30,4 +30,12 @@ export abstract class IEventRepository {
   abstract deleteSession(id: string): Promise<void>;
   abstract countSessionsByEventId(eventId: string): Promise<number>;
   abstract deleteSessionsByEventId(eventId: string): Promise<void>;
+
+  /** Minimal user row for attendance / lookup joins. */
+  abstract findUserBriefById(userId: string): Promise<{
+    displayName: string;
+    npa: string | null;
+    cabang: string | null;
+    photoUrl: string | null;
+  } | null>;
 }
