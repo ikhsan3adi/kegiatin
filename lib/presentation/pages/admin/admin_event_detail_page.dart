@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kegiatin/domain/entities/event.dart';
+import 'package:kegiatin/presentation/controllers/event/cancel_event_controller.dart';
 import 'package:kegiatin/presentation/controllers/event/complete_event_controller.dart';
 import 'package:kegiatin/presentation/controllers/event/event_detail_controller.dart';
 import 'package:kegiatin/presentation/controllers/event/publish_event_controller.dart';
@@ -72,6 +73,7 @@ class _AdminEventDetailLoaded extends ConsumerWidget {
     final publishState = ref.watch(publishEventControllerProvider);
     final startState = ref.watch(startEventControllerProvider);
     final completeState = ref.watch(completeEventControllerProvider);
+    final cancelState = ref.watch(cancelEventControllerProvider);
 
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -102,6 +104,7 @@ class _AdminEventDetailLoaded extends ConsumerWidget {
               isPublishing: publishState.isLoading,
               isStarting: startState.isLoading,
               isCompleting: completeState.isLoading,
+              isCancelling: cancelState.isLoading,
             ),
           ],
         ),

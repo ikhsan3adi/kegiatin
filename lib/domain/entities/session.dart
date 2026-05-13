@@ -11,7 +11,7 @@ class Session {
   final String title;
   final DateTime startTime;
   final DateTime endTime;
-  final String location;
+  final String? location;
   final int order;
   final SessionStatus status;
   final int? capacity;
@@ -22,7 +22,7 @@ class Session {
     required this.title,
     required this.startTime,
     required this.endTime,
-    required this.location,
+    this.location,
     required this.order,
     required this.status,
     this.capacity,

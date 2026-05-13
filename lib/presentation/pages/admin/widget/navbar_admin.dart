@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:kegiatin/core/theme/custom.dart';
 import 'package:kegiatin/presentation/pages/admin/admin_dashboard_page.dart';
 import 'package:kegiatin/presentation/pages/admin/admin_event_page.dart';
+import 'package:kegiatin/presentation/pages/admin/admin_materi_page.dart';
 import 'package:kegiatin/presentation/pages/admin/admin_profile_page.dart';
-import 'package:kegiatin/presentation/pages/admin/admin_settings_page.dart';
 
 class NavbarAdmin extends ConsumerStatefulWidget {
   const NavbarAdmin({super.key});
@@ -20,8 +20,8 @@ class _NavbarAdminState extends ConsumerState<NavbarAdmin> {
   static const List<Widget> _pages = [
     AdminDashboardPage(),
     AdminEventPage(),
+    AdminMateriPage(),
     AdminProfilePage(),
-    AdminSettingsPage(),
   ];
 
   void _onItemTapped(int index) {
@@ -100,8 +100,8 @@ class _NavbarAdminState extends ConsumerState<NavbarAdmin> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildNavItem(Icons.person, 'Profil', 2, colorScheme),
-                    _buildNavItem(Icons.settings, 'Pengaturan', 3, colorScheme),
+                    _buildNavItem(Icons.menu_book, 'Materi', 2, colorScheme),
+                    _buildNavItem(Icons.person, 'Profil', 3, colorScheme),
                   ],
                 ),
               ),

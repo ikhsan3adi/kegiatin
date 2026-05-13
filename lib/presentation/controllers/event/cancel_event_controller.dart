@@ -3,18 +3,18 @@ import 'package:kegiatin/presentation/providers/providers.dart';
 import 'package:kegiatin/presentation/controllers/event/event_list_controller.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'complete_event_controller.g.dart';
+part 'cancel_event_controller.g.dart';
 
 @riverpod
-class CompleteEventController extends _$CompleteEventController {
+class CancelEventController extends _$CancelEventController {
   @override
   AsyncValue<Event?> build() {
     return const AsyncValue.data(null);
   }
 
-  Future<void> complete(String eventId) async {
+  Future<void> cancel(String eventId) async {
     state = const AsyncValue.loading();
-    final useCase = ref.read(completeEventUseCaseProvider);
+    final useCase = ref.read(cancelEventUseCaseProvider);
 
     final result = await useCase(eventId);
 
