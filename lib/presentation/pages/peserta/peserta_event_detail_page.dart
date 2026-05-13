@@ -240,7 +240,7 @@ class _PesertaEventDetailContent extends ConsumerWidget {
                             const SizedBox(width: 12),
                             Text(
                               'Deskripsi Kegiatan',
-                              style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                              style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
@@ -275,7 +275,7 @@ class _PesertaEventDetailContent extends ConsumerWidget {
                       children: [
                         Text(
                           'Detail',
-                          style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                          style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 16),
                         _buildDetailRow(
@@ -378,36 +378,39 @@ class _PesertaEventDetailContent extends ConsumerWidget {
     final isCreating = createState.isLoading;
     // Gunakan helper findByEventId dari controller untuk menghindari dynamic call.
     final alreadyRsvp =
-        ref.watch(myRsvpControllerProvider.notifier).findByEventId(event.id) !=
-        null;
+        myRsvpAsync.value?.any((r) => r.eventId == event.id) ?? false;
 
-    // Event selesai — tampilkan status kehadiran (bukan tombol daftar).
+    // 1. Sudah RSVP — tombol Lihat QR (Selalu tampil jika sudah daftar karena fitur Absen belum ada).
+    if (alreadyRsvp) {
+      return _ActionChip(
+        icon: Icons.qr_code_2,
+        label: 'Lihat QR',
+        backgroundColor: colorScheme.tertiaryContainer,
+        foregroundColor: colorScheme.onTertiaryContainer,
+        onTap: () {
+          // TODO: Implementasi pop up QR
+        },
+      );
+    }
+
+    // 2. Belum RSVP
+
+    // Event sudah selesai.
     if (event.status == EventStatus.completed) {
       return _ActionChip(
-        icon: Icons.verified,
-        label: 'Kehadiran Terverifikasi',
-        backgroundColor: colorScheme.secondaryContainer,
-        foregroundColor: colorScheme.onSecondaryContainer,
+        icon: Icons.event_busy,
+        label: 'Kegiatan Berakhir',
+        backgroundColor: colorScheme.surfaceContainerHighest,
+        foregroundColor: colorScheme.onSurfaceVariant,
         onTap: null,
       );
     }
 
-    // Event sedang berlangsung — tampilkan tombol QR (belum diimplementasi).
+    // Event sedang berlangsung — Pendaftaran ditutup.
     if (event.status == EventStatus.ongoing) {
       return _ActionChip(
-        icon: Icons.qr_code_2,
-        label: 'Lihat QR Saya',
-        backgroundColor: colorScheme.tertiaryContainer,
-        foregroundColor: colorScheme.onTertiaryContainer,
-        onTap: alreadyRsvp ? () {} : null,
-      );
-    }
-
-    // Sudah RSVP — tombol disabled.
-    if (alreadyRsvp) {
-      return _ActionChip(
-        icon: Icons.check_circle_outline,
-        label: 'Sudah Terdaftar',
+        icon: Icons.event_busy,
+        label: 'Pendaftaran Ditutup',
         backgroundColor: colorScheme.surfaceContainerHighest,
         foregroundColor: colorScheme.onSurfaceVariant,
         onTap: null,
@@ -436,7 +439,7 @@ class _PesertaEventDetailContent extends ConsumerWidget {
       );
     }
 
-    // Default: belum RSVP, event PUBLISHED.
+    // Default: belum RSVP, event PUBLISHED (Segera).
     return _ActionChip(
       icon: Icons.assignment_outlined,
       label: 'Daftar Kegiatan',
@@ -481,9 +484,9 @@ class _ActionChip extends StatelessWidget {
               Icon(icon, size: 18, color: foregroundColor),
               const SizedBox(width: 8),
               Text(
-                text,
+                label,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: textColor,
+                  color: foregroundColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),
