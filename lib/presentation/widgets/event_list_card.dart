@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/core/theme/custom.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/enums/event_status.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
+import 'package:kegiatin/presentation/controllers/rsvp/my_rsvp_controller.dart';
 
 /// Shared card for listing events (admin & peserta dashboards/lists).
-class EventListCard extends StatelessWidget {
+class EventListCard extends ConsumerWidget {
   final Event event;
   final VoidCallback? onTap;
   final bool showActionButton;
@@ -18,7 +20,7 @@ class EventListCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -141,7 +143,7 @@ class EventListCard extends StatelessWidget {
                     const SizedBox(height: 16),
                     SizedBox(
                       width: double.infinity,
-                      child: _buildActionButton(context, colorScheme),
+                      child: _buildActionButton(context, ref, colorScheme),
                     ),
                   ],
                 ],
@@ -164,27 +166,39 @@ class EventListCard extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(BuildContext context, ColorScheme colorScheme) {
+  Widget _buildActionButton(BuildContext context, WidgetRef ref, ColorScheme colorScheme) {
     Color bgColor;
     Color textColor;
     String text;
     IconData? icon;
 
-    if (event.status == EventStatus.completed) {
-      bgColor = colorScheme.primaryContainer;
-      textColor = colorScheme.onPrimaryContainer;
-      text = 'Kehadiran Terverifikasi';
-      icon = Icons.verified;
-    } else if (event.status == EventStatus.ongoing) {
+    // Wajib watch state-nya agar widget rebuild saat data selesai loading
+    final myRsvps = ref.watch(myRsvpControllerProvider).value ?? [];
+    final alreadyRsvp = myRsvps.any((rsvp) => rsvp.eventId == event.id);
+
+    if (alreadyRsvp) {
+      // Jika sudah daftar, selalu tampilkan Lihat QR (fitur Absen belum ada)
       bgColor = colorScheme.tertiaryContainer;
       textColor = colorScheme.onTertiaryContainer;
-      text = 'Lihat QR Saya';
+      text = 'Lihat QR';
       icon = Icons.qr_code_2;
+    } else if (event.status == EventStatus.completed) {
+      // Belum daftar & sudah selesai
+      bgColor = colorScheme.surfaceContainerHighest;
+      textColor = colorScheme.onSurfaceVariant;
+      text = 'Kegiatan Berakhir';
+      icon = Icons.event_busy;
+    } else if (event.status == EventStatus.ongoing) {
+      // Belum daftar & sedang berlangsung
+      bgColor = colorScheme.surfaceContainerHighest;
+      textColor = colorScheme.onSurfaceVariant;
+      text = 'Pendaftaran Ditutup';
+      icon = Icons.event_busy;
     } else {
-      // Default: Published / Draft
-      bgColor = colorScheme.secondaryContainer;
-      textColor = colorScheme.onSecondaryContainer;
-      text = 'Detail Kegiatan';
+      // Default: Belum daftar & Segera (Published)
+      bgColor = colorScheme.primaryContainer;
+      textColor = colorScheme.onPrimaryContainer;
+      text = 'Daftar Kegiatan';
       icon = Icons.assignment_outlined;
     }
 
