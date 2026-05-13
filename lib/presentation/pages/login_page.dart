@@ -86,7 +86,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       const SizedBox(width: 8),
                       Text(
                         'KEGIATIN',
-                        style: textTheme.labelMedium?.copyWith(
+                        style: textTheme.titleMedium?.copyWith(
                           color: KegiatinCustomTheme.onGradient,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 1.5,
@@ -141,10 +141,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                   const SizedBox(height: 10),
                                   Text(
                                     'LOGIN',
-                                    style: textTheme.titleLarge?.copyWith(
+                                    style: textTheme.displaySmall?.copyWith(
                                       color: colorScheme.primary,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 36,
+                                      fontWeight: FontWeight.w900,
+                                      letterSpacing: -0.5,
                                     ),
                                     textAlign: TextAlign.center,
                                   ),

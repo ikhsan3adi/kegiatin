@@ -71,6 +71,7 @@ class EventListCard extends StatelessWidget {
                   Row(
                     children: [
                       _buildBadge(
+                        context: context,
                         text: _getStatusText(event.status),
                         backgroundColor: _getStatusColor(
                           event.status,
@@ -80,6 +81,7 @@ class EventListCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       _buildBadge(
+                        context: context,
                         text: event.type == EventType.series ? 'Rutin' : 'Tunggal',
                         backgroundColor: event.type == EventType.series
                             ? colorScheme.tertiaryContainer
@@ -95,7 +97,7 @@ class EventListCard extends StatelessWidget {
                   // Judul Kegiatan
                   Text(
                     event.title,
-                    style: textTheme.titleMedium?.copyWith(
+                    style: textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: colorScheme.onSurface,
                     ),
@@ -203,7 +205,10 @@ class EventListCard extends StatelessWidget {
               ...[Icon(icon, size: 16, color: textColor), const SizedBox(width: 8)],
               Text(
                 text,
-                style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 13),
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: textColor,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
@@ -213,6 +218,7 @@ class EventListCard extends StatelessWidget {
   }
 
   Widget _buildBadge({
+    required BuildContext context,
     required String text,
     required Color backgroundColor,
     required Color textColor,
@@ -222,7 +228,10 @@ class EventListCard extends StatelessWidget {
       decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(12)),
       child: Text(
         text,
-        style: TextStyle(color: textColor, fontSize: 10, fontWeight: FontWeight.bold),
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          color: textColor,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }

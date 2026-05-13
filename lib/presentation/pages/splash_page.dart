@@ -53,6 +53,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     final Color brandColor = colorScheme.primary;
 
     return Scaffold(
@@ -109,7 +110,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
                                   maxLines: 1,
                                   softWrap: false,
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(
+                                  style: textTheme.displayMedium?.copyWith(
                                     fontSize: fontSize,
                                     fontWeight: FontWeight.w900,
                                     letterSpacing: 2.5,
