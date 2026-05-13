@@ -4,6 +4,7 @@ import { DrizzleModule } from './database/drizzle.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { EventsModule } from './modules/events/events.module';
 import { RsvpModule } from './modules/rsvp/rsvp.module';
+import { AttendanceModule } from './modules/attendance/attendance.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { RsvpModule } from './modules/rsvp/rsvp.module';
     AuthModule,
     EventsModule,
     RsvpModule,
+    AttendanceModule,
   ],
 })
 export class AppModule {}

@@ -9,9 +9,10 @@ import * as morgan from 'morgan';
 import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './core/filters/http-exception.filter';
 import { TransformInterceptor } from './core/interceptors/transform.interceptor';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.use(morgan.default('combined'));
 
@@ -38,7 +39,14 @@ async function bootstrap() {
     defaultVersion: VERSION_NEUTRAL,
   });
 
-  app.enableCors();
+  app.enableCors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders:
+      'Content-Type, Accept, Authorization, X-Requested-With, ngrok-skip-browser-warning',
+  });
+
+  app.set('etag', false);
 
   const config = app.get(ConfigService);
   const port = config.get<number>('PORT', 3000);

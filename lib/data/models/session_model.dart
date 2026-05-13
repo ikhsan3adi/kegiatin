@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:kegiatin/core/utils/json_utils.dart';
 import 'package:kegiatin/domain/entities/session.dart';
 import 'package:kegiatin/domain/enums/session_status.dart';
 
@@ -15,7 +16,7 @@ abstract class SessionModel with _$SessionModel implements Session {
     required String title,
     required DateTime startTime,
     required DateTime endTime,
-    String? location,
+    @JsonKey(fromJson: stringFromJson) required String location,
     required int order,
     required SessionStatus status,
     int? capacity,

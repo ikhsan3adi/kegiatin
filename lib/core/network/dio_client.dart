@@ -16,6 +16,7 @@ class DioClient {
     dio.interceptors.add(
       QueuedInterceptorsWrapper(
         onRequest: (options, handler) async {
+          options.headers['ngrok-skip-browser-warning'] = 'true';
           final token = await authLocalDataSource.getAccessToken();
           if (token != null) {
             options.headers['Authorization'] = 'Bearer $token';

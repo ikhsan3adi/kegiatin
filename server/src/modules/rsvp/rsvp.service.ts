@@ -37,8 +37,7 @@ export class RsvpService {
       throw new ConflictException('Sudah terdaftar di event ini');
     }
 
-    const currentCount =
-      await this.rsvpRepo.countConfirmedByEventId(eventId);
+    const currentCount = await this.rsvpRepo.countConfirmedByEventId(eventId);
     if (isEventFull(currentCount, event.maxParticipants)) {
       throw new BadRequestException('Kuota peserta event sudah penuh');
     }
@@ -59,10 +58,7 @@ export class RsvpService {
     const event = await this.eventRepo.findEventById(eventId);
     if (!event) throw new NotFoundException('Event tidak ditemukan');
 
-    const { rsvps, total } = await this.rsvpRepo.findByEventId(
-      eventId,
-      filter,
-    );
+    const { rsvps, total } = await this.rsvpRepo.findByEventId(eventId, filter);
 
     return {
       data: rsvps,

@@ -140,7 +140,7 @@ export class EventsService {
       );
     }
 
-    const event = await this.eventRepo.updateEvent(id, dto as Partial<IEvent>);
+    const event = await this.eventRepo.updateEvent(id, dto);
     const sessions = await this.eventRepo.findSessionsByEventId(id);
     return { ...event!, sessions };
   }
@@ -205,7 +205,9 @@ export class EventsService {
     if (!event) throw new NotFoundException('Event tidak ditemukan');
 
     if (event.status !== EventStatus.ONGOING) {
-      throw new BadRequestException('Hanya event ONGOING yang dapat diselesaikan');
+      throw new BadRequestException(
+        'Hanya event ONGOING yang dapat diselesaikan',
+      );
     }
 
     await this.eventRepo.updateEvent(id, { status: EventStatus.COMPLETED });

@@ -78,7 +78,7 @@ class AdminDashboardPage extends ConsumerWidget {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Dashboard Admin',
-                  style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                  style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ),
             ),

@@ -7,6 +7,7 @@ class UpdateEventInput {
   final String? location;
   final String? contactPerson;
   final String? imageUrl;
+  final int? maxParticipants;
 
   const UpdateEventInput({
     this.title,
@@ -15,5 +16,6 @@ class UpdateEventInput {
     this.location,
     this.contactPerson,
     this.imageUrl,
+    this.maxParticipants,
   });
 }

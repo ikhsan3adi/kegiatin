@@ -1,29 +1,33 @@
-import { Test, TestingModule } from '@nestjs/testing';
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { App } from 'supertest/types';
-import { AppModule } from './../src/app.module';
+import { createConfiguredTestApp } from './test-app.factory';
 
-describe('AppController (e2e)', () => {
-  let app: INestApplication<App>;
+function ensureAuthEnv(): void {
+  process.env.JWT_ACCESS_SECRET ??=
+    'kegiatin_access_secret_change_in_production';
+  process.env.JWT_REFRESH_SECRET ??=
+    'kegiatin_refresh_secret_change_in_production';
+}
 
-  beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
+const hasDatabase = Boolean(process.env.DATABASE_URL);
 
-    app = moduleFixture.createNestApplication();
-    await app.init();
+(hasDatabase ? describe : describe.skip)('App bootstrap (e2e)', () => {
+  let app: INestApplication;
+
+  beforeAll(() => {
+    ensureAuthEnv();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+  beforeEach(async () => {
+    app = await createConfiguredTestApp();
   });
 
   afterEach(async () => {
     await app.close();
+  });
+
+  it('GET /api/events without token returns 401', () => {
+    return request(app.getHttpServer()).get('/api/events').expect(401);
   });
 });
