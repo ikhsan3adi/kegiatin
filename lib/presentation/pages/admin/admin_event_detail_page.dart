@@ -78,6 +78,7 @@ class _AdminEventDetailLoaded extends ConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return AdminEventDetailListeners(
+      eventId: event.id,
       child: Scaffold(
         backgroundColor: colorScheme.surfaceContainerHighest,
         body: Column(
