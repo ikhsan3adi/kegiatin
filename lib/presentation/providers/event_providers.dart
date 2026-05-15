@@ -8,6 +8,7 @@ import 'package:kegiatin/domain/usecases/get_event_by_id_usecase.dart';
 import 'package:kegiatin/domain/usecases/get_events_usecase.dart';
 import 'package:kegiatin/domain/usecases/publish_event_usecase.dart';
 import 'package:kegiatin/domain/usecases/start_event_usecase.dart';
+import 'package:kegiatin/domain/usecases/event/update_event_usecase.dart';
 import 'package:kegiatin/presentation/providers/core_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -49,3 +50,7 @@ CompleteEventUseCase completeEventUseCase(Ref ref) =>
 @riverpod
 CancelEventUseCase cancelEventUseCase(Ref ref) =>
     CancelEventUseCase(ref.watch(eventRepositoryProvider));
+
+@riverpod
+UpdateEventUseCase updateEventUseCase(Ref ref) =>
+    UpdateEventUseCase(ref.watch(eventRepositoryProvider));
