@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/enums/event_status.dart';
 import 'package:kegiatin/presentation/controllers/event/cancel_event_controller.dart';
@@ -49,9 +50,11 @@ class AdminEventDetailBottomBar extends ConsumerWidget {
             Expanded(
               child: FilledButton.icon(
                 onPressed: () {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(const SnackBar(content: Text('Simulasi: Pergi ke edit...')));
+                  if (isPublished || isOngoing) {
+                    _confirmEdit(context);
+                  } else {
+                    context.push('/admin/event-edit/${event.id}');
+                  }
                 },
                 icon: const Icon(Icons.edit_outlined, size: 18),
                 label: const Text('Edit'),
@@ -191,6 +194,36 @@ class AdminEventDetailBottomBar extends ConsumerWidget {
               foregroundColor: colorScheme.onError,
             ),
             child: const Text('Ya, Batalkan'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmEdit(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Edit Kegiatan Aktif?'),
+        content: const Text(
+          'Kegiatan ini sudah dipublish atau sedang berlangsung. Perubahan data mungkin membingungkan peserta. Lanjutkan edit?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Batal'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              context.push('/admin/event-edit/${event.id}');
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: colorScheme.primary,
+              foregroundColor: colorScheme.onPrimary,
+            ),
+            child: const Text('Ya, Edit'),
           ),
         ],
       ),

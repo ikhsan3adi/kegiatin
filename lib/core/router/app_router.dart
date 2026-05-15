@@ -5,6 +5,7 @@ import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
 import 'package:kegiatin/presentation/pages/admin/admin_home_page.dart';
 import 'package:kegiatin/presentation/pages/admin/admin_event_detail_page.dart';
 import 'package:kegiatin/presentation/pages/admin/create_event_page.dart';
+import 'package:kegiatin/presentation/pages/admin/edit_event_page.dart';
 import 'package:kegiatin/presentation/pages/admin/qr_scan_page.dart';
 import 'package:kegiatin/presentation/pages/peserta/peserta_home_page.dart';
 import 'package:kegiatin/presentation/pages/peserta/peserta_event_detail_page.dart';
@@ -86,6 +87,11 @@ GoRouter appRouter(Ref ref) {
         builder: (_, _) => const AdminHomePage(),
         routes: [
           GoRoute(path: 'create-event', builder: (_, _) => const CreateEventPage()),
+          GoRoute(
+            path: 'event-edit/:eventId',
+            builder: (context, state) =>
+                EditEventPage(eventId: state.pathParameters['eventId']!),
+          ),
           GoRoute(
             path: 'event-detail/:eventId',
             builder: (context, state) =>
