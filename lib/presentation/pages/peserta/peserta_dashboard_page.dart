@@ -1,20 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/enums/event_status.dart';
 import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
 import 'package:kegiatin/presentation/controllers/event/event_list_controller.dart';
+import 'package:kegiatin/presentation/controllers/event/event_stats_controller.dart';
 import 'package:kegiatin/presentation/widgets/event_list_card.dart';
+import 'package:kegiatin/presentation/widgets/calender_card.dart';
 import 'package:kegiatin/presentation/widgets/kegiatin_app_bar.dart';
 
-class PesertaDashboardPage extends ConsumerWidget {
+class PesertaDashboardPage extends ConsumerStatefulWidget {
   const PesertaDashboardPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PesertaDashboardPage> createState() => _PesertaDashboardPageState();
+}
+
+class _PesertaDashboardPageState extends ConsumerState<PesertaDashboardPage> {
+  DateTime? _selectedDate;
+
+  @override
+  Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final authState = ref.watch(authControllerProvider);
     final eventListState = ref.watch(eventListControllerProvider());
+    final statsState = ref.watch(eventStatsControllerProvider);
+    final eventsState = ref.watch(eventListControllerProvider());
+
+    // Build map of dates to events for calendar
+    final eventsByDate = <DateTime, List<Event>>{};
+    eventsState.maybeWhen(
+      data: (paginatedResult) {
+        for (final event in paginatedResult.data) {
+          for (final session in event.sessions) {
+            final dateKey = DateTime(
+              session.startTime.year,
+              session.startTime.month,
+              session.startTime.day,
+            );
+            if (eventsByDate.containsKey(dateKey)) {
+              eventsByDate[dateKey]!.add(event);
+            } else {
+              eventsByDate[dateKey] = [event];
+            }
+          }
+        }
+      },
+      orElse: () {},
+    );
 
     return authState.when(
       data: (user) => SingleChildScrollView(
@@ -73,6 +107,32 @@ class PesertaDashboardPage extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 24),
+            // Calendar Section
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Kalender Kegiatan',
+                  style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: CalendarCard(
+                selectedDate: _selectedDate,
+                eventsByDate: eventsByDate,
+                onDateSelected: (date) {
+                  setState(() {
+                    _selectedDate = date;
+                  });
+                },
+              ),
+            ),
+
+            const SizedBox(height: 24),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Align(
@@ -83,7 +143,6 @@ class PesertaDashboardPage extends ConsumerWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 12),
             eventListState.when(
               data: (paginatedResult) {
                 // Filter: Hanya tampilkan yang Berlangsung (ongoing) atau Segera (published)
