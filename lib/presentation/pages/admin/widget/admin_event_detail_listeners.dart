@@ -4,21 +4,34 @@ import 'package:go_router/go_router.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/presentation/controllers/event/cancel_event_controller.dart';
 import 'package:kegiatin/presentation/controllers/event/complete_event_controller.dart';
+import 'package:kegiatin/presentation/controllers/event/event_detail_controller.dart';
 import 'package:kegiatin/presentation/controllers/event/event_list_controller.dart';
 import 'package:kegiatin/presentation/controllers/event/publish_event_controller.dart';
 import 'package:kegiatin/presentation/controllers/event/start_event_controller.dart';
 
-/// Side-effect listeners for publish / start / complete (snackbar, invalidate list, pop).
+/// Side-effect listeners for publish / start / complete / cancel.
+///
+/// Invalidates both the event list and the specific event detail provider
+/// so data is guaranteed fresh if the user navigates back to the same event.
 class AdminEventDetailListeners extends ConsumerWidget {
-  const AdminEventDetailListeners({super.key, required this.child});
+  const AdminEventDetailListeners({
+    super.key,
+    required this.eventId,
+    required this.child,
+  });
 
+  final String eventId;
   final Widget child;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     void onSuccess(String message) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+      // Invalidate list agar halaman daftar menampilkan status terbaru.
       ref.invalidate(eventListControllerProvider);
+      // Invalidate detail provider agar data tidak stale jika provider
+      // masih hidup saat user kembali ke halaman ini.
+      ref.invalidate(eventDetailControllerProvider(eventId));
       context.pop();
     }
 
