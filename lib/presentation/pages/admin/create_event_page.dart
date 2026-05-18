@@ -1,25 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kegiatin/core/theme/custom.dart';
 import 'package:kegiatin/domain/entities/create_event_input.dart';
 import 'package:kegiatin/domain/entities/session_input.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
 import 'package:kegiatin/domain/enums/event_visibility.dart';
 import 'package:kegiatin/presentation/controllers/event/create_event_controller.dart';
-import 'package:kegiatin/presentation/widgets/custom_input_card.dart';
-import 'package:kegiatin/presentation/widgets/dropdown_item_row.dart';
 import 'package:kegiatin/presentation/widgets/gradient_header.dart';
 import 'package:kegiatin/presentation/widgets/section_label.dart';
 
-import 'create_event_sessions.dart';
-
-// Enum internal untuk pola pengulangan Series Even
-enum _RepeatPattern { mingguan, bulanan, custom }
-
-/// Batas atas jumlah sesi untuk mencegah rendering yang berat.
-const int _kMaxSesi = 15;
+import 'create_event/shared.dart';
+import 'create_event/widget/event_form_actions.dart';
+import 'create_event/widget/event_form_header.dart';
+import 'create_event/widget/event_metadata_fields.dart';
+import 'create_event/widget/event_time_section.dart';
+import 'create_event/widget/event_type_selector.dart';
+import 'create_event/widget/event_series_settings.dart';
 
 /// Halaman form untuk membuat kegiatan baru.
 ///
@@ -45,7 +41,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
   // State
   EventType? _tipe;
   EventVisibility? _visibilitas;
-  _RepeatPattern? _polaPengulangan;
+  RepeatPattern? _polaPengulangan;
 
   /// Tanggal kegiatan â€” digunakan bersama oleh waktu mulai dan waktu selesai.
   DateTime? _tanggal;
@@ -121,7 +117,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
 
   /// Generate ulang daftar sesi berdasarkan pola.
   ///
-  /// Untuk mode [_RepeatPattern.custom], tanggal yang sudah diedit user
+  /// Untuk mode [RepeatPattern.custom], tanggal yang sudah diedit user
   /// dipertahankan selama jumlah sesi tidak berubah (hanya sesi baru
   /// yang ditambahkan di akhir dengan interval 7 hari sebagai default).
   void _regenerateSessions() {
@@ -136,9 +132,9 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
       return;
     }
 
-    final count = rawCount.clamp(1, _kMaxSesi);
+    final count = rawCount.clamp(1, kMaxSesi);
 
-    if (_polaPengulangan == _RepeatPattern.custom) {
+    if (_polaPengulangan == RepeatPattern.custom) {
       // Pertahankan tanggal yang sudah diedit. Hanya resize list.
       final prev = List<DateTime>.from(_generatedSessions);
       if (count == prev.length) return; // tidak ada perubahan
@@ -159,13 +155,13 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
     for (int i = 0; i < count; i++) {
       final DateTime next;
       switch (_polaPengulangan) {
-        case _RepeatPattern.bulanan:
+        case RepeatPattern.bulanan:
           final m = _tanggal!.month + i;
           next = DateTime(_tanggal!.year + (m - 1) ~/ 12, ((m - 1) % 12) + 1, _tanggal!.day);
-        case _RepeatPattern.mingguan:
+        case RepeatPattern.mingguan:
         case null:
           next = _tanggal!.add(Duration(days: 7 * i));
-        case _RepeatPattern.custom:
+        case RepeatPattern.custom:
           // Ditangani di blok atas; tidak akan masuk ke sini.
           next = _tanggal!.add(Duration(days: 7 * i));
       }
@@ -272,18 +268,6 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
       );
   }
 
-  // Formatting Helpers
-
-  String _formatTanggal(DateTime dt) {
-    String p(int v) => v.toString().padLeft(2, '0');
-    return '${p(dt.day)}/${p(dt.month)}/${dt.year}';
-  }
-
-  String _formatJam(TimeOfDay t) {
-    String p(int v) => v.toString().padLeft(2, '0');
-    return '${p(t.hour)}:${p(t.minute)}';
-  }
-
   String _formatDateShort(DateTime dt) {
     const months = [
       'Jan',
@@ -307,7 +291,6 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
     final isLoading = ref.watch(createEventControllerProvider).isLoading;
 
@@ -333,539 +316,64 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                       icon: Icons.info_outline_rounded,
                     ),
                     const SizedBox(height: 12),
-
-                    // â”€â”€ Nama Kegiatan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-                    CustomInputCard(
-                      child: TextFormField(
-                        controller: _namaController,
-                        style: textTheme.bodyMedium,
-                        decoration:
-                            InputDecoration.collapsed(
-                              hintText: 'Nama Kegiatan',
-                              hintStyle: textTheme.bodyMedium?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                            ).copyWith(
-                              prefixIcon: Icon(
-                                Icons.event_outlined,
-                                size: 18,
-                                color: colorScheme.primary,
-                              ),
-                              prefixIconConstraints: const BoxConstraints(
-                                minWidth: 36,
-                                minHeight: 0,
-                              ),
-                            ),
-                        textInputAction: TextInputAction.next,
-                        validator: (v) => (v == null || v.trim().isEmpty) ? 'Wajib diisi' : null,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-
-                    // â”€â”€ Jenis Kegiatan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-                    CustomInputCard(
-                      child: DropdownButtonFormField<EventType>(
-                        initialValue: _tipe,
-                        isExpanded: true,
-                        style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
-                        decoration: InputDecoration.collapsed(
-                          hintText: 'Jenis Kegiatan',
-                          hintStyle: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        hint: Text(
-                          'Jenis Kegiatan',
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        items: EventType.values
-                            .map(
-                              (t) => DropdownMenuItem(
-                                value: t,
-                                child: Builder(
-                                  builder: (ctx) {
-                                    final cs = Theme.of(ctx).colorScheme;
-                                    final tt = Theme.of(ctx).textTheme;
-                                    return DropdownItemRow(
-                                      icon: t == EventType.single
-                                          ? Icons.event_outlined
-                                          : Icons.event_repeat_outlined,
-                                      iconColor: t == EventType.single ? cs.primary : cs.secondary,
-                                      label: _labelTipe(t),
-                                      textStyle: tt.bodyMedium,
-                                    );
-                                  },
-                                ),
-                              ),
-                            )
-                            .toList(),
+                    EventFormHeader(
+                      namaController: _namaController,
+                      deskripsiController: _deskripsiController,
+                      typeSelector: EventTypeSelector(
+                        value: _tipe,
                         onChanged: (v) => setState(() {
                           _tipe = v;
                           _polaPengulangan = null;
                           _jumlahPertemuanController.clear();
                           _generatedSessions = [];
                         }),
-                        selectedItemBuilder: (ctx) {
-                          final tt = Theme.of(ctx).textTheme;
-                          final cs = Theme.of(ctx).colorScheme;
-                          return EventType.values
-                              .map(
-                                (t) => Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: DropdownItemRow(
-                                    icon: t == EventType.single
-                                        ? Icons.event_outlined
-                                        : Icons.event_repeat_outlined,
-                                    iconColor: t == EventType.single ? cs.primary : cs.secondary,
-                                    label: _labelTipe(t),
-                                    textStyle: tt.bodyMedium?.copyWith(color: cs.onSurface),
-                                  ),
-                                ),
-                              )
-                              .toList();
-                        },
-                        validator: (v) => v == null ? 'Wajib dipilih' : null,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-
-                    // â”€â”€ Deskripsi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-                    CustomInputCard(
-                      child: TextFormField(
-                        controller: _deskripsiController,
-                        maxLines: 3,
-                        style: textTheme.bodyMedium,
-                        decoration:
-                            InputDecoration.collapsed(
-                              hintText: 'Deskripsi Kegiatan',
-                              hintStyle: textTheme.bodyMedium?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                            ).copyWith(
-                              prefixIcon: Padding(
-                                padding: const EdgeInsets.only(top: 2),
-                                child: Icon(
-                                  Icons.notes_rounded,
-                                  size: 18,
-                                  color: colorScheme.tertiary,
-                                ),
-                              ),
-                              prefixIconConstraints: const BoxConstraints(
-                                minWidth: 36,
-                                minHeight: 0,
-                              ),
-                            ),
-                        validator: (v) => (v == null || v.trim().isEmpty) ? 'Wajib diisi' : null,
+                        labelTipe: _labelTipe,
                       ),
                     ),
                     const SizedBox(height: 20),
 
                     // â”€â”€ Waktu Kegiatan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-                    const SectionLabel(label: 'Waktu Kegiatan', icon: Icons.schedule_outlined),
-                    const SizedBox(height: 12),
-
-                    // Tanggal Kegiatan (shared mulai & selesai)
-                    CustomInputCard(
-                      child: InkWell(
-                        onTap: _pickTanggal,
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.calendar_today_outlined,
-                              size: 18,
-                              color: colorScheme.primary,
-                            ),
-                            const SizedBox(width: 12),
-                            Text(
-                              _tanggal != null ? _formatTanggal(_tanggal!) : 'Tanggal Kegiatan',
-                              style: textTheme.bodyMedium?.copyWith(
-                                color: _tanggal != null
-                                    ? colorScheme.onSurface
-                                    : colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-
-                    // Jam Mulai & Jam Selesai berdampingan
-                    Row(
-                      children: [
-                        Expanded(
-                          child: CustomInputCard(
-                            child: InkWell(
-                              onTap: _pickJamMulai,
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.access_time_outlined,
-                                    size: 18,
-                                    color: colorScheme.primary,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    _jamMulai != null ? _formatJam(_jamMulai!) : 'Jam Mulai',
-                                    style: textTheme.bodyMedium?.copyWith(
-                                      color: _jamMulai != null
-                                          ? colorScheme.onSurface
-                                          : colorScheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: CustomInputCard(
-                            child: InkWell(
-                              onTap: _pickJamSelesai,
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.access_time_outlined,
-                                    size: 18,
-                                    color: colorScheme.primary,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    _jamSelesai != null ? _formatJam(_jamSelesai!) : 'Jam Selesai',
-                                    style: textTheme.bodyMedium?.copyWith(
-                                      color: _jamSelesai != null
-                                          ? colorScheme.onSurface
-                                          : colorScheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                    EventTimeSection(
+                      tanggal: _tanggal,
+                      jamMulai: _jamMulai,
+                      jamSelesai: _jamSelesai,
+                      onPickTanggal: _pickTanggal,
+                      onPickJamMulai: _pickJamMulai,
+                      onPickJamSelesai: _pickJamSelesai,
                     ),
 
                     // â”€â”€ Pengaturan Series â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-                    if (_tipe == EventType.series) ...[
-                      const SizedBox(height: 20),
-                      const SectionLabel(label: 'Pengaturan Series', icon: Icons.repeat_rounded),
-                      const SizedBox(height: 12),
-
-                      // Pola Pengulangan
-                      CustomInputCard(
-                        child: DropdownButtonFormField<_RepeatPattern>(
-                          initialValue: _polaPengulangan,
-                          isExpanded: true,
-                          style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
-                          decoration: InputDecoration.collapsed(
-                            hintText: 'Pola Pengulangan',
-                            hintStyle: textTheme.bodyMedium?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                          hint: Text(
-                            'Pola Pengulangan',
-                            style: textTheme.bodyMedium?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                          items: [
-                            for (final p in _RepeatPattern.values)
-                              DropdownMenuItem(
-                                value: p,
-                                child: Builder(
-                                  builder: (ctx) {
-                                    final cs = Theme.of(ctx).colorScheme;
-                                    final tt = Theme.of(ctx).textTheme;
-                                    return DropdownItemRow(
-                                      icon: switch (p) {
-                                        _RepeatPattern.mingguan =>
-                                          Icons.calendar_view_week_outlined,
-                                        _RepeatPattern.bulanan => Icons.calendar_month_outlined,
-                                        _RepeatPattern.custom => Icons.tune_rounded,
-                                      },
-                                      iconColor: switch (p) {
-                                        _RepeatPattern.mingguan => cs.primary,
-                                        _RepeatPattern.bulanan => cs.tertiary,
-                                        _RepeatPattern.custom => cs.secondary,
-                                      },
-                                      label: switch (p) {
-                                        _RepeatPattern.mingguan => 'Mingguan',
-                                        _RepeatPattern.bulanan => 'Bulanan',
-                                        _RepeatPattern.custom => 'Custom',
-                                      },
-                                      textStyle: tt.bodyMedium,
-                                    );
-                                  },
-                                ),
-                              ),
-                          ],
-                          onChanged: (v) => setState(() {
-                            _polaPengulangan = v;
-                            _jumlahPertemuanController.clear();
-                            _generatedSessions = [];
-                          }),
-                          selectedItemBuilder: (ctx) {
-                            final tt = Theme.of(ctx).textTheme;
-                            final cs = Theme.of(ctx).colorScheme;
-                            return _RepeatPattern.values
-                                .map(
-                                  (p) => Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: DropdownItemRow(
-                                      icon: switch (p) {
-                                        _RepeatPattern.mingguan =>
-                                          Icons.calendar_view_week_outlined,
-                                        _RepeatPattern.bulanan => Icons.calendar_month_outlined,
-                                        _RepeatPattern.custom => Icons.tune_rounded,
-                                      },
-                                      iconColor: switch (p) {
-                                        _RepeatPattern.mingguan => cs.primary,
-                                        _RepeatPattern.bulanan => cs.tertiary,
-                                        _RepeatPattern.custom => cs.secondary,
-                                      },
-                                      label: switch (p) {
-                                        _RepeatPattern.mingguan => 'Mingguan',
-                                        _RepeatPattern.bulanan => 'Bulanan',
-                                        _RepeatPattern.custom => 'Custom',
-                                      },
-                                      textStyle: tt.bodyMedium?.copyWith(color: cs.onSurface),
-                                    ),
-                                  ),
-                                )
-                                .toList();
-                          },
-                          validator: (v) =>
-                              (_tipe == EventType.series && v == null) ? 'Wajib dipilih' : null,
-                        ),
+                    if (_tipe == EventType.series)
+                      EventSeriesSettings(
+                        polaPengulangan: _polaPengulangan,
+                        onPolaPengulanganChanged: (v) => setState(() {
+                          _polaPengulangan = v;
+                          _jumlahPertemuanController.clear();
+                          _generatedSessions = [];
+                        }),
+                        jumlahPertemuanController: _jumlahPertemuanController,
+                        onJumlahPertemuanChanged: () => setState(_regenerateSessions),
+                        generatedSessions: _generatedSessions,
+                        isCustom: _polaPengulangan == RepeatPattern.custom,
+                        onEditSession: _pickSessionDate,
+                        formatDateShort: _formatDateShort,
+                        kMaxSesi: kMaxSesi,
                       ),
-                      const SizedBox(height: 8),
-
-                      // Jumlah Pertemuan
-                      CustomInputCard(
-                        child: TextFormField(
-                          controller: _jumlahPertemuanController,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                          style: textTheme.bodyMedium,
-                          decoration:
-                              InputDecoration.collapsed(
-                                hintText: 'Jumlah Pertemuan (maks. $_kMaxSesi)',
-                                hintStyle: textTheme.bodyMedium?.copyWith(
-                                  color: colorScheme.onSurfaceVariant,
-                                ),
-                              ).copyWith(
-                                prefixIcon: Icon(
-                                  Icons.format_list_numbered_rounded,
-                                  size: 18,
-                                  color: colorScheme.primary,
-                                ),
-                                prefixIconConstraints: const BoxConstraints(
-                                  minWidth: 36,
-                                  minHeight: 0,
-                                ),
-                              ),
-                          onChanged: (_) => setState(_regenerateSessions),
-                          validator: (v) {
-                            if (_tipe != EventType.series) return null;
-                            if (v == null || v.trim().isEmpty) {
-                              return 'Wajib diisi untuk Series';
-                            }
-                            final n = int.tryParse(v.trim());
-                            if (n == null || n <= 0) {
-                              return 'Minimal 1 pertemuan';
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-
-                      // Jadwal sesi ter-generate
-                      if (_generatedSessions.isNotEmpty) ...[
-                        const SizedBox(height: 12),
-                        SessionListHeader(
-                          count: _generatedSessions.length,
-                          isCustom: _polaPengulangan == _RepeatPattern.custom,
-                        ),
-                        const SizedBox(height: 8),
-                        SessionDateGrid(
-                          sessions: _generatedSessions,
-                          isCustom: _polaPengulangan == _RepeatPattern.custom,
-                          onEdit: _pickSessionDate,
-                          formatDate: _formatDateShort,
-                        ),
-                      ],
-                    ],
 
                     const SizedBox(height: 20),
 
                     // â”€â”€ Lokasi & Kontak â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-                    const SectionLabel(label: 'Lokasi & Kontak', icon: Icons.place_outlined),
-                    const SizedBox(height: 12),
-
-                    // Lokasi
-                    CustomInputCard(
-                      child: TextFormField(
-                        controller: _lokasiController,
-                        style: textTheme.bodyMedium,
-                        decoration:
-                            InputDecoration.collapsed(
-                              hintText: 'Lokasi Pelaksanaan',
-                              hintStyle: textTheme.bodyMedium?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                            ).copyWith(
-                              prefixIcon: Icon(
-                                Icons.location_on_outlined,
-                                size: 18,
-                                color: colorScheme.tertiary,
-                              ),
-                              prefixIconConstraints: const BoxConstraints(
-                                minWidth: 36,
-                                minHeight: 0,
-                              ),
-                            ),
-                        textInputAction: TextInputAction.next,
-                        validator: (v) => (v == null || v.trim().isEmpty) ? 'Wajib diisi' : null,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-
-                    // Narahubung
-                    CustomInputCard(
-                      child: TextFormField(
-                        controller: _narahubungController,
-                        style: textTheme.bodyMedium,
-                        decoration:
-                            InputDecoration.collapsed(
-                              hintText: 'Narahubung',
-                              hintStyle: textTheme.bodyMedium?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                            ).copyWith(
-                              prefixIcon: Icon(
-                                Icons.person_outline_rounded,
-                                size: 18,
-                                color: colorScheme.secondary,
-                              ),
-                              prefixIconConstraints: const BoxConstraints(
-                                minWidth: 36,
-                                minHeight: 0,
-                              ),
-                            ),
-                        textInputAction: TextInputAction.next,
-                        validator: (v) => (v == null || v.trim().isEmpty) ? 'Wajib diisi' : null,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // â”€â”€ Pengaturan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-                    const SectionLabel(label: 'Pengaturan', icon: Icons.tune_rounded),
-                    const SizedBox(height: 12),
-
-                    // Visibilitas
-                    CustomInputCard(
-                      child: DropdownButtonFormField<EventVisibility>(
-                        initialValue: _visibilitas,
-                        isExpanded: true,
-                        style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
-                        decoration: InputDecoration.collapsed(
-                          hintText: 'Visibilitas',
-                          hintStyle: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        hint: Text(
-                          'Visibilitas',
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        items: EventVisibility.values
-                            .map(
-                              (vis) => DropdownMenuItem(
-                                value: vis,
-                                child: Builder(
-                                  builder: (ctx) {
-                                    final cs = Theme.of(ctx).colorScheme;
-                                    final tt = Theme.of(ctx).textTheme;
-                                    return DropdownItemRow(
-                                      icon: vis == EventVisibility.open
-                                          ? Icons.public_rounded
-                                          : Icons.lock_outline_rounded,
-                                      iconColor: vis == EventVisibility.open
-                                          ? cs.tertiary
-                                          : cs.secondary,
-                                      label: _labelVisibilitas(vis),
-                                      textStyle: tt.bodyMedium,
-                                    );
-                                  },
-                                ),
-                              ),
-                            )
-                            .toList(),
-                        onChanged: (v) => setState(() => _visibilitas = v),
-                        selectedItemBuilder: (ctx) {
-                          final tt = Theme.of(ctx).textTheme;
-                          final cs = Theme.of(ctx).colorScheme;
-                          return EventVisibility.values
-                              .map(
-                                (vis) => Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: DropdownItemRow(
-                                    icon: vis == EventVisibility.open
-                                        ? Icons.public_rounded
-                                        : Icons.lock_outline_rounded,
-                                    iconColor: vis == EventVisibility.open
-                                        ? cs.tertiary
-                                        : cs.secondary,
-                                    label: _labelVisibilitas(vis),
-                                    textStyle: tt.bodyMedium?.copyWith(color: cs.onSurface),
-                                  ),
-                                ),
-                              )
-                              .toList();
-                        },
-                        validator: (v) => v == null ? 'Wajib dipilih' : null,
-                      ),
+                    EventMetadataFields(
+                      lokasiController: _lokasiController,
+                      narahubungController: _narahubungController,
+                      visibilitas: _visibilitas,
+                      onVisibilitasChanged: (v) => setState(() => _visibilitas = v),
+                      labelVisibilitas: _labelVisibilitas,
                     ),
                     const SizedBox(height: 32),
 
                     // â”€â”€ Tombol Simpan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: FilledButton(
-                        onPressed: isLoading ? null : _onSimpan,
-                        style: FilledButton.styleFrom(
-                          backgroundColor: KegiatinCustomTheme.appBarTop,
-                          disabledBackgroundColor: KegiatinCustomTheme.appBarTop.withValues(
-                            alpha: 0.6,
-                          ),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
-                        child: isLoading
-                            ? const SizedBox(
-                                width: 22,
-                                height: 22,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.5,
-                                  color: KegiatinCustomTheme.onGradient,
-                                ),
-                              )
-                            : Text(
-                                'Simpan Kegiatan',
-                                style: textTheme.labelLarge?.copyWith(
-                                  color: KegiatinCustomTheme.onGradient,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                      ),
-                    ),
+                    EventFormActions(isLoading: isLoading, onSimpan: _onSimpan),
                     const SizedBox(height: 24),
                   ],
                 ),
