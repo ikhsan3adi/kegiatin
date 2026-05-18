@@ -18,6 +18,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   final _passwordController = TextEditingController();
   final _nameController = TextEditingController();
   final _npaController = TextEditingController();
+  final _cabangController = TextEditingController();
   bool _obscurePassword = true;
   String _userType = 'UMUM';
 
@@ -27,6 +28,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     _passwordController.dispose();
     _nameController.dispose();
     _npaController.dispose();
+    _cabangController.dispose();
     super.dispose();
   }
 
@@ -42,6 +44,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             displayName: _nameController.text.trim(),
             userType: _userType,
             npa: _userType == 'ANGGOTA' ? _npaController.text.trim() : null,
+            cabang: _userType == 'ANGGOTA' ? _cabangController.text.trim() : null,
           ),
         );
 
@@ -176,7 +179,12 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             _buildEmailField(),
             const SizedBox(height: 16),
             _buildPasswordField(),
-            if (_userType == 'ANGGOTA') ...[const SizedBox(height: 16), _buildNpaField()],
+            if (_userType == 'ANGGOTA') ...[
+              const SizedBox(height: 16),
+              _buildNpaField(),
+              const SizedBox(height: 16),
+              _buildCabangField(),
+            ],
             const SizedBox(height: 28),
             _buildSubmitButton(authState),
             const SizedBox(height: 16),
@@ -294,6 +302,17 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
         }
         return null;
       },
+    );
+  }
+
+  Widget _buildCabangField() {
+    return TextFormField(
+      controller: _cabangController,
+      decoration: InputDecoration(
+        labelText: 'Cabang',
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      ),
     );
   }
 

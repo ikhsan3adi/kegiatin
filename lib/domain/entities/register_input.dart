@@ -4,6 +4,7 @@ class RegisterInput {
   final String displayName;
   final String userType; // 'ANGGOTA' | 'UMUM'
   final String? npa;
+  final String? cabang;
 
   const RegisterInput({
     required this.email,
@@ -11,5 +12,6 @@ class RegisterInput {
     required this.displayName,
     required this.userType,
     this.npa,
+    this.cabang,
   });
 }
