@@ -3,6 +3,9 @@ import 'package:kegiatin/core/constants/api_constants.dart';
 import 'package:kegiatin/core/errors/exceptions.dart';
 import 'package:kegiatin/data/models/rsvp_model.dart';
 import 'package:kegiatin/domain/entities/paginated_result.dart';
+import 'package:kegiatin/domain/entities/rsvp_with_user.dart';
+import 'package:kegiatin/domain/entities/user_summary.dart';
+import 'package:kegiatin/domain/enums/rsvp_status.dart';
 
 abstract class RsvpRemoteDataSource {
   /// Membuat RSVP baru: `POST /events/{eventId}/rsvp`.
@@ -10,6 +13,13 @@ abstract class RsvpRemoteDataSource {
 
   /// Mengambil RSVP milik user yang sedang login: `GET /rsvp/me`.
   Future<PaginatedResult<RsvpModel>> getMyRsvps({int page = 1, int limit = 20});
+
+  /// Mengambil daftar peserta RSVP per event (Admin): `GET /events/{eventId}/rsvp`.
+  Future<PaginatedResult<RsvpWithUser>> getEventRsvps(
+    String eventId, {
+    int page = 1,
+    int limit = 100,
+  });
 }
 
 class RsvpRemoteDataSourceImpl implements RsvpRemoteDataSource {
@@ -61,6 +71,54 @@ class RsvpRemoteDataSourceImpl implements RsvpRemoteDataSource {
     } on DioException catch (e) {
       throw ServerException(
         _extractErrorMessage(e, 'Gagal mengambil daftar RSVP'),
+        statusCode: e.response?.statusCode,
+      );
+    }
+  }
+
+  @override
+  Future<PaginatedResult<RsvpWithUser>> getEventRsvps(
+    String eventId, {
+    int page = 1,
+    int limit = 100,
+  }) async {
+    try {
+      final response = await dio.get(
+        ApiConstants.eventRsvpList(eventId),
+        queryParameters: {'page': page, 'limit': limit},
+      );
+      final body = _asMap(response.data);
+      final data = (body['data'] as List).map((item) {
+        final itemMap = _asMap(item);
+        final userMap = _asMap(itemMap['user']);
+        return RsvpWithUser(
+          id: itemMap['id'] as String,
+          userId: itemMap['userId'] as String,
+          eventId: itemMap['eventId'] as String,
+          qrToken: itemMap['qrToken'] as String,
+          status: RsvpStatus.values.firstWhere(
+            (e) => e.name.toUpperCase() == (itemMap['status'] as String).toUpperCase(),
+          ),
+          createdAt: DateTime.parse(itemMap['createdAt'] as String),
+          user: UserSummary(
+            id: itemMap['userId'] as String,
+            displayName: userMap['displayName'] as String? ?? '',
+            npa: userMap['npa'] as String?,
+            cabang: userMap['cabang'] as String?,
+            photoUrl: userMap['photoUrl'] as String?,
+          ),
+        );
+      }).toList();
+      final meta = _asMap(body['meta']);
+      return PaginatedResult<RsvpWithUser>(
+        data: data,
+        total: meta['total'] as int,
+        page: meta['page'] as int,
+        limit: meta['limit'] as int,
+      );
+    } on DioException catch (e) {
+      throw ServerException(
+        _extractErrorMessage(e, 'Gagal mengambil daftar peserta RSVP'),
         statusCode: e.response?.statusCode,
       );
     }

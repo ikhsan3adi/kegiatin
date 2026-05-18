@@ -6,6 +6,7 @@ import 'package:kegiatin/data/datasources/local/rsvp_local_datasource.dart';
 import 'package:kegiatin/data/datasources/remote/rsvp_remote_datasource.dart';
 import 'package:kegiatin/domain/entities/paginated_result.dart';
 import 'package:kegiatin/domain/entities/rsvp.dart';
+import 'package:kegiatin/domain/entities/rsvp_with_user.dart';
 import 'package:kegiatin/domain/repositories/rsvp_repository.dart';
 
 class RsvpRepositoryImpl implements RsvpRepository {
@@ -61,5 +62,24 @@ class RsvpRepositoryImpl implements RsvpRepository {
     return Right(
       PaginatedResult<Rsvp>(data: cached, total: cached.length, page: 1, limit: cached.length),
     );
+  }
+
+  @override
+  Future<Either<Failure, PaginatedResult<RsvpWithUser>>> getEventRsvps(
+    String eventId, {
+    int page = 1,
+    int limit = 100,
+  }) async {
+    if (await networkInfo.isConnected) {
+      try {
+        final result = await remoteDataSource.getEventRsvps(eventId, page: page, limit: limit);
+        return Right(result);
+      } on ServerException catch (e) {
+        return Left(ServerFailure(e.message, statusCode: e.statusCode));
+      } catch (e) {
+        return Left(ServerFailure(e.toString()));
+      }
+    }
+    return const Left(NetworkFailure());
   }
 }
