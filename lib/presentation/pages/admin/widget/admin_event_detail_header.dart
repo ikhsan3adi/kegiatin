@@ -69,23 +69,35 @@ class AdminEventDetailHeader extends StatelessWidget {
           const SizedBox(height: 8),
           Row(
             children: [
-              Icon(Icons.access_time, size: 14, color: colorScheme.onPrimary.withValues(alpha: 0.8)),
+              Icon(
+                Icons.access_time,
+                size: 14,
+                color: colorScheme.onPrimary.withValues(alpha: 0.8),
+              ),
               const SizedBox(width: 4),
               Text(
                 dateStr,
-                style: textTheme.bodySmall?.copyWith(color: colorScheme.onPrimary.withValues(alpha: 0.8)),
+                style: textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onPrimary.withValues(alpha: 0.8),
+                ),
               ),
             ],
           ),
           const SizedBox(height: 4),
           Row(
             children: [
-              Icon(Icons.location_on_outlined, size: 14, color: colorScheme.onPrimary.withValues(alpha: 0.8)),
+              Icon(
+                Icons.location_on_outlined,
+                size: 14,
+                color: colorScheme.onPrimary.withValues(alpha: 0.8),
+              ),
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
                   event.location,
-                  style: textTheme.bodySmall?.copyWith(color: colorScheme.onPrimary.withValues(alpha: 0.8)),
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onPrimary.withValues(alpha: 0.8),
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -114,11 +126,7 @@ class AdminEventDetailHeader extends StatelessWidget {
 }
 
 class _Badge extends StatelessWidget {
-  const _Badge({
-    required this.text,
-    required this.backgroundColor,
-    required this.textColor,
-  });
+  const _Badge({required this.text, required this.backgroundColor, required this.textColor});
 
   final String text;
   final Color backgroundColor;

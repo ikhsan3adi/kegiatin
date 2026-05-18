@@ -17,8 +17,7 @@ class RsvpRemoteDataSourceImpl implements RsvpRemoteDataSource {
 
   RsvpRemoteDataSourceImpl(this.dio);
 
-  Map<String, dynamic> _asMap(dynamic value) =>
-      Map<String, dynamic>.from(value as Map);
+  Map<String, dynamic> _asMap(dynamic value) => Map<String, dynamic>.from(value as Map);
 
   String _extractErrorMessage(DioException e, String fallback) {
     final data = e.response?.data;
@@ -44,19 +43,14 @@ class RsvpRemoteDataSourceImpl implements RsvpRemoteDataSource {
   }
 
   @override
-  Future<PaginatedResult<RsvpModel>> getMyRsvps({
-    int page = 1,
-    int limit = 20,
-  }) async {
+  Future<PaginatedResult<RsvpModel>> getMyRsvps({int page = 1, int limit = 20}) async {
     try {
       final response = await dio.get(
         ApiConstants.myRsvps,
         queryParameters: {'page': page, 'limit': limit},
       );
       final body = _asMap(response.data);
-      final data = (body['data'] as List)
-          .map((item) => RsvpModel.fromJson(_asMap(item)))
-          .toList();
+      final data = (body['data'] as List).map((item) => RsvpModel.fromJson(_asMap(item))).toList();
       final meta = _asMap(body['meta']);
       return PaginatedResult<RsvpModel>(
         data: data,

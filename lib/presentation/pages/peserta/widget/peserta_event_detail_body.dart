@@ -31,11 +31,7 @@ class PesertaEventDetailBody extends ConsumerWidget {
               children: [
                 Row(
                   children: [
-                    Icon(
-                      Icons.menu_book_outlined,
-                      size: 20,
-                      color: colorScheme.onSurfaceVariant,
-                    ),
+                    Icon(Icons.menu_book_outlined, size: 20, color: colorScheme.onSurfaceVariant),
                     const SizedBox(width: 12),
                     Text(
                       'Deskripsi Kegiatan',
@@ -59,10 +55,7 @@ class PesertaEventDetailBody extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Detail',
-                  style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                ),
+                Text('Detail', style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 16),
                 _DetailRow(
                   label: 'Visibilitas',
@@ -133,9 +126,9 @@ class _DetailRow extends StatelessWidget {
       children: [
         Text(
           label,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
         ),
         Flexible(
           child: Text(

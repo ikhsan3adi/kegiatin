@@ -22,27 +22,35 @@ class EventListController extends _$EventListController {
   }
 
   Future<PaginatedResult<Event>> _fetchEvents() async {
-    final useCase = ref.watch(getEventsUseCaseProvider);
-    
+    final useCase = ref.read(getEventsUseCaseProvider);
+
     final currentStatus = status;
     EventStatus? eventStatus;
     if (currentStatus != null) {
-      eventStatus = EventStatus.values.firstWhere((e) => e.name.toUpperCase() == currentStatus.toUpperCase(), orElse: () => EventStatus.published);
+      eventStatus = EventStatus.values.firstWhere(
+        (e) => e.name.toUpperCase() == currentStatus.toUpperCase(),
+        orElse: () => EventStatus.published,
+      );
     }
-    
+
     final currentType = type;
     EventType? eventType;
     if (currentType != null) {
-      eventType = EventType.values.firstWhere((e) => e.name.toUpperCase() == currentType.toUpperCase(), orElse: () => EventType.single);
+      eventType = EventType.values.firstWhere(
+        (e) => e.name.toUpperCase() == currentType.toUpperCase(),
+        orElse: () => EventType.single,
+      );
     }
 
-    final result = await useCase(GetEventsUseCaseParams(
-      page: page, 
-      limit: limit, 
-      search: search,
-      status: eventStatus,
-      type: eventType,
-    ));
+    final result = await useCase(
+      GetEventsUseCaseParams(
+        page: page,
+        limit: limit,
+        search: search,
+        status: eventStatus,
+        type: eventType,
+      ),
+    );
 
     return result.fold((failure) => throw Exception(failure.message), (data) => data);
   }

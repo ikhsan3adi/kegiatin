@@ -47,10 +47,7 @@ class AdminEventDetailBody extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Detail',
-                  style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                ),
+                Text('Detail', style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 16),
                 _DetailRow(
                   label: 'Visibilitas',
@@ -119,7 +116,11 @@ class _DetailRow extends StatelessWidget {
           child: Text(
             value,
             textAlign: TextAlign.end,
-            style: TextStyle(color: colorScheme.onSurface, fontSize: 14, fontWeight: FontWeight.w500),
+            style: TextStyle(
+              color: colorScheme.onSurface,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
       ],

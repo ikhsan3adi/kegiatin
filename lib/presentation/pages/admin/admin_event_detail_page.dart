@@ -23,10 +23,8 @@ class AdminEventDetailPage extends ConsumerWidget {
     final asyncEvent = ref.watch(eventDetailControllerProvider(eventId));
 
     return asyncEvent.when(
-      loading: () => _loadingOrErrorScaffold(
-        context,
-        body: const Center(child: CircularProgressIndicator()),
-      ),
+      loading: () =>
+          _loadingOrErrorScaffold(context, body: const Center(child: CircularProgressIndicator())),
       error: (error, _) => _loadingOrErrorScaffold(
         context,
         body: Center(

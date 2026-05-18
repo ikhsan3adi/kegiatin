@@ -18,10 +18,7 @@ class PesertaEventDetailPage extends ConsumerWidget {
     final asyncEvent = ref.watch(eventDetailControllerProvider(eventId));
 
     return asyncEvent.when(
-      loading: () => _fallbackScaffold(
-        context,
-        const Center(child: CircularProgressIndicator()),
-      ),
+      loading: () => _fallbackScaffold(context, const Center(child: CircularProgressIndicator())),
       error: (error, _) => _fallbackScaffold(
         context,
         Center(
@@ -50,10 +47,7 @@ class PesertaEventDetailPage extends ConsumerWidget {
     return Scaffold(
       backgroundColor: colorScheme.surfaceContainerHighest,
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
+        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
         backgroundColor: colorScheme.surfaceContainerHighest,
       ),
       body: body,

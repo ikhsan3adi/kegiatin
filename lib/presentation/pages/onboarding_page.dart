@@ -143,9 +143,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: colorScheme.primary,
                             foregroundColor: colorScheme.onPrimary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
                           child: const Text(
                             'Sign Up',
@@ -161,14 +159,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           onPressed: () => context.go('/login'),
                           style: OutlinedButton.styleFrom(
                             side: BorderSide(color: colorScheme.primary),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
-                          child: const Text(
-                            'Login',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
+                          child: const Text('Login', style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
                       ),
                     ],

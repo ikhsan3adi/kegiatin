@@ -11,8 +11,5 @@ abstract class RsvpRepository {
   Future<Either<Failure, Rsvp>> createRsvp(String eventId);
 
   /// Mengambil daftar RSVP milik user yang sedang login.
-  Future<Either<Failure, PaginatedResult<Rsvp>>> getMyRsvps({
-    int page = 1,
-    int limit = 20,
-  });
+  Future<Either<Failure, PaginatedResult<Rsvp>>> getMyRsvps({int page = 1, int limit = 20});
 }

@@ -22,9 +22,9 @@ class PesertaEventDetailHeader extends StatelessWidget {
     final startTime = firstSession?.startTime;
     final dateStr = startTime != null
         ? '${startTime.year}-${startTime.month.toString().padLeft(2, '0')}-'
-            '${startTime.day.toString().padLeft(2, '0')} . '
-            '${startTime.hour.toString().padLeft(2, '0')}:'
-            '${startTime.minute.toString().padLeft(2, '0')}'
+              '${startTime.day.toString().padLeft(2, '0')} . '
+              '${startTime.hour.toString().padLeft(2, '0')}:'
+              '${startTime.minute.toString().padLeft(2, '0')}'
         : 'Waktu belum ditentukan';
 
     return KegiatinAppBar(
@@ -107,11 +107,7 @@ class PesertaEventDetailHeader extends StatelessWidget {
 }
 
 class _Badge extends StatelessWidget {
-  const _Badge({
-    required this.text,
-    required this.backgroundColor,
-    required this.textColor,
-  });
+  const _Badge({required this.text, required this.backgroundColor, required this.textColor});
 
   final String text;
   final Color backgroundColor;
@@ -121,16 +117,12 @@ class _Badge extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(16),
-      ),
+      decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(16)),
       child: Text(
         text,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-          color: textColor,
-          fontWeight: FontWeight.bold,
-        ),
+        style: Theme.of(
+          context,
+        ).textTheme.labelSmall?.copyWith(color: textColor, fontWeight: FontWeight.bold),
       ),
     );
   }

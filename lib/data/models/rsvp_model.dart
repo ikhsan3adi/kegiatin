@@ -19,6 +19,5 @@ abstract class RsvpModel with _$RsvpModel implements Rsvp {
     required DateTime createdAt,
   }) = _RsvpModel;
 
-  factory RsvpModel.fromJson(Map<String, dynamic> json) =>
-      _$RsvpModelFromJson(json);
+  factory RsvpModel.fromJson(Map<String, dynamic> json) => _$RsvpModelFromJson(json);
 }

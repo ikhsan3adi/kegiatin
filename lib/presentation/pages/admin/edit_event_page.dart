@@ -77,10 +77,7 @@ class _EditEventPageState extends ConsumerState<EditEventPage> {
           'Pastikan data yang diubah sudah benar. Apakah Anda yakin ingin menyimpan perubahan ini?',
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Batal'),
-          ),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Batal')),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             style: FilledButton.styleFrom(
@@ -112,9 +109,9 @@ class _EditEventPageState extends ConsumerState<EditEventPage> {
     if (errorMsg != null) {
       _showError(errorMsg);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Kegiatan berhasil diperbarui')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Kegiatan berhasil diperbarui')));
       context.pop(); // Go back
     }
   }
@@ -123,10 +120,7 @@ class _EditEventPageState extends ConsumerState<EditEventPage> {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
+        SnackBar(content: Text(message), backgroundColor: Theme.of(context).colorScheme.error),
       );
   }
 
@@ -138,9 +132,6 @@ class _EditEventPageState extends ConsumerState<EditEventPage> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: state.when(
         data: (event) {
-          if (event == null) {
-            return const Center(child: Text('Kegiatan tidak ditemukan'));
-          }
           // Only init once
           WidgetsBinding.instance.addPostFrameCallback((_) {
             _initData(ref);
@@ -179,34 +170,28 @@ class _EditEventPageState extends ConsumerState<EditEventPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SectionLabel(
-                    label: 'Informasi Kegiatan',
-                    icon: Icons.info_outline_rounded,
-                  ),
+                  const SectionLabel(label: 'Informasi Kegiatan', icon: Icons.info_outline_rounded),
                   const SizedBox(height: 12),
                   CustomInputCard(
                     child: TextFormField(
                       controller: _namaController,
                       style: textTheme.bodyMedium,
-                      decoration: InputDecoration.collapsed(
-                        hintText: 'Nama Kegiatan',
-                        hintStyle: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ).copyWith(
-                        prefixIcon: Icon(
-                          Icons.event_outlined,
-                          size: 18,
-                          color: colorScheme.primary,
-                        ),
-                        prefixIconConstraints: const BoxConstraints(
-                          minWidth: 36,
-                          minHeight: 0,
-                        ),
-                      ),
+                      decoration:
+                          InputDecoration.collapsed(
+                            hintText: 'Nama Kegiatan',
+                            hintStyle: textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ).copyWith(
+                            prefixIcon: Icon(
+                              Icons.event_outlined,
+                              size: 18,
+                              color: colorScheme.primary,
+                            ),
+                            prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 0),
+                          ),
                       textInputAction: TextInputAction.next,
-                      validator: (v) =>
-                          (v == null || v.trim().isEmpty) ? 'Wajib diisi' : null,
+                      validator: (v) => (v == null || v.trim().isEmpty) ? 'Wajib diisi' : null,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -215,27 +200,24 @@ class _EditEventPageState extends ConsumerState<EditEventPage> {
                       controller: _deskripsiController,
                       maxLines: 3,
                       style: textTheme.bodyMedium,
-                      decoration: InputDecoration.collapsed(
-                        hintText: 'Deskripsi Kegiatan',
-                        hintStyle: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ).copyWith(
-                        prefixIcon: Padding(
-                          padding: const EdgeInsets.only(top: 2),
-                          child: Icon(
-                            Icons.notes_rounded,
-                            size: 18,
-                            color: colorScheme.tertiary,
+                      decoration:
+                          InputDecoration.collapsed(
+                            hintText: 'Deskripsi Kegiatan',
+                            hintStyle: textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ).copyWith(
+                            prefixIcon: Padding(
+                              padding: const EdgeInsets.only(top: 2),
+                              child: Icon(
+                                Icons.notes_rounded,
+                                size: 18,
+                                color: colorScheme.tertiary,
+                              ),
+                            ),
+                            prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 0),
                           ),
-                        ),
-                        prefixIconConstraints: const BoxConstraints(
-                          minWidth: 36,
-                          minHeight: 0,
-                        ),
-                      ),
-                      validator: (v) =>
-                          (v == null || v.trim().isEmpty) ? 'Wajib diisi' : null,
+                      validator: (v) => (v == null || v.trim().isEmpty) ? 'Wajib diisi' : null,
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -245,25 +227,22 @@ class _EditEventPageState extends ConsumerState<EditEventPage> {
                     child: TextFormField(
                       controller: _lokasiController,
                       style: textTheme.bodyMedium,
-                      decoration: InputDecoration.collapsed(
-                        hintText: 'Lokasi Pelaksanaan',
-                        hintStyle: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ).copyWith(
-                        prefixIcon: Icon(
-                          Icons.location_on_outlined,
-                          size: 18,
-                          color: colorScheme.tertiary,
-                        ),
-                        prefixIconConstraints: const BoxConstraints(
-                          minWidth: 36,
-                          minHeight: 0,
-                        ),
-                      ),
+                      decoration:
+                          InputDecoration.collapsed(
+                            hintText: 'Lokasi Pelaksanaan',
+                            hintStyle: textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ).copyWith(
+                            prefixIcon: Icon(
+                              Icons.location_on_outlined,
+                              size: 18,
+                              color: colorScheme.tertiary,
+                            ),
+                            prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 0),
+                          ),
                       textInputAction: TextInputAction.next,
-                      validator: (v) =>
-                          (v == null || v.trim().isEmpty) ? 'Wajib diisi' : null,
+                      validator: (v) => (v == null || v.trim().isEmpty) ? 'Wajib diisi' : null,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -271,25 +250,22 @@ class _EditEventPageState extends ConsumerState<EditEventPage> {
                     child: TextFormField(
                       controller: _narahubungController,
                       style: textTheme.bodyMedium,
-                      decoration: InputDecoration.collapsed(
-                        hintText: 'Narahubung',
-                        hintStyle: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ).copyWith(
-                        prefixIcon: Icon(
-                          Icons.person_outline_rounded,
-                          size: 18,
-                          color: colorScheme.secondary,
-                        ),
-                        prefixIconConstraints: const BoxConstraints(
-                          minWidth: 36,
-                          minHeight: 0,
-                        ),
-                      ),
+                      decoration:
+                          InputDecoration.collapsed(
+                            hintText: 'Narahubung',
+                            hintStyle: textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ).copyWith(
+                            prefixIcon: Icon(
+                              Icons.person_outline_rounded,
+                              size: 18,
+                              color: colorScheme.secondary,
+                            ),
+                            prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 0),
+                          ),
                       textInputAction: TextInputAction.next,
-                      validator: (v) =>
-                          (v == null || v.trim().isEmpty) ? 'Wajib diisi' : null,
+                      validator: (v) => (v == null || v.trim().isEmpty) ? 'Wajib diisi' : null,
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -297,7 +273,7 @@ class _EditEventPageState extends ConsumerState<EditEventPage> {
                   const SizedBox(height: 12),
                   CustomInputCard(
                     child: DropdownButtonFormField<EventVisibility>(
-                      value: _visibilitas,
+                      initialValue: _visibilitas,
                       isExpanded: true,
                       style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
                       decoration: InputDecoration.collapsed(
@@ -308,9 +284,7 @@ class _EditEventPageState extends ConsumerState<EditEventPage> {
                       ),
                       hint: Text(
                         'Visibilitas',
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
+                        style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
                       ),
                       items: EventVisibility.values
                           .map(
@@ -324,9 +298,7 @@ class _EditEventPageState extends ConsumerState<EditEventPage> {
                                     icon: vis == EventVisibility.open
                                         ? Icons.public_rounded
                                         : Icons.lock_outline_rounded,
-                                    iconColor: vis == EventVisibility.open
-                                        ? cs.primary
-                                        : cs.error,
+                                    iconColor: vis == EventVisibility.open ? cs.primary : cs.error,
                                     label: vis == EventVisibility.open
                                         ? 'Publik'
                                         : 'Hanya Undangan',
@@ -349,14 +321,9 @@ class _EditEventPageState extends ConsumerState<EditEventPage> {
                                   icon: vis == EventVisibility.open
                                       ? Icons.public_rounded
                                       : Icons.lock_outline_rounded,
-                                  iconColor: vis == EventVisibility.open
-                                      ? cs.primary
-                                      : cs.error,
-                                  label: vis == EventVisibility.open
-                                      ? 'Publik'
-                                      : 'Hanya Undangan',
-                                  textStyle:
-                                      tt.bodyMedium?.copyWith(color: cs.onSurface),
+                                  iconColor: vis == EventVisibility.open ? cs.primary : cs.error,
+                                  label: vis == EventVisibility.open ? 'Publik' : 'Hanya Undangan',
+                                  textStyle: tt.bodyMedium?.copyWith(color: cs.onSurface),
                                 ),
                               ),
                             )
@@ -380,18 +347,13 @@ class _EditEventPageState extends ConsumerState<EditEventPage> {
                 onPressed: isLoading ? null : _onSimpan,
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 child: isLoading
                     ? const SizedBox(
                         width: 24,
                         height: 24,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                       )
                     : const Text(
                         'Simpan Perubahan',

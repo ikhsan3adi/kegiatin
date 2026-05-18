@@ -20,8 +20,5 @@ class UpdateEventUseCaseParams {
   final String eventId;
   final UpdateEventInput input;
 
-  const UpdateEventUseCaseParams({
-    required this.eventId,
-    required this.input,
-  });
+  const UpdateEventUseCaseParams({required this.eventId, required this.input});
 }

@@ -93,9 +93,7 @@ class AdminEventDetailBottomBar extends ConsumerWidget {
               ),
               const SizedBox(width: 8),
               FilledButton(
-                onPressed: isCancelling
-                    ? null
-                    : () => _confirmCancel(context, ref),
+                onPressed: isCancelling ? null : () => _confirmCancel(context, ref),
                 style: FilledButton.styleFrom(
                   backgroundColor: colorScheme.errorContainer,
                   foregroundColor: colorScheme.onErrorContainer,
@@ -176,14 +174,9 @@ class AdminEventDetailBottomBar extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Batalkan Kegiatan?'),
-        content: const Text(
-          'Kegiatan yang dibatalkan tidak dapat di-publish kembali. Lanjutkan?',
-        ),
+        content: const Text('Kegiatan yang dibatalkan tidak dapat di-publish kembali. Lanjutkan?'),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Tidak'),
-          ),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Tidak')),
           FilledButton(
             onPressed: () {
               Navigator.of(ctx).pop();
@@ -210,10 +203,7 @@ class AdminEventDetailBottomBar extends ConsumerWidget {
           'Kegiatan ini sudah dipublish atau sedang berlangsung. Perubahan data mungkin membingungkan peserta. Lanjutkan edit?',
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Batal'),
-          ),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Batal')),
           FilledButton(
             onPressed: () {
               Navigator.of(ctx).pop();

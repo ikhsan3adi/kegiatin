@@ -42,11 +42,7 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
       SnackBar(
         content: Row(
           children: [
-            const Icon(
-              Icons.check_circle,
-              color: KegiatinCustomTheme.onGradient,
-              size: 20,
-            ),
+            const Icon(Icons.check_circle, color: KegiatinCustomTheme.onGradient, size: 20),
             const SizedBox(width: 10),
             Expanded(
               child: Text('QR terbaca: $value', maxLines: 1, overflow: TextOverflow.ellipsis),
@@ -258,7 +254,11 @@ class _EventDropdown extends StatelessWidget {
       height: 40,
       child: Row(
         children: [
-          const Icon(Icons.event_note_outlined, size: 16, color: KegiatinCustomTheme.onGradientSecondary),
+          const Icon(
+            Icons.event_note_outlined,
+            size: 16,
+            color: KegiatinCustomTheme.onGradientSecondary,
+          ),
           const SizedBox(width: 8),
           Text(
             'Memuat kegiatan...',
@@ -266,9 +266,11 @@ class _EventDropdown extends StatelessWidget {
           ),
           const Spacer(),
           const SizedBox(
-            width: 16, height: 16,
+            width: 16,
+            height: 16,
             child: CircularProgressIndicator(
-              strokeWidth: 2, color: KegiatinCustomTheme.onGradientSecondary,
+              strokeWidth: 2,
+              color: KegiatinCustomTheme.onGradientSecondary,
             ),
           ),
         ],
@@ -313,7 +315,11 @@ class _EventDropdown extends StatelessWidget {
         height: 40,
         child: Row(
           children: [
-            const Icon(Icons.event_busy_outlined, size: 16, color: KegiatinCustomTheme.onGradientSecondary),
+            const Icon(
+              Icons.event_busy_outlined,
+              size: 16,
+              color: KegiatinCustomTheme.onGradientSecondary,
+            ),
             const SizedBox(width: 8),
             Text(
               'Belum ada kegiatan tersedia',

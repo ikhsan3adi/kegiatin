@@ -37,7 +37,12 @@ class _AdminEventPageState extends ConsumerState<AdminEventPage> {
     });
   }
 
-  Widget _buildFilterChip(String label, String? statusValue, ColorScheme colorScheme, TextTheme textTheme) {
+  Widget _buildFilterChip(
+    String label,
+    String? statusValue,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
     final isSelected = _selectedStatus == statusValue;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
@@ -46,16 +51,18 @@ class _AdminEventPageState extends ConsumerState<AdminEventPage> {
         color: isSelected ? colorScheme.primary : colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isSelected ? colorScheme.primary : colorScheme.outlineVariant.withValues(alpha: 0.5),
+          color: isSelected
+              ? colorScheme.primary
+              : colorScheme.outlineVariant.withValues(alpha: 0.5),
           width: 1,
         ),
-        boxShadow: isSelected 
+        boxShadow: isSelected
             ? [
                 BoxShadow(
                   color: colorScheme.primary.withValues(alpha: 0.3),
                   blurRadius: 6,
                   offset: const Offset(0, 3),
-                )
+                ),
               ]
             : [],
       ),
@@ -91,10 +98,12 @@ class _AdminEventPageState extends ConsumerState<AdminEventPage> {
     final textTheme = Theme.of(context).textTheme;
 
     // Fetch events with filters
-    final eventsState = ref.watch(eventListControllerProvider(
-      search: _searchQuery.isEmpty ? null : _searchQuery,
-      status: _selectedStatus,
-    ));
+    final eventsState = ref.watch(
+      eventListControllerProvider(
+        search: _searchQuery.isEmpty ? null : _searchQuery,
+        status: _selectedStatus,
+      ),
+    );
 
     return Column(
       children: [
@@ -152,9 +161,7 @@ class _AdminEventPageState extends ConsumerState<AdminEventPage> {
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Container(
-              constraints: BoxConstraints(
-                minWidth: MediaQuery.of(context).size.width,
-              ),
+              constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width),
               alignment: Alignment.center,
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
               child: Row(
@@ -173,15 +180,19 @@ class _AdminEventPageState extends ConsumerState<AdminEventPage> {
         Expanded(
           child: RefreshIndicator(
             onRefresh: () async {
-              ref.invalidate(eventListControllerProvider(
-                search: _searchQuery.isEmpty ? null : _searchQuery,
-                status: _selectedStatus,
-              ));
-              try {
-                await ref.read(eventListControllerProvider(
+              ref.invalidate(
+                eventListControllerProvider(
                   search: _searchQuery.isEmpty ? null : _searchQuery,
                   status: _selectedStatus,
-                ).future);
+                ),
+              );
+              try {
+                await ref.read(
+                  eventListControllerProvider(
+                    search: _searchQuery.isEmpty ? null : _searchQuery,
+                    status: _selectedStatus,
+                  ).future,
+                );
               } catch (_) {}
             },
             child: SingleChildScrollView(
@@ -199,7 +210,9 @@ class _AdminEventPageState extends ConsumerState<AdminEventPage> {
                             padding: const EdgeInsets.all(32.0),
                             child: Text(
                               'Belum ada kegiatan',
-                              style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+                              style: textTheme.bodyMedium?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
                             ),
                           ),
                         );
@@ -221,7 +234,10 @@ class _AdminEventPageState extends ConsumerState<AdminEventPage> {
                       );
                     },
                     loading: () => const Center(
-                      child: Padding(padding: EdgeInsets.all(32.0), child: CircularProgressIndicator()),
+                      child: Padding(
+                        padding: EdgeInsets.all(32.0),
+                        child: CircularProgressIndicator(),
+                      ),
                     ),
                     error: (e, _) => Center(
                       child: Padding(

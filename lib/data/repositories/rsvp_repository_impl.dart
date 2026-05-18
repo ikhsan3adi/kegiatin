@@ -24,10 +24,7 @@ class RsvpRepositoryImpl implements RsvpRepository {
   }
 
   @override
-  Future<Either<Failure, PaginatedResult<Rsvp>>> getMyRsvps({
-    int page = 1,
-    int limit = 20,
-  }) async {
+  Future<Either<Failure, PaginatedResult<Rsvp>>> getMyRsvps({int page = 1, int limit = 20}) async {
     try {
       final result = await remoteDataSource.getMyRsvps(page: page, limit: limit);
       return Right(

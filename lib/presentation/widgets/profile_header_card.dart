@@ -123,9 +123,7 @@ class _InitialsFallback extends StatelessWidget {
     return Center(
       child: Text(
         initials,
-        style: Theme.of(
-          context,
-        ).textTheme.titleMedium?.copyWith(
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(
           color: KegiatinCustomTheme.onGradient,
           fontWeight: FontWeight.w700,
         ),
@@ -155,9 +153,7 @@ class _RoleBadge extends StatelessWidget {
       ),
       child: Text(
         _label,
-        style: Theme.of(
-          context,
-        ).textTheme.labelSmall?.copyWith(
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
           color: KegiatinCustomTheme.onGradient,
           fontWeight: FontWeight.w600,
         ),

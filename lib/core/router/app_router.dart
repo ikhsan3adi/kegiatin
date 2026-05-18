@@ -89,8 +89,7 @@ GoRouter appRouter(Ref ref) {
           GoRoute(path: 'create-event', builder: (_, _) => const CreateEventPage()),
           GoRoute(
             path: 'event-edit/:eventId',
-            builder: (context, state) =>
-                EditEventPage(eventId: state.pathParameters['eventId']!),
+            builder: (context, state) => EditEventPage(eventId: state.pathParameters['eventId']!),
           ),
           GoRoute(
             path: 'event-detail/:eventId',
