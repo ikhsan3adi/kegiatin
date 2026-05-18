@@ -1,3 +1,4 @@
+import 'package:kegiatin/data/datasources/local/rsvp_local_datasource.dart';
 import 'package:kegiatin/data/datasources/remote/rsvp_remote_datasource.dart';
 import 'package:kegiatin/data/repositories/rsvp_repository_impl.dart';
 import 'package:kegiatin/domain/repositories/rsvp_repository.dart';
@@ -15,8 +16,15 @@ RsvpRemoteDataSource rsvpRemoteDataSource(Ref ref) =>
     RsvpRemoteDataSourceImpl(ref.watch(dioClientProvider).dio);
 
 @Riverpod(keepAlive: true)
-RsvpRepository rsvpRepository(Ref ref) =>
-    RsvpRepositoryImpl(remoteDataSource: ref.watch(rsvpRemoteDataSourceProvider));
+RsvpLocalDataSource rsvpLocalDataSource(Ref ref) =>
+    RsvpLocalDataSourceImpl(rsvpBox: ref.watch(rsvpBoxProvider));
+
+@Riverpod(keepAlive: true)
+RsvpRepository rsvpRepository(Ref ref) => RsvpRepositoryImpl(
+  remoteDataSource: ref.watch(rsvpRemoteDataSourceProvider),
+  localDataSource: ref.watch(rsvpLocalDataSourceProvider),
+  networkInfo: ref.watch(networkInfoProvider),
+);
 
 @Riverpod(keepAlive: true)
 CreateRsvpUseCase createRsvpUseCase(Ref ref) =>

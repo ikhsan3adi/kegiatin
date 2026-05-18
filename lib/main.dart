@@ -13,6 +13,7 @@ Future<void> main() async {
 
   await Hive.initFlutter();
   final authBox = await Hive.openBox(DbConstants.authBox);
+  final rsvpBox = await Hive.openBox(DbConstants.rsvpBox);
   final sharedPreferences = await SharedPreferences.getInstance();
 
   runApp(
@@ -20,6 +21,7 @@ Future<void> main() async {
       overrides: [
         sharedPreferencesProvider.overrideWithValue(sharedPreferences),
         authBoxProvider.overrideWithValue(authBox),
+        rsvpBoxProvider.overrideWithValue(rsvpBox),
       ],
       child: const MyApp(),
     ),
