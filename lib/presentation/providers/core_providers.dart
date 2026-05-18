@@ -29,6 +29,9 @@ Box<dynamic> authBox(Ref ref) => throw UnimplementedError('Override di ProviderS
 Box<dynamic> rsvpBox(Ref ref) => throw UnimplementedError('Override di ProviderScope');
 
 @Riverpod(keepAlive: true)
+Box<dynamic> eventCacheBox(Ref ref) => throw UnimplementedError('Override di ProviderScope');
+
+@Riverpod(keepAlive: true)
 NetworkInfo networkInfo(Ref ref) => NetworkInfoImpl(Connectivity());
 
 @Riverpod(keepAlive: true)

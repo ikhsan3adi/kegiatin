@@ -7,4 +7,5 @@ class DbConstants {
   static const String hasSeenOnboardingKey = 'has_seen_onboarding';
 
   static const String rsvpBox = 'rsvp_box';
+  static const String eventCacheBox = 'event_cache_box';
 }
