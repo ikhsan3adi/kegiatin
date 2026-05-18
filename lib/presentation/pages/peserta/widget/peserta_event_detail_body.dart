@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/enums/event_status.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
@@ -168,9 +169,7 @@ class _PesertaActionButton extends ConsumerWidget {
         label: 'Lihat QR',
         backgroundColor: colorScheme.tertiaryContainer,
         foregroundColor: colorScheme.onTertiaryContainer,
-        onTap: () {
-          // TODO: tampilkan QR display
-        },
+        onTap: () => context.go('/peserta/qr/${event.id}'),
       );
     }
 
