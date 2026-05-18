@@ -21,6 +21,8 @@ class ApiConstants {
   static String startEvent(String id) => '/events/$id/start';
   static String completeEvent(String id) => '/events/$id/complete';
   static String eventSessions(String id) => '/events/$id/sessions';
+  static String sessionById(String id) => '/sessions/$id';
+  static String sessionStatus(String id) => '/sessions/$id/status';
 
   // RSVP
   static String eventRsvp(String eventId) => '/events/$eventId/rsvp';

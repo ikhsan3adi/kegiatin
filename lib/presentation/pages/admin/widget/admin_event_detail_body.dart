@@ -3,6 +3,7 @@ import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
 import 'package:kegiatin/domain/enums/event_visibility.dart';
 import 'package:kegiatin/presentation/pages/admin/widget/admin_rsvp_list.dart';
+import 'package:kegiatin/presentation/pages/admin/widget/session_management_section.dart';
 
 class AdminEventDetailBody extends StatelessWidget {
   const AdminEventDetailBody({super.key, required this.event});
@@ -64,6 +65,8 @@ class AdminEventDetailBody extends StatelessWidget {
               ],
             ),
           ),
+          const SizedBox(height: 16),
+          SessionManagementSection(event: event),
           const SizedBox(height: 16),
           _SurfaceCard(
             child: Column(
