@@ -39,7 +39,7 @@ class MateriListCard extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: isPdf 
+                color: isPdf
                     ? colorScheme.errorContainer.withValues(alpha: 0.5)
                     : colorScheme.primaryContainer.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(12),
@@ -51,7 +51,7 @@ class MateriListCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 16),
-            
+
             // Text Content
             Expanded(
               child: Column(
@@ -74,9 +74,7 @@ class MateriListCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           '$eventName - $sessionName',
-                          style: textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
+                          style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -93,7 +91,7 @@ class MateriListCard extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             // Action Menu
             IconButton(
               icon: const Icon(Icons.more_vert),

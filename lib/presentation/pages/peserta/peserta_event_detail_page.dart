@@ -42,7 +42,7 @@ class PesertaEventDetailPage extends ConsumerWidget {
     );
   }
 
-  Widget _loadingOrErrorScaffold(BuildContext context, {required Widget body}) {
+  Widget _fallbackScaffold(BuildContext context, Widget body) {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       backgroundColor: colorScheme.surfaceContainerHighest,

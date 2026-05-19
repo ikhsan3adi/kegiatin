@@ -75,8 +75,7 @@ class AdminMateriPage extends StatelessWidget {
                       'Ketuk tombol di bawah untuk mengunggah\nmateri kegiatan.',
                       textAlign: TextAlign.center,
                       style: textTheme.bodySmall?.copyWith(
-                        color:
-                            colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                        color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                       ),
                     ),
                   ],

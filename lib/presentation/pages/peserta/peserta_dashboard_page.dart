@@ -4,7 +4,6 @@ import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/enums/event_status.dart';
 import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
 import 'package:kegiatin/presentation/controllers/event/event_list_controller.dart';
-import 'package:kegiatin/presentation/controllers/event/event_stats_controller.dart';
 import 'package:kegiatin/presentation/widgets/event_list_card.dart';
 import 'package:kegiatin/presentation/widgets/calender_card.dart';
 import 'package:kegiatin/presentation/widgets/kegiatin_app_bar.dart';
@@ -25,7 +24,6 @@ class _PesertaDashboardPageState extends ConsumerState<PesertaDashboardPage> {
     final textTheme = Theme.of(context).textTheme;
     final authState = ref.watch(authControllerProvider);
     final eventListState = ref.watch(eventListControllerProvider());
-    final statsState = ref.watch(eventStatsControllerProvider);
     final eventsState = ref.watch(eventListControllerProvider());
 
     // Build map of dates to events for calendar

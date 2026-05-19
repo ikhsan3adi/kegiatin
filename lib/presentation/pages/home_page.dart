@@ -22,10 +22,7 @@ class HomePage extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (isMember) ...[
-                  Image.asset(
-                    'assets/LogoKegiaTin 2.png',
-                    height: 28,
-                  ),
+                  Image.asset('assets/LogoKegiaTin 2.png', height: 28),
                   const SizedBox(width: 8),
                 ],
                 const Text('Kegiatin'),
@@ -33,7 +30,7 @@ class HomePage extends ConsumerWidget {
             );
           },
           loading: () => const Text('Kegiatin'),
-          error: (_, __) => const Text('Kegiatin'),
+          error: (e, _) => const Text('Kegiatin'),
         ),
         actions: [
           IconButton(

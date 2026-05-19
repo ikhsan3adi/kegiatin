@@ -31,18 +31,11 @@ class _NavbarAdminState extends ConsumerState<NavbarAdmin> {
           data: (user) => Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Icons.admin_panel_settings,
-                size: 64,
-                color: colorScheme.primary,
-              ),
+              Icon(Icons.admin_panel_settings, size: 64, color: colorScheme.primary),
               const SizedBox(height: 16),
               Text('Selamat datang, Admin ${user?.displayName ?? '-'}'),
               const SizedBox(height: 8),
-              Text(
-                user?.email ?? '',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
+              Text(user?.email ?? '', style: Theme.of(context).textTheme.bodySmall),
             ],
           ),
           loading: () => const CircularProgressIndicator(),
@@ -50,20 +43,15 @@ class _NavbarAdminState extends ConsumerState<NavbarAdmin> {
         ),
       ),
       // Index 1: Kegiatan
-      const Center(
-        child: Text('Halaman Kegiatan', style: TextStyle(fontSize: 24)),
-      ),
+      const Center(child: Text('Halaman Kegiatan', style: TextStyle(fontSize: 24))),
       // Index 2: Profil
-      const Center(
-        child: Text('Halaman Profil', style: TextStyle(fontSize: 24)),
-      ),
+      const Center(child: Text('Halaman Profil', style: TextStyle(fontSize: 24))),
       // Index 3: Pengaturan
-      const Center(
-        child: Text('Halaman Pengaturan', style: TextStyle(fontSize: 24)),
-      ),
+      const Center(child: Text('Halaman Pengaturan', style: TextStyle(fontSize: 24))),
     ];
 
-    return Scaffold(   
+    return Scaffold(
+      body: pages[_selectedIndex],
       // --- Tombol Tengah (Pindai QR) ---
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -85,8 +73,7 @@ class _NavbarAdminState extends ConsumerState<NavbarAdmin> {
       // --- Navigasi Bawah ---
       bottomNavigationBar: BottomAppBar(
         color: colorScheme.primary, // Menggunakan primary color untuk navigasi
-        shape:
-            const CircularNotchedRectangle(), // Membuat efek potongan/lengkungan
+        shape: const CircularNotchedRectangle(), // Membuat efek potongan/lengkungan
         notchMargin: 8.0, // Jarak antara FAB dan lengkungan navigasi
         clipBehavior: Clip.antiAlias,
         child: SizedBox(
@@ -100,12 +87,7 @@ class _NavbarAdminState extends ConsumerState<NavbarAdmin> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     _buildNavItem(Icons.home, 'Beranda', 0, colorScheme),
-                    _buildNavItem(
-                      Icons.calendar_month,
-                      'Kegiatan',
-                      1,
-                      colorScheme,
-                    ),
+                    _buildNavItem(Icons.calendar_month, 'Kegiatan', 1, colorScheme),
                   ],
                 ),
               ),
@@ -129,12 +111,7 @@ class _NavbarAdminState extends ConsumerState<NavbarAdmin> {
   }
 
   // Fungsi pembantu (helper) untuk membuat item navigasi agar kode lebih rapi
-  Widget _buildNavItem(
-    IconData icon,
-    String label,
-    int index,
-    ColorScheme colorScheme,
-  ) {
+  Widget _buildNavItem(IconData icon, String label, int index, ColorScheme colorScheme) {
     final isSelected = _selectedIndex == index;
     final activeColor = colorScheme.onPrimary;
     final inactiveColor = colorScheme.onPrimary.withValues(alpha: 0.54);

@@ -8,12 +8,10 @@ class UploadMateriBottomSheet extends ConsumerStatefulWidget {
   const UploadMateriBottomSheet({super.key});
 
   @override
-  ConsumerState<UploadMateriBottomSheet> createState() =>
-      _UploadMateriBottomSheetState();
+  ConsumerState<UploadMateriBottomSheet> createState() => _UploadMateriBottomSheetState();
 }
 
-class _UploadMateriBottomSheetState
-    extends ConsumerState<UploadMateriBottomSheet> {
+class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomSheet> {
   // UI-only local state
   String _selectedType = 'PDF'; // 'PDF' | 'LINK'
   Event? _selectedEvent;
@@ -39,9 +37,7 @@ class _UploadMateriBottomSheetState
     final eventsState = ref.watch(eventListControllerProvider());
 
     return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
         child: Column(
@@ -67,8 +63,7 @@ class _UploadMateriBottomSheetState
               children: [
                 Text(
                   'Unggah Materi',
-                  style: textTheme.titleLarge
-                      ?.copyWith(fontWeight: FontWeight.bold),
+                  style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
@@ -87,11 +82,8 @@ class _UploadMateriBottomSheetState
                 return InputDecorator(
                   decoration: InputDecoration(
                     labelText: 'Pilih Kegiatan',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 4),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                   ),
                   child: DropdownButton<Event>(
                     value: _selectedEvent,
@@ -102,10 +94,7 @@ class _UploadMateriBottomSheetState
                         .map(
                           (e) => DropdownMenuItem<Event>(
                             value: e,
-                            child: Text(
-                              e.title,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                            child: Text(e.title, overflow: TextOverflow.ellipsis),
                           ),
                         )
                         .toList(),
@@ -121,8 +110,7 @@ class _UploadMateriBottomSheetState
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => Text(
                 'Gagal memuat kegiatan',
-                style: textTheme.bodySmall
-                    ?.copyWith(color: colorScheme.error),
+                style: textTheme.bodySmall?.copyWith(color: colorScheme.error),
               ),
             ),
             const SizedBox(height: 16),
@@ -131,20 +119,15 @@ class _UploadMateriBottomSheetState
             InputDecorator(
               decoration: InputDecoration(
                 labelText: 'Pilih Sesi',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               ),
               child: DropdownButton<Session>(
                 value: _selectedSession,
                 isExpanded: true,
                 underline: const SizedBox.shrink(),
                 hint: Text(
-                  _selectedEvent == null
-                      ? 'Pilih kegiatan terlebih dahulu'
-                      : 'Pilih sesi',
+                  _selectedEvent == null ? 'Pilih kegiatan terlebih dahulu' : 'Pilih sesi',
                 ),
                 // Nonaktif jika belum ada kegiatan atau tidak ada sesi
                 onChanged: (_availableSessions.isEmpty)
@@ -154,10 +137,7 @@ class _UploadMateriBottomSheetState
                     .map(
                       (s) => DropdownMenuItem<Session>(
                         value: s,
-                        child: Text(
-                          s.title,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                        child: Text(s.title, overflow: TextOverflow.ellipsis),
                       ),
                     )
                     .toList(),
@@ -171,21 +151,14 @@ class _UploadMateriBottomSheetState
               decoration: InputDecoration(
                 labelText: 'Judul Materi',
                 hintText: 'Masukkan judul materi',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
             ),
             const SizedBox(height: 24),
 
             // ── Toggle Tipe Materi ───────────────────────────────────────
-            Text(
-              'Tipe Materi',
-              style:
-                  textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
-            ),
+            Text('Tipe Materi', style: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             SegmentedButton<String>(
               segments: const [
@@ -215,24 +188,19 @@ class _UploadMateriBottomSheetState
                 },
                 borderRadius: BorderRadius.circular(12),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 28, horizontal: 16),
+                  padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 16),
                   decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainerHighest
-                        .withValues(alpha: 0.3),
+                    color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: colorScheme.outlineVariant),
                   ),
                   child: Column(
                     children: [
-                      Icon(Icons.upload_file_rounded,
-                          size: 48, color: colorScheme.primary),
+                      Icon(Icons.upload_file_rounded, size: 48, color: colorScheme.primary),
                       const SizedBox(height: 8),
                       Text(
                         'Ketuk untuk memilih file PDF',
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
+                        style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -246,11 +214,8 @@ class _UploadMateriBottomSheetState
                 decoration: InputDecoration(
                   labelText: 'URL Tautan',
                   hintText: 'https://',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   prefixIcon: const Icon(Icons.link_rounded),
                 ),
               ),
@@ -264,8 +229,7 @@ class _UploadMateriBottomSheetState
               },
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               child: const Text(
                 'Unggah Materi',
