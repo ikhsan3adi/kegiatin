@@ -29,7 +29,7 @@ class AdminEventDetailBody extends StatelessWidget {
                     const SizedBox(width: 12),
                     Text(
                       'Deskripsi Kegiatan',
-                      style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                      style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -49,7 +49,7 @@ class AdminEventDetailBody extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Detail', style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                Text('Detail', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 16),
                 _DetailRow(
                   label: 'Visibilitas',
@@ -78,7 +78,7 @@ class AdminEventDetailBody extends StatelessWidget {
                     const SizedBox(width: 12),
                     Text(
                       'Peserta Terdaftar',
-                      style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                      style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),

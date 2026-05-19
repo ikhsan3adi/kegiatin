@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/entities/session.dart';
-import 'package:kegiatin/presentation/controllers/event/event_list_controller.dart';
 
 class UploadMateriBottomSheet extends ConsumerStatefulWidget {
-  const UploadMateriBottomSheet({super.key});
+  const UploadMateriBottomSheet({super.key, required this.event});
+
+  final Event event;
 
   @override
   ConsumerState<UploadMateriBottomSheet> createState() => _UploadMateriBottomSheetState();
@@ -14,10 +15,17 @@ class UploadMateriBottomSheet extends ConsumerStatefulWidget {
 class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomSheet> {
   // UI-only local state
   String _selectedType = 'PDF'; // 'PDF' | 'LINK'
-  Event? _selectedEvent;
   Session? _selectedSession;
   final _titleController = TextEditingController();
   final _linkController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.event.sessions.length == 1) {
+      _selectedSession = widget.event.sessions.first;
+    }
+  }
 
   @override
   void dispose() {
@@ -26,15 +34,12 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
     super.dispose();
   }
 
-  List<Session> get _availableSessions => _selectedEvent?.sessions ?? [];
+  List<Session> get _availableSessions => widget.event.sessions;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-
-    // Fetch semua event (tanpa filter) untuk pilihan dropdown
-    final eventsState = ref.watch(eventListControllerProvider());
 
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
@@ -75,75 +80,35 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
             ),
             const SizedBox(height: 24),
 
-            // ── Pilih Kegiatan ───────────────────────────────────────────
-            eventsState.when(
-              data: (paginated) {
-                final events = paginated.data;
-                return InputDecorator(
-                  decoration: InputDecoration(
-                    labelText: 'Pilih Kegiatan',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                  ),
-                  child: DropdownButton<Event>(
-                    value: _selectedEvent,
-                    isExpanded: true,
-                    underline: const SizedBox.shrink(),
-                    hint: const Text('Pilih kegiatan'),
-                    items: events
-                        .map(
-                          (e) => DropdownMenuItem<Event>(
-                            value: e,
-                            child: Text(e.title, overflow: TextOverflow.ellipsis),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (val) {
-                      setState(() {
-                        _selectedEvent = val;
-                        _selectedSession = null;
-                      });
-                    },
-                  ),
-                );
-              },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Text(
-                'Gagal memuat kegiatan',
-                style: textTheme.bodySmall?.copyWith(color: colorScheme.error),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // ── Pilih Sesi ───────────────────────────────────────────────
-            InputDecorator(
-              decoration: InputDecoration(
-                labelText: 'Pilih Sesi',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-              ),
-              child: DropdownButton<Session>(
-                value: _selectedSession,
-                isExpanded: true,
-                underline: const SizedBox.shrink(),
-                hint: Text(
-                  _selectedEvent == null ? 'Pilih kegiatan terlebih dahulu' : 'Pilih sesi',
+            if (_availableSessions.length > 1) ...[
+              // ── Pilih Sesi ───────────────────────────────────────────────
+              InputDecorator(
+                decoration: InputDecoration(
+                  labelText: 'Pilih Sesi',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 ),
-                // Nonaktif jika belum ada kegiatan atau tidak ada sesi
-                onChanged: (_availableSessions.isEmpty)
-                    ? null
-                    : (val) => setState(() => _selectedSession = val),
-                items: _availableSessions
-                    .map(
-                      (s) => DropdownMenuItem<Session>(
-                        value: s,
-                        child: Text(s.title, overflow: TextOverflow.ellipsis),
-                      ),
-                    )
-                    .toList(),
+                child: DropdownButton<Session>(
+                  value: _selectedSession,
+                  isExpanded: true,
+                  underline: const SizedBox.shrink(),
+                  hint: const Text('Pilih sesi'),
+                  // Nonaktif jika belum ada kegiatan atau tidak ada sesi
+                  onChanged: (_availableSessions.isEmpty)
+                      ? null
+                      : (val) => setState(() => _selectedSession = val),
+                  items: _availableSessions
+                      .map(
+                        (s) => DropdownMenuItem<Session>(
+                          value: s,
+                          child: Text(s.title, overflow: TextOverflow.ellipsis),
+                        ),
+                      )
+                      .toList(),
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
+            ],
 
             // ── Judul Materi ─────────────────────────────────────────────
             TextField(
