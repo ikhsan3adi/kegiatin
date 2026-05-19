@@ -12,8 +12,9 @@ class Attendance {
   final String rsvpId;
   final AttendanceStatus status;
   final SyncStatus syncStatus;
-  final DateTime? checkedInAt;
+  final DateTime checkedInAt;
   final DateTime? syncedAt;
+  final DateTime createdAt;
 
   const Attendance({
     required this.id,
@@ -22,7 +23,8 @@ class Attendance {
     required this.rsvpId,
     required this.status,
     required this.syncStatus,
-    this.checkedInAt,
+    required this.checkedInAt,
     this.syncedAt,
+    required this.createdAt,
   });
 }

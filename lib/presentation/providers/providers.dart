@@ -7,6 +7,7 @@
 /// - [rsvp_providers.dart] — RSVP stack & RSVP use cases
 library;
 
+export 'attendance_providers.dart';
 export 'auth_providers.dart';
 export 'core_providers.dart';
 export 'event_providers.dart';
