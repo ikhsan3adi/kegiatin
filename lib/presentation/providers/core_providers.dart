@@ -26,6 +26,12 @@ bool hasSeenOnboardingSync(Ref ref) {
 Box<dynamic> authBox(Ref ref) => throw UnimplementedError('Override di ProviderScope');
 
 @Riverpod(keepAlive: true)
+Box<dynamic> rsvpBox(Ref ref) => throw UnimplementedError('Override di ProviderScope');
+
+@Riverpod(keepAlive: true)
+Box<dynamic> eventCacheBox(Ref ref) => throw UnimplementedError('Override di ProviderScope');
+
+@Riverpod(keepAlive: true)
 NetworkInfo networkInfo(Ref ref) => NetworkInfoImpl(Connectivity());
 
 @Riverpod(keepAlive: true)

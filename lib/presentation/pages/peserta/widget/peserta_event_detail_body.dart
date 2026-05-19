@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/enums/event_status.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
@@ -31,11 +32,7 @@ class PesertaEventDetailBody extends ConsumerWidget {
               children: [
                 Row(
                   children: [
-                    Icon(
-                      Icons.menu_book_outlined,
-                      size: 20,
-                      color: colorScheme.onSurfaceVariant,
-                    ),
+                    Icon(Icons.menu_book_outlined, size: 20, color: colorScheme.onSurfaceVariant),
                     const SizedBox(width: 12),
                     Text(
                       'Deskripsi Kegiatan',
@@ -59,10 +56,7 @@ class PesertaEventDetailBody extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Detail',
-                  style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                ),
+                Text('Detail', style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 16),
                 _DetailRow(
                   label: 'Visibilitas',
@@ -133,9 +127,9 @@ class _DetailRow extends StatelessWidget {
       children: [
         Text(
           label,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
         ),
         Flexible(
           child: Text(
@@ -175,9 +169,7 @@ class _PesertaActionButton extends ConsumerWidget {
         label: 'Lihat QR',
         backgroundColor: colorScheme.tertiaryContainer,
         foregroundColor: colorScheme.onTertiaryContainer,
-        onTap: () {
-          // TODO: tampilkan QR display
-        },
+        onTap: () => context.go('/peserta/qr/${event.id}'),
       );
     }
 

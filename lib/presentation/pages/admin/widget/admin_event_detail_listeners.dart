@@ -14,11 +14,7 @@ import 'package:kegiatin/presentation/controllers/event/start_event_controller.d
 /// Invalidates both the event list and the specific event detail provider
 /// so data is guaranteed fresh if the user navigates back to the same event.
 class AdminEventDetailListeners extends ConsumerWidget {
-  const AdminEventDetailListeners({
-    super.key,
-    required this.eventId,
-    required this.child,
-  });
+  const AdminEventDetailListeners({super.key, required this.eventId, required this.child});
 
   final String eventId;
   final Widget child;
@@ -45,16 +41,32 @@ class AdminEventDetailListeners extends ConsumerWidget {
     }
 
     ref.listen(publishEventControllerProvider, (previous, next) {
-      _handleAsyncEvent(next, onSuccess: () => onSuccess('Kegiatan berhasil di-publish!'), onError: onError);
+      _handleAsyncEvent(
+        next,
+        onSuccess: () => onSuccess('Kegiatan berhasil di-publish!'),
+        onError: onError,
+      );
     });
     ref.listen(startEventControllerProvider, (previous, next) {
-      _handleAsyncEvent(next, onSuccess: () => onSuccess('Kegiatan berhasil dimulai!'), onError: onError);
+      _handleAsyncEvent(
+        next,
+        onSuccess: () => onSuccess('Kegiatan berhasil dimulai!'),
+        onError: onError,
+      );
     });
     ref.listen(completeEventControllerProvider, (previous, next) {
-      _handleAsyncEvent(next, onSuccess: () => onSuccess('Kegiatan berhasil diselesaikan!'), onError: onError);
+      _handleAsyncEvent(
+        next,
+        onSuccess: () => onSuccess('Kegiatan berhasil diselesaikan!'),
+        onError: onError,
+      );
     });
     ref.listen(cancelEventControllerProvider, (previous, next) {
-      _handleAsyncEvent(next, onSuccess: () => onSuccess('Kegiatan berhasil dibatalkan!'), onError: onError);
+      _handleAsyncEvent(
+        next,
+        onSuccess: () => onSuccess('Kegiatan berhasil dibatalkan!'),
+        onError: onError,
+      );
     });
 
     return child;

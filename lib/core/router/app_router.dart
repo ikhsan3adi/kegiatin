@@ -9,6 +9,7 @@ import 'package:kegiatin/presentation/pages/admin/edit_event_page.dart';
 import 'package:kegiatin/presentation/pages/admin/qr_scan_page.dart';
 import 'package:kegiatin/presentation/pages/peserta/peserta_home_page.dart';
 import 'package:kegiatin/presentation/pages/peserta/peserta_event_detail_page.dart';
+import 'package:kegiatin/presentation/pages/peserta/qr_display_page.dart';
 import 'package:kegiatin/presentation/pages/login_page.dart';
 import 'package:kegiatin/presentation/pages/onboarding_page.dart';
 import 'package:kegiatin/presentation/pages/register_page.dart';
@@ -89,8 +90,7 @@ GoRouter appRouter(Ref ref) {
           GoRoute(path: 'create-event', builder: (_, _) => const CreateEventPage()),
           GoRoute(
             path: 'event-edit/:eventId',
-            builder: (context, state) =>
-                EditEventPage(eventId: state.pathParameters['eventId']!),
+            builder: (context, state) => EditEventPage(eventId: state.pathParameters['eventId']!),
           ),
           GoRoute(
             path: 'event-detail/:eventId',
@@ -108,6 +108,11 @@ GoRouter appRouter(Ref ref) {
             path: 'event-detail/:eventId',
             builder: (context, state) =>
                 PesertaEventDetailPage(eventId: state.pathParameters['eventId']!),
+          ),
+          GoRoute(
+            path: 'qr/:eventId',
+            builder: (context, state) =>
+                PesertaQrDisplayPage(eventId: state.pathParameters['eventId']!),
           ),
         ],
       ),

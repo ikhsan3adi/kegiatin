@@ -18,6 +18,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   final _passwordController = TextEditingController();
   final _nameController = TextEditingController();
   final _npaController = TextEditingController();
+  final _cabangController = TextEditingController();
   bool _obscurePassword = true;
   String _userType = 'UMUM';
 
@@ -27,6 +28,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     _passwordController.dispose();
     _nameController.dispose();
     _npaController.dispose();
+    _cabangController.dispose();
     super.dispose();
   }
 
@@ -42,6 +44,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             displayName: _nameController.text.trim(),
             userType: _userType,
             npa: _userType == 'ANGGOTA' ? _npaController.text.trim() : null,
+            cabang: _userType == 'ANGGOTA' ? _cabangController.text.trim() : null,
           ),
         );
 
@@ -82,9 +85,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Stack(
                         alignment: Alignment.topCenter,
-                        children: [
-                          _buildFormCard(authState, colorScheme, textTheme),
-                        ],
+                        children: [_buildFormCard(authState, colorScheme, textTheme)],
                       ),
                     ),
                   ),
@@ -99,16 +100,20 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
   Widget _buildGradientHeader() {
     return Positioned(
-      top: 0, left: 0, right: 0,
+      top: 0,
+      left: 0,
+      right: 0,
       child: Container(
         height: 280,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topCenter, end: Alignment.bottomCenter,
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
             colors: [KegiatinCustomTheme.appBarTop, KegiatinCustomTheme.appBarBottom],
           ),
           borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(48), bottomRight: Radius.circular(48),
+            bottomLeft: Radius.circular(48),
+            bottomRight: Radius.circular(48),
           ),
         ),
       ),
@@ -126,7 +131,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             'KEGIATIN',
             style: textTheme.titleMedium?.copyWith(
               color: KegiatinCustomTheme.onGradient,
-              fontWeight: FontWeight.w800, letterSpacing: 1.5,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.5,
             ),
           ),
         ],
@@ -134,9 +140,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     );
   }
 
-  Widget _buildFormCard(
-    AsyncValue authState, ColorScheme colorScheme, TextTheme textTheme,
-  ) {
+  Widget _buildFormCard(AsyncValue authState, ColorScheme colorScheme, TextTheme textTheme) {
     return Container(
       margin: const EdgeInsets.only(top: 30, bottom: 24),
       decoration: BoxDecoration(
@@ -145,7 +149,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
         boxShadow: [
           BoxShadow(
             color: colorScheme.shadow.withValues(alpha: 0.1),
-            blurRadius: 12, offset: const Offset(0, 4),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -177,6 +182,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             if (_userType == 'ANGGOTA') ...[
               const SizedBox(height: 16),
               _buildNpaField(),
+              const SizedBox(height: 16),
+              _buildCabangField(),
             ],
             const SizedBox(height: 28),
             _buildSubmitButton(authState),
@@ -184,7 +191,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             _buildDivider(colorScheme, textTheme),
             const SizedBox(height: 16),
             OutlinedButton.icon(
-              onPressed: () { /* TODO: Implement Google Sign In */ },
+              onPressed: () {
+                /* TODO: Implement Google Sign In */
+              },
               icon: const Icon(Icons.g_mobiledata),
               label: const Text('Sign in with Google'),
             ),
@@ -296,14 +305,22 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     );
   }
 
+  Widget _buildCabangField() {
+    return TextFormField(
+      controller: _cabangController,
+      decoration: InputDecoration(
+        labelText: 'Cabang',
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      ),
+    );
+  }
+
   Widget _buildSubmitButton(AsyncValue authState) {
     return FilledButton(
       onPressed: authState.isLoading ? null : _handleRegister,
       child: authState.isLoading
-          ? const SizedBox(
-              height: 20, width: 20,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            )
+          ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
           : const Text('SIGN UP'),
     );
   }

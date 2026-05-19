@@ -18,10 +18,7 @@ class MyRsvpController extends _$MyRsvpController {
     // Gunakan read agar tidak memicu only_use_keep_alive_inside_keep_alive.
     final useCase = ref.read(getMyRsvpsUseCaseProvider);
     final result = await useCase(NoInput.instance);
-    return result.fold(
-      (failure) => throw failure,
-      (paginated) => paginated.data,
-    );
+    return result.fold((failure) => throw failure, (paginated) => paginated.data);
   }
 
   /// Cek apakah user sudah RSVP ke event dengan [eventId].

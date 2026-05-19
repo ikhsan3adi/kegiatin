@@ -12,12 +12,7 @@ class EventListCard extends ConsumerWidget {
   final VoidCallback? onTap;
   final bool showActionButton;
 
-  const EventListCard({
-    super.key,
-    required this.event,
-    this.onTap,
-    this.showActionButton = false,
-  });
+  const EventListCard({super.key, required this.event, this.onTap, this.showActionButton = false});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -219,10 +214,9 @@ class EventListCard extends ConsumerWidget {
               ...[Icon(icon, size: 16, color: textColor), const SizedBox(width: 8)],
               Text(
                 text,
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: textColor,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.labelMedium?.copyWith(color: textColor, fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -242,10 +236,9 @@ class EventListCard extends ConsumerWidget {
       decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(12)),
       child: Text(
         text,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-          color: textColor,
-          fontWeight: FontWeight.bold,
-        ),
+        style: Theme.of(
+          context,
+        ).textTheme.labelSmall?.copyWith(color: textColor, fontWeight: FontWeight.bold),
       ),
     );
   }

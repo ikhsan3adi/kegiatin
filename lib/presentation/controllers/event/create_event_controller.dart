@@ -31,6 +31,5 @@ class CreateEventController extends _$CreateEventController {
     );
   }
 
-
   void reset() => state = const AsyncData(null);
 }

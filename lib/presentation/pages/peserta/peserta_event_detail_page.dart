@@ -18,11 +18,10 @@ class PesertaEventDetailPage extends ConsumerWidget {
     final asyncEvent = ref.watch(eventDetailControllerProvider(eventId));
 
     return asyncEvent.when(
-      loading: () =>
-          _loadingOrErrorScaffold(context, body: const Center(child: CircularProgressIndicator())),
-      error: (error, _) => _loadingOrErrorScaffold(
+      loading: () => _fallbackScaffold(context, const Center(child: CircularProgressIndicator())),
+      error: (error, _) => _fallbackScaffold(
         context,
-        body: Center(
+        Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
             child: Column(

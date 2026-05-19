@@ -53,6 +53,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           'displayName': input.displayName,
           'userType': input.userType,
           if (input.npa != null) 'npa': input.npa,
+          if (input.cabang != null) 'cabang': input.cabang,
         },
       );
       final responseData = response.data as Map<String, dynamic>;

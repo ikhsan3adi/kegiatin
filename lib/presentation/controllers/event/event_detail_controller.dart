@@ -12,7 +12,7 @@ class EventDetailController extends _$EventDetailController {
   }
 
   Future<Event> _fetchEventById(String id) async {
-    final useCase = ref.watch(getEventByIdUseCaseProvider);
+    final useCase = ref.read(getEventByIdUseCaseProvider);
     final result = await useCase(id);
 
     return result.fold((failure) => throw Exception(failure.message), (data) => data);

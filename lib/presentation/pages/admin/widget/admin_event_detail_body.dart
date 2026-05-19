@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
 import 'package:kegiatin/domain/enums/event_visibility.dart';
+import 'package:kegiatin/presentation/pages/admin/widget/admin_rsvp_list.dart';
+import 'package:kegiatin/presentation/pages/admin/widget/session_management_section.dart';
 
 class AdminEventDetailBody extends StatelessWidget {
   const AdminEventDetailBody({super.key, required this.event});
@@ -47,10 +49,7 @@ class AdminEventDetailBody extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Detail',
-                  style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                ),
+                Text('Detail', style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 16),
                 _DetailRow(
                   label: 'Visibilitas',
@@ -63,6 +62,28 @@ class AdminEventDetailBody extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 _DetailRow(label: 'Narahubung', value: event.contactPerson),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          SessionManagementSection(event: event),
+          const SizedBox(height: 16),
+          _SurfaceCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.people_alt_outlined, size: 20, color: colorScheme.onSurfaceVariant),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Peserta Terdaftar',
+                      style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                AdminRsvpList(eventId: event.id),
               ],
             ),
           ),
@@ -119,7 +140,11 @@ class _DetailRow extends StatelessWidget {
           child: Text(
             value,
             textAlign: TextAlign.end,
-            style: TextStyle(color: colorScheme.onSurface, fontSize: 14, fontWeight: FontWeight.w500),
+            style: TextStyle(
+              color: colorScheme.onSurface,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
       ],

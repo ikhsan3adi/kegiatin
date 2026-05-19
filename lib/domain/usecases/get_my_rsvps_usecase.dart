@@ -15,6 +15,5 @@ class GetMyRsvpsUseCase extends UseCase<PaginatedResult<Rsvp>, NoInput> {
   GetMyRsvpsUseCase(this.repository);
 
   @override
-  Future<Either<Failure, PaginatedResult<Rsvp>>> call(NoInput input) =>
-      repository.getMyRsvps();
+  Future<Either<Failure, PaginatedResult<Rsvp>>> call(NoInput input) => repository.getMyRsvps();
 }

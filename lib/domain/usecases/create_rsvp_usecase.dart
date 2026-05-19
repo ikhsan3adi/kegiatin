@@ -14,6 +14,5 @@ class CreateRsvpUseCase extends UseCase<Rsvp, String> {
   CreateRsvpUseCase(this.repository);
 
   @override
-  Future<Either<Failure, Rsvp>> call(String eventId) =>
-      repository.createRsvp(eventId);
+  Future<Either<Failure, Rsvp>> call(String eventId) => repository.createRsvp(eventId);
 }
