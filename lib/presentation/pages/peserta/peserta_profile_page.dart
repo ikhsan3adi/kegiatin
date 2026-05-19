@@ -40,63 +40,67 @@ class PesertaProfilePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
-    final user = ref.watch(authControllerProvider).value;
 
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // ProfileHeaderCard ditempatkan di dalam AppBar sebagai bagian child-nya.
-          KegiatinAppBar(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Profil Saya',
-                  style: textTheme.headlineSmall?.copyWith(
-                    color: colorScheme.onPrimary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                if (user != null)
-                  ProfileHeaderCard(
-                    displayName: user.displayName,
-                    role: user.role,
-                    npa: user.npa,
-                    photoUrl: user.photoUrl,
-                  ),
-              ],
-            ),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
+    return ref
+        .watch(authControllerProvider)
+        .when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (e, _) => Center(child: Text('Error: $e')),
+          data: (user) => SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (user != null) ProfileCard(email: user.email, joinedAt: user.createdAt),
-                const SizedBox(height: 24),
-                FilledButton.icon(
-                  onPressed: () => _showLogoutDialog(context, ref),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: colorScheme.errorContainer,
-                    foregroundColor: colorScheme.onErrorContainer,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                KegiatinAppBar(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Profil Saya',
+                        style: textTheme.headlineSmall?.copyWith(
+                          color: colorScheme.onPrimary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      if (user != null)
+                        ProfileHeaderCard(
+                          displayName: user.displayName,
+                          role: user.role,
+                          npa: user.npa,
+                          photoUrl: user.photoUrl,
+                        ),
+                    ],
                   ),
-                  icon: const Icon(Icons.logout_rounded),
-                  label: const Text(
-                    'Keluar dari Aplikasi',
-                    style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (user != null) ProfileCard(email: user.email, joinedAt: user.createdAt),
+                      const SizedBox(height: 24),
+                      FilledButton.icon(
+                        onPressed: () => _showLogoutDialog(context, ref),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: colorScheme.errorContainer,
+                          foregroundColor: colorScheme.onErrorContainer,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                        icon: const Icon(Icons.logout_rounded),
+                        label: const Text(
+                          'Keluar dari Aplikasi',
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
-        ],
-      ),
-    );
+        );
   }
 }

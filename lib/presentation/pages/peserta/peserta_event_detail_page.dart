@@ -18,13 +18,11 @@ class PesertaEventDetailPage extends ConsumerWidget {
     final asyncEvent = ref.watch(eventDetailControllerProvider(eventId));
 
     return asyncEvent.when(
-      loading: () => _fallbackScaffold(
+      loading: () =>
+          _loadingOrErrorScaffold(context, body: const Center(child: CircularProgressIndicator())),
+      error: (error, _) => _loadingOrErrorScaffold(
         context,
-        const Center(child: CircularProgressIndicator()),
-      ),
-      error: (error, _) => _fallbackScaffold(
-        context,
-        Center(
+        body: Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
             child: Column(
@@ -45,15 +43,12 @@ class PesertaEventDetailPage extends ConsumerWidget {
     );
   }
 
-  Widget _fallbackScaffold(BuildContext context, Widget body) {
+  Widget _loadingOrErrorScaffold(BuildContext context, {required Widget body}) {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       backgroundColor: colorScheme.surfaceContainerHighest,
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
+        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
         backgroundColor: colorScheme.surfaceContainerHighest,
       ),
       body: body,
@@ -69,6 +64,7 @@ class _PesertaEventDetailLoaded extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return PesertaEventDetailListeners(
       child: Scaffold(
@@ -83,10 +79,9 @@ class _PesertaEventDetailLoaded extends ConsumerWidget {
               child: Center(
                 child: Text(
                   'Info',
-                  style: TextStyle(
+                  style: textTheme.titleMedium?.copyWith(
                     color: colorScheme.primary,
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
                   ),
                 ),
               ),
