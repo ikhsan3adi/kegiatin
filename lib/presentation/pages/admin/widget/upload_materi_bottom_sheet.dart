@@ -101,7 +101,12 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
                     onChanged: (val) {
                       setState(() {
                         _selectedEvent = val;
-                        _selectedSession = null;
+                        // Auto-select session jika hanya ada 1 (misal Single Event)
+                        if (val != null && val.sessions.length == 1) {
+                          _selectedSession = val.sessions.first;
+                        } else {
+                          _selectedSession = null;
+                        }
                       });
                     },
                   ),
@@ -115,35 +120,37 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
             ),
             const SizedBox(height: 16),
 
-            // ── Pilih Sesi ───────────────────────────────────────────────
-            InputDecorator(
-              decoration: InputDecoration(
-                labelText: 'Pilih Sesi',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-              ),
-              child: DropdownButton<Session>(
-                value: _selectedSession,
-                isExpanded: true,
-                underline: const SizedBox.shrink(),
-                hint: Text(
-                  _selectedEvent == null ? 'Pilih kegiatan terlebih dahulu' : 'Pilih sesi',
+            if (_availableSessions.length > 1) ...[
+              // ── Pilih Sesi ───────────────────────────────────────────────
+              InputDecorator(
+                decoration: InputDecoration(
+                  labelText: 'Pilih Sesi',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 ),
-                // Nonaktif jika belum ada kegiatan atau tidak ada sesi
-                onChanged: (_availableSessions.isEmpty)
-                    ? null
-                    : (val) => setState(() => _selectedSession = val),
-                items: _availableSessions
-                    .map(
-                      (s) => DropdownMenuItem<Session>(
-                        value: s,
-                        child: Text(s.title, overflow: TextOverflow.ellipsis),
-                      ),
-                    )
-                    .toList(),
+                child: DropdownButton<Session>(
+                  value: _selectedSession,
+                  isExpanded: true,
+                  underline: const SizedBox.shrink(),
+                  hint: Text(
+                    _selectedEvent == null ? 'Pilih kegiatan terlebih dahulu' : 'Pilih sesi',
+                  ),
+                  // Nonaktif jika belum ada kegiatan atau tidak ada sesi
+                  onChanged: (_availableSessions.isEmpty)
+                      ? null
+                      : (val) => setState(() => _selectedSession = val),
+                  items: _availableSessions
+                      .map(
+                        (s) => DropdownMenuItem<Session>(
+                          value: s,
+                          child: Text(s.title, overflow: TextOverflow.ellipsis),
+                        ),
+                      )
+                      .toList(),
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
+            ],
 
             // ── Judul Materi ─────────────────────────────────────────────
             TextField(
