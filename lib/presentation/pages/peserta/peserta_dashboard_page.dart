@@ -23,7 +23,7 @@ class _PesertaDashboardPageState extends ConsumerState<PesertaDashboardPage> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final authState = ref.watch(authControllerProvider);
-    final eventListState = ref.watch(eventListControllerProvider());
+
     final eventsState = ref.watch(eventListControllerProvider());
 
     // Build map of dates to events for calendar
@@ -141,7 +141,7 @@ class _PesertaDashboardPageState extends ConsumerState<PesertaDashboardPage> {
                 ),
               ),
             ),
-            eventListState.when(
+            eventsState.when(
               data: (paginatedResult) {
                 // Filter: Hanya tampilkan yang Berlangsung (ongoing) atau Segera (published)
                 final filteredEvents = paginatedResult.data.where((event) {

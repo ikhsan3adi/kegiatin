@@ -30,6 +30,11 @@ class ApiConstants {
   static String rsvpQr(String rsvpId) => '/rsvp/$rsvpId/qr';
   static const String myRsvps = '/rsvp/me';
   static String eventRsvpList(String eventId) => '/events/$eventId/rsvp';
+  // Attendance
+  static const String attendanceScan = '/attendance/scan';
+  static const String attendanceSync = '/attendance/sync';
+  static const String attendanceLookup = '/attendance/lookup';
+  static String sessionAttendance(String sessionId) => '/sessions/$sessionId/attendance';
 
   // Profile
   static const String profile = '/profile';

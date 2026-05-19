@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kegiatin/domain/enums/user_role.dart';
 import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
-import 'package:kegiatin/presentation/pages/admin/admin_home_page.dart';
 import 'package:kegiatin/presentation/pages/admin/admin_event_detail_page.dart';
 import 'package:kegiatin/presentation/pages/admin/create_event_page.dart';
 import 'package:kegiatin/presentation/pages/admin/edit_event_page.dart';
@@ -10,6 +9,7 @@ import 'package:kegiatin/presentation/pages/admin/qr_scan_page.dart';
 import 'package:kegiatin/presentation/pages/peserta/peserta_home_page.dart';
 import 'package:kegiatin/presentation/pages/peserta/peserta_event_detail_page.dart';
 import 'package:kegiatin/presentation/pages/peserta/qr_display_page.dart';
+import 'package:kegiatin/presentation/pages/admin/widget/navbar_admin.dart';
 import 'package:kegiatin/presentation/pages/login_page.dart';
 import 'package:kegiatin/presentation/pages/onboarding_page.dart';
 import 'package:kegiatin/presentation/pages/register_page.dart';
@@ -85,7 +85,7 @@ GoRouter appRouter(Ref ref) {
       GoRoute(path: '/register', builder: (_, _) => const RegisterPage()),
       GoRoute(
         path: '/admin',
-        builder: (_, _) => const AdminHomePage(),
+        builder: (_, _) => const NavbarAdmin(),
         routes: [
           GoRoute(path: 'create-event', builder: (_, _) => const CreateEventPage()),
           GoRoute(

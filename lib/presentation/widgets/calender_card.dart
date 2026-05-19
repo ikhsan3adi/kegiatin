@@ -167,8 +167,6 @@ class _CalendarCardState extends State<CalendarCard> {
     );
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -303,7 +301,7 @@ class _CalendarCardState extends State<CalendarCard> {
               final hasEvent = events != null && events.isNotEmpty;
 
               // Get color for event highlight from theme based on event status
-              final eventColor = hasEvent ? _getEventColor(colorScheme, events!.first.status) : null;
+              final eventColor = hasEvent ? _getEventColor(colorScheme, events.first.status) : null;
 
               return GestureDetector(
                 onTap: isCurrentMonth ? () => _selectDate(date) : null,
