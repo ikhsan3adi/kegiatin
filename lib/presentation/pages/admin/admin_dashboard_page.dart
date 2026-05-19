@@ -139,7 +139,7 @@ class _AdminDashboardPageState extends ConsumerState<AdminDashboardPage> {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Statistik Kegiatan',
-                  style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                  style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ),
             ),

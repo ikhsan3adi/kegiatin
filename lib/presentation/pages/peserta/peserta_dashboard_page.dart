@@ -112,7 +112,7 @@ class _PesertaDashboardPageState extends ConsumerState<PesertaDashboardPage> {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Kalender Kegiatan',
-                  style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                  style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ),
             ),
