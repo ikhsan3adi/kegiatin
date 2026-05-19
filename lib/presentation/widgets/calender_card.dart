@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:kegiatin/domain/entities/event.dart';
+import 'package:kegiatin/domain/enums/event_status.dart';
 
 /// Shared calendar card widget for event activity display.
 /// Shows a calendar month with date selection and event highlight capability.
@@ -75,6 +76,16 @@ class _CalendarCardState extends State<CalendarCard> {
     if (events != null && events.isNotEmpty) {
       _showEventBottomSheet(context, date, events);
     }
+  }
+
+  Color _getEventColor(ColorScheme colorScheme, EventStatus status) {
+    return switch (status) {
+      EventStatus.draft => colorScheme.secondary,
+      EventStatus.published => colorScheme.primary,
+      EventStatus.ongoing => colorScheme.tertiary,
+      EventStatus.completed => colorScheme.outline,
+      EventStatus.cancelled => colorScheme.error,
+    };
   }
 
   void _showEventBottomSheet(BuildContext context, DateTime date, List<Event> events) {
@@ -156,20 +167,7 @@ class _CalendarCardState extends State<CalendarCard> {
     );
   }
 
-  Color _getEventColor(int eventCount, int colorIndex) {
-    // Define a palette of vibrant colors for event highlights
-    const colors = [
-      Color(0xFF405f91), // Primary blue
-      Color(0xFF2E7D32), // Green
-      Color(0xFFFF6B6B), // Red
-      Color(0xFFFFD700), // Gold
-      Color(0xFF9C27B0), // Purple
-      Color(0xFF00BCD4), // Cyan
-      Color(0xFFFF9800), // Orange
-      Color(0xFFE91E63), // Pink
-    ];
-    return colors[colorIndex % colors.length];
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -304,8 +302,8 @@ class _CalendarCardState extends State<CalendarCard> {
               isSelected = _isSameDay(date, _selectedDate);
               final hasEvent = events != null && events.isNotEmpty;
 
-              // Get color for event highlight
-              final eventColor = hasEvent ? _getEventColor(events.length, date.day) : null;
+              // Get color for event highlight from theme based on event status
+              final eventColor = hasEvent ? _getEventColor(colorScheme, events!.first.status) : null;
 
               return GestureDetector(
                 onTap: isCurrentMonth ? () => _selectDate(date) : null,
