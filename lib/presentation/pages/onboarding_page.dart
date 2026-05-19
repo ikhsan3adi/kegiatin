@@ -34,7 +34,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
     final brandColor = colorScheme.primary;
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {

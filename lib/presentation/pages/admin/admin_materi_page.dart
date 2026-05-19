@@ -1,21 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:kegiatin/presentation/pages/admin/widget/upload_materi_bottom_sheet.dart';
 import 'package:kegiatin/presentation/widgets/kegiatin_app_bar.dart';
 
 class AdminMateriPage extends StatelessWidget {
   const AdminMateriPage({super.key});
-
-  void _showUploadSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (_) => const UploadMateriBottomSheet(),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,51 +38,33 @@ class AdminMateriPage extends StatelessWidget {
 
         // Konten kosong (belum ada backend materi)
         Expanded(
-          child: Stack(
-            children: [
-              Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.menu_book_rounded,
-                      size: 72,
-                      color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Belum ada materi',
-                      style: textTheme.titleMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Ketuk tombol di bawah untuk mengunggah\nmateri kegiatan.',
-                      textAlign: TextAlign.center,
-                      style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-                      ),
-                    ),
-                  ],
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.menu_book_rounded,
+                  size: 72,
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
                 ),
-              ),
-
-              // FAB di dalam Stack agar tidak bertabrakan dengan BottomNavBar
-              Positioned(
-                right: 24,
-                bottom: 16,
-                child: FloatingActionButton(
-                  heroTag: 'fab_tambah_materi',
-                  onPressed: () => _showUploadSheet(context),
-                  backgroundColor: colorScheme.primary,
-                  foregroundColor: colorScheme.onPrimary,
-                  elevation: 4.0,
-                  child: const Icon(Icons.add),
+                const SizedBox(height: 16),
+                Text(
+                  'Belum ada materi',
+                  style: textTheme.titleMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 8),
+                Text(
+                  'Materi kegiatan dapat dikelola\ndi dalam halaman detail kegiatan.',
+                  textAlign: TextAlign.center,
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],
