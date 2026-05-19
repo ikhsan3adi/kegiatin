@@ -44,7 +44,7 @@ class SessionManagementSection extends ConsumerWidget {
             children: [
               Icon(Icons.event_note_outlined, size: 20, color: colorScheme.onSurfaceVariant),
               const SizedBox(width: 12),
-              Text('Sesi', style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+              Text('Sesi', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
               const Spacer(),
               if (_canManage && event.type == EventType.series)
                 TextButton.icon(

@@ -4,7 +4,6 @@ import 'package:kegiatin/domain/enums/event_type.dart';
 import 'package:kegiatin/domain/enums/event_visibility.dart';
 import 'package:kegiatin/presentation/pages/admin/widget/admin_rsvp_list.dart';
 import 'package:kegiatin/presentation/pages/admin/widget/session_management_section.dart';
-import 'package:kegiatin/presentation/pages/admin/widget/upload_materi_bottom_sheet.dart';
 
 class AdminEventDetailBody extends StatelessWidget {
   const AdminEventDetailBody({super.key, required this.event});
@@ -30,7 +29,7 @@ class AdminEventDetailBody extends StatelessWidget {
                     const SizedBox(width: 12),
                     Text(
                       'Deskripsi Kegiatan',
-                      style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                      style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -50,7 +49,7 @@ class AdminEventDetailBody extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Detail', style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                Text('Detail', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 16),
                 _DetailRow(
                   label: 'Visibilitas',
@@ -75,56 +74,11 @@ class AdminEventDetailBody extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.folder_copy_outlined, size: 20, color: colorScheme.onSurfaceVariant),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Materi Kegiatan',
-                      style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                Center(
-                  child: Column(
-                    children: [
-                      Text(
-                        'Belum ada materi yang diunggah.',
-                        style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
-                      ),
-                      const SizedBox(height: 16),
-                      FilledButton.tonalIcon(
-                        onPressed: () {
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            useSafeArea: true,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-                            ),
-                            builder: (_) => UploadMateriBottomSheet(event: event),
-                          );
-                        },
-                        icon: const Icon(Icons.upload_file_rounded),
-                        label: const Text('Unggah Materi'),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          _SurfaceCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
                     Icon(Icons.people_alt_outlined, size: 20, color: colorScheme.onSurfaceVariant),
                     const SizedBox(width: 12),
                     Text(
                       'Peserta Terdaftar',
-                      style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                      style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
