@@ -11,6 +11,7 @@ abstract class AttendanceLocalDataSource {
   Future<List<AttendanceModel>> getRecordsBySession(String sessionId);
   Future<void> updateSyncStatus(String localId, SyncStatus newStatus);
   Future<bool> isDuplicate(String userId, String sessionId);
+  Future<bool> isDuplicateByQrToken(String qrToken, String sessionId);
   Future<void> clearAll();
 }
 
@@ -95,6 +96,24 @@ class AttendanceLocalDataSourceImpl implements AttendanceLocalDataSource {
       return false;
     } catch (e) {
       throw CacheException('Gagal cek duplikat attendance: $e');
+    }
+  }
+
+  @override
+  Future<bool> isDuplicateByQrToken(String qrToken, String sessionId) async {
+    try {
+      final values = attendanceBox.values;
+      for (final raw in values) {
+        if (raw is String) {
+          final model = AttendanceModel.fromJson(Map<String, dynamic>.from(jsonDecode(raw) as Map));
+          if (model.qrToken == qrToken && model.sessionId == sessionId) {
+            return true;
+          }
+        }
+      }
+      return false;
+    } catch (e) {
+      throw CacheException('Gagal cek duplikat attendance by QR: $e');
     }
   }
 

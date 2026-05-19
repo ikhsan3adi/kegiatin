@@ -1,6 +1,5 @@
-import 'dart:math';
-
 import 'package:fpdart/fpdart.dart';
+import 'package:uuid/uuid.dart';
 import 'package:kegiatin/core/errors/exceptions.dart';
 import 'package:kegiatin/core/errors/failures.dart';
 import 'package:kegiatin/core/network/network_info.dart';
@@ -36,8 +35,12 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
       }
     }
     try {
+      if (await localDataSource.isDuplicateByQrToken(qrToken, sessionId)) {
+        return const Left(CacheFailure('Presensi dengan QR ini sudah tercatat sebelumnya.'));
+      }
+
       final record = AttendanceModel(
-        id: _generateLocalId(),
+        id: const Uuid().v4(),
         userId: '',
         sessionId: sessionId,
         rsvpId: '',
@@ -110,11 +113,5 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
     } on CacheException catch (e) {
       return Left(CacheFailure(e.message));
     }
-  }
-
-  String _generateLocalId() {
-    final random = Random().nextInt(99999);
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
-    return 'local_${timestamp}_$random';
   }
 }

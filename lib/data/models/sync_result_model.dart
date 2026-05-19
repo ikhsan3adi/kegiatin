@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:kegiatin/domain/enums/attendance_status.dart';
 
 part 'sync_result_model.freezed.dart';
 part 'sync_result_model.g.dart';
@@ -50,7 +51,7 @@ class SyncAttendanceRecord {
   final String qrToken;
   final String sessionId;
   final DateTime checkedInAt;
-  final String? status;
+  final AttendanceStatus? status;
 
   const SyncAttendanceRecord({
     required this.localId,
@@ -65,7 +66,7 @@ class SyncAttendanceRecord {
     'qrToken': qrToken,
     'sessionId': sessionId,
     'checkedInAt': checkedInAt.toIso8601String(),
-    if (status != null) 'status': status,
+    if (status != null) 'status': status!.name.toUpperCase(),
   };
 }
 
