@@ -10,9 +10,6 @@ class AttendanceListController extends _$AttendanceListController {
   Future<List<Attendance>> build(String sessionId) async {
     final useCase = ref.read(getSessionAttendanceUseCaseProvider);
     final result = await useCase(sessionId);
-    return result.fold(
-      (failure) => throw failure,
-      (list) => list,
-    );
+    return result.fold((failure) => throw failure, (list) => list);
   }
 }

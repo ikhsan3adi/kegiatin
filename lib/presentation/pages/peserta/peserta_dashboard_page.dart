@@ -23,7 +23,7 @@ class _PesertaDashboardPageState extends ConsumerState<PesertaDashboardPage> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final authState = ref.watch(authControllerProvider);
-    
+
     final eventsState = ref.watch(eventListControllerProvider());
 
     // Build map of dates to events for calendar
