@@ -74,6 +74,7 @@ class _AdminEventDetailLoaded extends ConsumerWidget {
     final cancelState = ref.watch(cancelEventControllerProvider);
 
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return AdminEventDetailListeners(
       eventId: event.id,
@@ -89,10 +90,9 @@ class _AdminEventDetailLoaded extends ConsumerWidget {
               child: Center(
                 child: Text(
                   'Detail Kegiatan (Admin)',
-                  style: TextStyle(
+                  style: textTheme.titleMedium?.copyWith(
                     color: colorScheme.primary,
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
                   ),
                 ),
               ),

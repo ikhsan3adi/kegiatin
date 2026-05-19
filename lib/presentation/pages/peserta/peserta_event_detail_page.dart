@@ -42,7 +42,7 @@ class PesertaEventDetailPage extends ConsumerWidget {
     );
   }
 
-  Widget _fallbackScaffold(BuildContext context, Widget body) {
+  Widget _loadingOrErrorScaffold(BuildContext context, {required Widget body}) {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       backgroundColor: colorScheme.surfaceContainerHighest,
@@ -63,6 +63,7 @@ class _PesertaEventDetailLoaded extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return PesertaEventDetailListeners(
       child: Scaffold(
@@ -77,10 +78,9 @@ class _PesertaEventDetailLoaded extends ConsumerWidget {
               child: Center(
                 child: Text(
                   'Info',
-                  style: TextStyle(
+                  style: textTheme.titleMedium?.copyWith(
                     color: colorScheme.primary,
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
                   ),
                 ),
               ),
