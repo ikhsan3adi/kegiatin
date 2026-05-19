@@ -11,7 +11,7 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // final brightness = View.of(context).platformDispatcher.platformBrightness;
-    final textTheme = createTextTheme(context, 'Inter', 'Alumni Sans');
+    final textTheme = createTextTheme(context, 'Inter', 'Inter');
     final theme = MaterialTheme(textTheme);
 
     final router = ref.watch(appRouterProvider);
