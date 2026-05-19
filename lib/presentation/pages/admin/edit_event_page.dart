@@ -138,9 +138,7 @@ class _EditEventPageState extends ConsumerState<EditEventPage> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: state.when(
         data: (event) {
-          if (event == null) {
-            return const Center(child: Text('Kegiatan tidak ditemukan'));
-          }
+
           // Only init once
           WidgetsBinding.instance.addPostFrameCallback((_) {
             _initData(ref);
@@ -297,7 +295,7 @@ class _EditEventPageState extends ConsumerState<EditEventPage> {
                   const SizedBox(height: 12),
                   CustomInputCard(
                     child: DropdownButtonFormField<EventVisibility>(
-                      value: _visibilitas,
+                      initialValue: _visibilitas,
                       isExpanded: true,
                       style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
                       decoration: InputDecoration.collapsed(

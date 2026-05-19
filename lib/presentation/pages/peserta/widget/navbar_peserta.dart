@@ -15,7 +15,7 @@ class NavbarPeserta extends ConsumerStatefulWidget {
 class _NavbarPesertaState extends ConsumerState<NavbarPeserta> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = const [
+  static const List<Widget> _pages = [
     PesertaDashboardPage(),
     PesertaEventPage(),
     PesertaRiwayatPage(),

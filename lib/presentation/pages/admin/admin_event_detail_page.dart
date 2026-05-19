@@ -23,10 +23,8 @@ class AdminEventDetailPage extends ConsumerWidget {
     final asyncEvent = ref.watch(eventDetailControllerProvider(eventId));
 
     return asyncEvent.when(
-      loading: () => _loadingOrErrorScaffold(
-        context,
-        body: const Center(child: CircularProgressIndicator()),
-      ),
+      loading: () =>
+          _loadingOrErrorScaffold(context, body: const Center(child: CircularProgressIndicator())),
       error: (error, _) => _loadingOrErrorScaffold(
         context,
         body: Center(
@@ -76,6 +74,7 @@ class _AdminEventDetailLoaded extends ConsumerWidget {
     final cancelState = ref.watch(cancelEventControllerProvider);
 
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return AdminEventDetailListeners(
       eventId: event.id,
@@ -91,10 +90,9 @@ class _AdminEventDetailLoaded extends ConsumerWidget {
               child: Center(
                 child: Text(
                   'Detail Kegiatan (Admin)',
-                  style: TextStyle(
+                  style: textTheme.titleMedium?.copyWith(
                     color: colorScheme.primary,
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
                   ),
                 ),
               ),
