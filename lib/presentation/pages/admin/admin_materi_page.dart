@@ -86,14 +86,13 @@ class AdminMateriPage extends StatelessWidget {
               Positioned(
                 right: 24,
                 bottom: 16,
-                child: FloatingActionButton.extended(
+                child: FloatingActionButton(
                   heroTag: 'fab_tambah_materi',
                   onPressed: () => _showUploadSheet(context),
                   backgroundColor: colorScheme.primary,
                   foregroundColor: colorScheme.onPrimary,
-                  icon: const Icon(Icons.add),
-                  label: const Text('Unggah Materi'),
                   elevation: 4.0,
+                  child: const Icon(Icons.add),
                 ),
               ),
             ],
