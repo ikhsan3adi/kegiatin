@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/core/theme/custom.dart';
+import 'package:kegiatin/domain/entities/attendance.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/entities/session.dart';
 import 'package:kegiatin/domain/entities/paginated_result.dart';
+import 'package:kegiatin/presentation/controllers/attendance/attendance_list_controller.dart';
+import 'package:kegiatin/presentation/controllers/attendance/scan_attendance_controller.dart';
 import 'package:kegiatin/presentation/controllers/event/event_list_controller.dart';
 import 'package:kegiatin/presentation/pages/admin/widget/manual_input_tab.dart';
 import 'package:kegiatin/presentation/pages/admin/widget/qr_scanner_tab.dart';
@@ -21,6 +24,7 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
 
   /// Kegiatan yang dipilih admin di dropdown.
   Event? _selectedEvent;
+
   /// Sesi yang dipilih admin di dropdown.
   Session? _selectedSession;
   int _totalScanned = 0;
@@ -38,33 +42,74 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
   }
 
   void _onQrDetected(String value) {
-    setState(() => _totalScanned++);
-
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.check_circle, color: KegiatinCustomTheme.onGradient, size: 20),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text('QR terbaca: $value', maxLines: 1, overflow: TextOverflow.ellipsis),
-            ),
-          ],
+    if (_selectedSession == null) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Row(
+            children: [
+              Icon(Icons.warning_rounded, color: KegiatinCustomTheme.onGradient, size: 20),
+              SizedBox(width: 10),
+              Expanded(child: Text('Pilih kegiatan dan sesi terlebih dahulu', maxLines: 1)),
+            ],
+          ),
+          backgroundColor: Colors.orange,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         ),
-        backgroundColor: KegiatinCustomTheme.snackbarSuccess,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-        duration: const Duration(seconds: 2),
-      ),
-    );
+      );
+      return;
+    }
+    setState(() => _totalScanned++);
+    ref.read(scanAttendanceControllerProvider.notifier).scan(value, _selectedSession!.id);
   }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+
+    ref.listen<AsyncValue<Attendance?>>(scanAttendanceControllerProvider, (prev, next) {
+      if (next is AsyncError) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: KegiatinCustomTheme.onGradient, size: 20),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(next.error.toString(), maxLines: 2, overflow: TextOverflow.ellipsis),
+                ),
+              ],
+            ),
+            backgroundColor: colorScheme.error,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          ),
+        );
+      } else if (next is AsyncData && next.value != null && _selectedSession != null) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Row(
+              children: [
+                Icon(Icons.check_circle, color: KegiatinCustomTheme.onGradient, size: 20),
+                SizedBox(width: 10),
+                Expanded(child: Text('Presensi berhasil dicatat!', maxLines: 1)),
+              ],
+            ),
+            backgroundColor: KegiatinCustomTheme.snackbarSuccess,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          ),
+        );
+        ref.invalidate(attendanceListControllerProvider(_selectedSession!.id));
+      }
+    });
 
     // Watch event list — ambil semua (limit tinggi) tanpa filter agar dropdown lengkap
     final eventsAsync = ref.watch(eventListControllerProvider(limit: 100));
@@ -127,10 +172,7 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
               controller: _tabController,
               children: [
                 QrScannerTab(onDetect: _onQrDetected),
-                ManualInputTab(
-                  eventId: _selectedEvent?.id,
-                  sessionId: _selectedSession?.id,
-                ),
+                ManualInputTab(eventId: _selectedEvent?.id, sessionId: _selectedSession?.id),
               ],
             ),
           ),
@@ -424,11 +466,7 @@ class _EventDropdown extends StatelessWidget {
 
 /// Dropdown pemilih sesi dari kegiatan terpilih.
 class _SessionDropdown extends StatelessWidget {
-  const _SessionDropdown({
-    required this.sessions,
-    required this.selected,
-    required this.onChanged,
-  });
+  const _SessionDropdown({required this.sessions, required this.selected, required this.onChanged});
 
   final List<Session> sessions;
   final Session? selected;
@@ -494,7 +532,9 @@ class _SessionDropdown extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 'Pilih Sesi',
-                style: textTheme.bodyMedium?.copyWith(color: KegiatinCustomTheme.onGradientSecondary),
+                style: textTheme.bodyMedium?.copyWith(
+                  color: KegiatinCustomTheme.onGradientSecondary,
+                ),
               ),
             ],
           ),
@@ -503,4 +543,3 @@ class _SessionDropdown extends StatelessWidget {
     );
   }
 }
-

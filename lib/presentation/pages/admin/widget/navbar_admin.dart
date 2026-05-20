@@ -1,11 +1,14 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kegiatin/core/theme/custom.dart';
+import 'package:kegiatin/domain/usecases/base_usecase.dart';
 import 'package:kegiatin/presentation/pages/admin/admin_dashboard_page.dart';
 import 'package:kegiatin/presentation/pages/admin/admin_event_page.dart';
 import 'package:kegiatin/presentation/pages/admin/admin_materi_page.dart';
 import 'package:kegiatin/presentation/pages/admin/admin_profile_page.dart';
+import 'package:kegiatin/presentation/providers/providers.dart';
 
 class NavbarAdmin extends ConsumerStatefulWidget {
   const NavbarAdmin({super.key});
@@ -27,6 +30,18 @@ class _NavbarAdminState extends ConsumerState<NavbarAdmin> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Connectivity().onConnectivityChanged.listen((results) {
+        if (!results.contains(ConnectivityResult.none) && mounted) {
+          ref.read(syncAttendanceUseCaseProvider)(NoInput.instance);
+        }
+      });
     });
   }
 

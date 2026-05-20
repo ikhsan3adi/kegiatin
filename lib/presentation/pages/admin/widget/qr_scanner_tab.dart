@@ -1,10 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:kegiatin/core/theme/custom.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
-class QrScannerTab extends StatelessWidget {
+class QrScannerTab extends StatefulWidget {
   const QrScannerTab({super.key, this.onDetect});
 
   final void Function(String value)? onDetect;
+
+  @override
+  State<QrScannerTab> createState() => _QrScannerTabState();
+}
+
+class _QrScannerTabState extends State<QrScannerTab> {
+  final _controller = MobileScannerController();
+  bool _isProcessing = false;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _handleDetection(BarcodeCapture capture) {
+    if (_isProcessing) return;
+    final raw = capture.barcodes.firstOrNull?.rawValue;
+    if (raw == null || raw.isEmpty) return;
+    _isProcessing = true;
+    widget.onDetect?.call(raw);
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) setState(() => _isProcessing = false);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,13 +43,13 @@ class QrScannerTab extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              // Background gelap pengganti preview kamera
-              const ColoredBox(color: KegiatinCustomTheme.scannerBackground),
+              // Live camera preview
+              MobileScanner(controller: _controller, onDetect: _handleDetection),
 
               // Overlay viewfinder (blur luar + border sudut)
               CustomPaint(painter: _OverlayPainter(borderColor: colorScheme.primary)),
 
-              // Ikon QR di tengah area scan — sinkron dengan pusat viewfinder
+              // Ikon QR di tengah area scan
               const Center(
                 child: Icon(
                   Icons.qr_code_2_rounded,
@@ -38,12 +64,16 @@ class QrScannerTab extends StatelessWidget {
                 right: 12,
                 child: Column(
                   children: [
-                    _ControlButton(icon: Icons.flash_on_rounded, tooltip: 'Flash', onTap: () {}),
+                    _ControlButton(
+                      icon: Icons.flash_on_rounded,
+                      tooltip: 'Flash',
+                      onTap: () => _controller.toggleTorch(),
+                    ),
                     const SizedBox(height: 8),
                     _ControlButton(
                       icon: Icons.flip_camera_ios_rounded,
                       tooltip: 'Balik Kamera',
-                      onTap: () {},
+                      onTap: () => _controller.switchCamera(),
                     ),
                   ],
                 ),
@@ -52,7 +82,7 @@ class QrScannerTab extends StatelessWidget {
           ),
         ),
 
-        // ── Label instruksi (di luar area kamera, tidak bertumpuk) ─────────
+        // Label instruksi
         Container(
           color: colorScheme.surface,
           padding: const EdgeInsets.symmetric(vertical: 14),
@@ -60,25 +90,6 @@ class QrScannerTab extends StatelessWidget {
           child: Text(
             'Arahkan kamera ke QR Code',
             style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
-          ),
-        ),
-
-        // ── Tombol simulasi ────────────────────────────────────────────────
-        Padding(
-          padding: const EdgeInsets.fromLTRB(24, 4, 24, 24),
-          child: SizedBox(
-            width: double.infinity,
-            child: FilledButton.icon(
-              onPressed: () => onDetect?.call('SIMULASI_QR_TOKEN_12345'),
-              icon: const Icon(Icons.qr_code_scanner),
-              label: const Text('Simulasi Scan QR'),
-              style: FilledButton.styleFrom(
-                backgroundColor: colorScheme.primary,
-                foregroundColor: colorScheme.onPrimary,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-              ),
-            ),
           ),
         ),
       ],
@@ -93,17 +104,14 @@ class _OverlayPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Responsif: 65 % sisi terpendek, maks 280 dp
     final scanAreaSize = (size.shortestSide * 0.65).clamp(120.0, 280.0);
 
-    // Viewfinder tepat di tengah canvas
     final scanRect = Rect.fromCenter(
       center: Offset(size.width / 2, size.height / 2),
       width: scanAreaSize,
       height: scanAreaSize,
     );
 
-    // Overlay gelap di luar area scan
     final overlayPaint = Paint()
       ..color = KegiatinCustomTheme.scannerBackground.withValues(alpha: 0.60);
     final path = Path()
@@ -112,7 +120,6 @@ class _OverlayPainter extends CustomPainter {
       ..fillType = PathFillType.evenOdd;
     canvas.drawPath(path, overlayPaint);
 
-    // Border sudut L-shape
     const cornerLen = 22.0;
     const strokeW = 3.5;
     final borderPaint = Paint()
@@ -122,25 +129,21 @@ class _OverlayPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round;
 
     final corners = [
-      // Top-left
       [
         Offset(scanRect.left + cornerLen, scanRect.top),
         Offset(scanRect.left, scanRect.top),
         Offset(scanRect.left, scanRect.top + cornerLen),
       ],
-      // Top-right
       [
         Offset(scanRect.right - cornerLen, scanRect.top),
         Offset(scanRect.right, scanRect.top),
         Offset(scanRect.right, scanRect.top + cornerLen),
       ],
-      // Bottom-left
       [
         Offset(scanRect.left + cornerLen, scanRect.bottom),
         Offset(scanRect.left, scanRect.bottom),
         Offset(scanRect.left, scanRect.bottom - cornerLen),
       ],
-      // Bottom-right
       [
         Offset(scanRect.right - cornerLen, scanRect.bottom),
         Offset(scanRect.right, scanRect.bottom),

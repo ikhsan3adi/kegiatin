@@ -14,11 +14,7 @@ class ManualInputTab extends ConsumerStatefulWidget {
   final String? eventId;
   final String? sessionId;
 
-  const ManualInputTab({
-    super.key,
-    this.eventId,
-    this.sessionId,
-  });
+  const ManualInputTab({super.key, this.eventId, this.sessionId});
 
   @override
   ConsumerState<ManualInputTab> createState() => _ManualInputTabState();
@@ -58,11 +54,7 @@ class _ManualInputTabState extends ConsumerState<ManualInputTab> {
                 const Icon(Icons.error_outline, color: KegiatinCustomTheme.onGradient, size: 20),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Text(
-                    next.error.toString(),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  child: Text(next.error.toString(), maxLines: 2, overflow: TextOverflow.ellipsis),
                 ),
               ],
             ),
@@ -80,9 +72,7 @@ class _ManualInputTabState extends ConsumerState<ManualInputTab> {
               children: [
                 Icon(Icons.check_circle, color: KegiatinCustomTheme.onGradient, size: 20),
                 SizedBox(width: 10),
-                Expanded(
-                  child: Text('Presensi berhasil dicatat secara manual!', maxLines: 1),
-                ),
+                Expanded(child: Text('Presensi berhasil dicatat secara manual!', maxLines: 1)),
               ],
             ),
             backgroundColor: KegiatinCustomTheme.snackbarSuccess,
@@ -100,11 +90,7 @@ class _ManualInputTabState extends ConsumerState<ManualInputTab> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.event_note_outlined,
-              size: 48,
-              color: colorScheme.outlineVariant,
-            ),
+            Icon(Icons.event_note_outlined, size: 48, color: colorScheme.outlineVariant),
             const SizedBox(height: 8),
             Text(
               'Silakan pilih kegiatan dan sesi terlebih dahulu',
@@ -193,103 +179,110 @@ class _ManualInputTabState extends ConsumerState<ManualInputTab> {
                           const SizedBox(height: 8),
                           Text(
                             'Gagal memuat daftar kehadiran: $err',
-                            style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
-                            textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                ),
-                data: (attendances) {
-                  final rsvps = rsvpResult.data;
-
-                  // Filter RSVP terdaftar berdasarkan kueri pencarian (Nama / NPA)
-                  final filteredRsvps = rsvps.where((rsvp) {
-                    if (_query.isEmpty) return true;
-                    final q = _query.toLowerCase();
-                    final nameMatch = rsvp.user.displayName.toLowerCase().contains(q);
-                    final npaMatch = rsvp.user.npa?.toLowerCase().contains(q) ?? false;
-                    return nameMatch || npaMatch;
-                  }).toList();
-
-                  if (filteredRsvps.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            rsvps.isEmpty ? Icons.group_add_outlined : Icons.person_search_outlined,
-                            size: 48,
-                            color: colorScheme.outlineVariant,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            rsvps.isEmpty
-                                ? 'Belum ada peserta terdaftar (RSVP)'
-                                : 'Peserta tidak ditemukan',
-                            style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+                            style: textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
                             textAlign: TextAlign.center,
                           ),
                         ],
                       ),
-                    );
-                  }
+                    ),
+                    data: (attendances) {
+                      final rsvps = rsvpResult.data;
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                        child: Text(
-                          'Peserta Terdaftar: ${rsvps.length}',
-                          style: textTheme.labelMedium?.copyWith(color: colorScheme.onSurfaceVariant),
-                        ),
-                      ),
-                      Expanded(
-                        child: ListView.separated(
-                          padding: const EdgeInsets.fromLTRB(16, 4, 16, 80),
-                          itemCount: filteredRsvps.length,
-                          separatorBuilder: (_, _) => const SizedBox(height: 8),
-                          itemBuilder: (context, i) {
-                            final rsvp = filteredRsvps[i];
-                            final isPresent = attendances.any((att) => att.userId == rsvp.userId);
+                      // Filter RSVP terdaftar berdasarkan kueri pencarian (Nama / NPA)
+                      final filteredRsvps = rsvps.where((rsvp) {
+                        if (_query.isEmpty) return true;
+                        final q = _query.toLowerCase();
+                        final nameMatch = rsvp.user.displayName.toLowerCase().contains(q);
+                        final npaMatch = rsvp.user.npa?.toLowerCase().contains(q) ?? false;
+                        return nameMatch || npaMatch;
+                      }).toList();
 
-                            return _PesertaCard(
-                              name: rsvp.user.displayName,
-                              initials: _initials(rsvp.user.displayName),
-                              isAnggota: rsvp.user.npa != null,
-                              npa: rsvp.user.npa,
-                              isPresent: isPresent,
-                              onHadir: () {
-                                ref.read(scanAttendanceControllerProvider.notifier).scan(
-                                      rsvp.qrToken,
-                                      widget.sessionId!,
-                                    );
+                      if (filteredRsvps.isEmpty) {
+                        return Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                rsvps.isEmpty
+                                    ? Icons.group_add_outlined
+                                    : Icons.person_search_outlined,
+                                size: 48,
+                                color: colorScheme.outlineVariant,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                rsvps.isEmpty
+                                    ? 'Belum ada peserta terdaftar (RSVP)'
+                                    : 'Peserta tidak ditemukan',
+                                style: textTheme.bodyMedium?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                            child: Text(
+                              'Peserta Terdaftar: ${rsvps.length}',
+                              style: textTheme.labelMedium?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: ListView.separated(
+                              padding: const EdgeInsets.fromLTRB(16, 4, 16, 80),
+                              itemCount: filteredRsvps.length,
+                              separatorBuilder: (_, _) => const SizedBox(height: 8),
+                              itemBuilder: (context, i) {
+                                final rsvp = filteredRsvps[i];
+                                final isPresent = attendances.any(
+                                  (att) => att.userId == rsvp.userId,
+                                );
+
+                                return _PesertaCard(
+                                  name: rsvp.user.displayName,
+                                  initials: _initials(rsvp.user.displayName),
+                                  isAnggota: rsvp.user.npa != null,
+                                  npa: rsvp.user.npa,
+                                  isPresent: isPresent,
+                                  onHadir: () {
+                                    ref
+                                        .read(scanAttendanceControllerProvider.notifier)
+                                        .scan(rsvp.qrToken, widget.sessionId!);
+                                  },
+                                );
                               },
-                            );
-                          },
-                        ),
-                      ),
-                    ],
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   );
                 },
-              );
-            },
-          ),
+              ),
+            ),
+          ],
         ),
-      ],
-    ),
 
-    // Overlay Loading saat memproses presensi manual
-    if (isLoadingScan)
-      Container(
-        color: Colors.black.withValues(alpha: 0.3),
-        child: const Center(
-          child: CircularProgressIndicator(),
-        ),
-      ),
-    ],
-  );
-}
+        // Overlay Loading saat memproses presensi manual
+        if (isLoadingScan)
+          Container(
+            color: colorScheme.scrim.withValues(alpha: 0.3),
+            child: const Center(child: CircularProgressIndicator()),
+          ),
+      ],
+    );
+  }
 }
 
 /// Card item detail peserta terdaftar beserta aksi presensi manual.
@@ -319,7 +312,9 @@ class _PesertaCard extends StatelessWidget {
       duration: const Duration(milliseconds: 250),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: isPresent ? colorScheme.primaryContainer.withValues(alpha: 0.4) : colorScheme.surface,
+        color: isPresent
+            ? colorScheme.primaryContainer.withValues(alpha: 0.4)
+            : colorScheme.surface,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: isPresent
@@ -355,10 +350,7 @@ class _PesertaCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  name,
-                  style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
-                ),
+                Text(name, style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
                 const SizedBox(height: 2),
                 Text(
                   isAnggota
