@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/core/theme/custom.dart';
 import 'package:kegiatin/domain/entities/event.dart';
+import 'package:kegiatin/domain/entities/session.dart';
 import 'package:kegiatin/domain/entities/paginated_result.dart';
 import 'package:kegiatin/presentation/controllers/event/event_list_controller.dart';
 import 'package:kegiatin/presentation/pages/admin/widget/manual_input_tab.dart';
@@ -20,6 +21,8 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
 
   /// Kegiatan yang dipilih admin di dropdown.
   Event? _selectedEvent;
+  /// Sesi yang dipilih admin di dropdown.
+  Session? _selectedSession;
   int _totalScanned = 0;
 
   @override
@@ -74,8 +77,19 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
           _ScanHeader(
             eventsAsync: eventsAsync,
             selectedEvent: _selectedEvent,
+            selectedSession: _selectedSession,
             totalScanned: _totalScanned,
-            onEventChanged: (event) => setState(() => _selectedEvent = event),
+            onEventChanged: (event) {
+              setState(() {
+                _selectedEvent = event;
+                if (event != null && event.sessions.isNotEmpty) {
+                  _selectedSession = event.sessions.first;
+                } else {
+                  _selectedSession = null;
+                }
+              });
+            },
+            onSessionChanged: (session) => setState(() => _selectedSession = session),
             onBack: () => Navigator.of(context).pop(),
             onRetry: () => ref.invalidate(eventListControllerProvider(limit: 100)),
           ),
@@ -113,7 +127,10 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
               controller: _tabController,
               children: [
                 QrScannerTab(onDetect: _onQrDetected),
-                const ManualInputTab(),
+                ManualInputTab(
+                  eventId: _selectedEvent?.id,
+                  sessionId: _selectedSession?.id,
+                ),
               ],
             ),
           ),
@@ -128,16 +145,20 @@ class _ScanHeader extends StatelessWidget {
   const _ScanHeader({
     required this.eventsAsync,
     required this.selectedEvent,
+    required this.selectedSession,
     required this.totalScanned,
     required this.onEventChanged,
+    required this.onSessionChanged,
     required this.onBack,
     required this.onRetry,
   });
 
   final AsyncValue<PaginatedResult<Event>> eventsAsync;
   final Event? selectedEvent;
+  final Session? selectedSession;
   final int totalScanned;
   final ValueChanged<Event?> onEventChanged;
+  final ValueChanged<Session?> onSessionChanged;
   final VoidCallback onBack;
   final VoidCallback onRetry;
 
@@ -205,6 +226,19 @@ class _ScanHeader extends StatelessWidget {
                   onRetry: onRetry,
                 ),
               ),
+
+              // Dropdown sesi kegiatan jika ada kegiatan terpilih dan memiliki sesi
+              if (selectedEvent != null && selectedEvent!.sessions.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: _SessionDropdown(
+                    sessions: selectedEvent!.sessions,
+                    selected: selectedSession,
+                    onChanged: onSessionChanged,
+                  ),
+                ),
+              ],
             ],
           ),
         ),
@@ -387,3 +421,86 @@ class _EventDropdown extends StatelessWidget {
     );
   }
 }
+
+/// Dropdown pemilih sesi dari kegiatan terpilih.
+class _SessionDropdown extends StatelessWidget {
+  const _SessionDropdown({
+    required this.sessions,
+    required this.selected,
+    required this.onChanged,
+  });
+
+  final List<Session> sessions;
+  final Session? selected;
+  final ValueChanged<Session?> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    // Pastikan nilai selected masih ada di list sessions
+    final validSelected = sessions.any((s) => s.id == selected?.id) ? selected : null;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      decoration: BoxDecoration(
+        color: KegiatinCustomTheme.glassInput,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: KegiatinCustomTheme.glassInputBorder),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<Session>(
+          value: validSelected,
+          dropdownColor: KegiatinCustomTheme.appBarTop,
+          iconEnabledColor: KegiatinCustomTheme.onGradient,
+          isExpanded: true,
+          icon: const Icon(Icons.keyboard_arrow_down_rounded),
+          style: textTheme.bodyMedium?.copyWith(color: KegiatinCustomTheme.onGradient),
+          items: sessions
+              .map(
+                (s) => DropdownMenuItem<Session>(
+                  value: s,
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.access_time_rounded,
+                        size: 16,
+                        color: KegiatinCustomTheme.onGradientSecondary,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          s.title,
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: KegiatinCustomTheme.onGradient,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+              .toList(),
+          onChanged: onChanged,
+          hint: Row(
+            children: [
+              const Icon(
+                Icons.access_time_rounded,
+                size: 16,
+                color: KegiatinCustomTheme.onGradientSecondary,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Pilih Sesi',
+                style: textTheme.bodyMedium?.copyWith(color: KegiatinCustomTheme.onGradientSecondary),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
