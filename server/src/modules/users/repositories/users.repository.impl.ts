@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { and, count, eq, ilike, or, SQL } from 'drizzle-orm';
-import { DRIZZLE, DrizzleDB } from '../../../database/drizzle.provider';
+import { DRIZZLE } from '../../../database/drizzle.provider';
+import type { DrizzleDB } from '../../../database/drizzle.provider';
 import { users } from '../../../database/schema';
 import { IUserProfile } from '../../auth/domain/user.types';
 import { IUsersRepository, PaginatedUsers, SearchUsersParams } from '../domain/users.repository';
@@ -20,7 +21,7 @@ export class DrizzleUsersRepository extends IUsersRepository {
         ilike(users.npa, pattern),
       )!,
     ];
-    if (role) conditions.push(eq(users.role, role));
+    if (role) conditions.push(eq(users.role, role as 'ADMIN' | 'MEMBER'));
 
     const where = and(...conditions);
 
