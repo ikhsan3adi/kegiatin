@@ -39,4 +39,7 @@ class ApiConstants {
   // Profile
   static const String profile = '/profile';
   static const String profileHistory = '/profile/history';
+
+  // Users
+  static const String usersSearch = '/users/search';
 }

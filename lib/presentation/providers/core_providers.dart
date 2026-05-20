@@ -43,3 +43,7 @@ AuthLocalDataSource authLocalDataSource(Ref ref) => AuthLocalDataSourceImpl(
 @Riverpod(keepAlive: true)
 DioClient dioClient(Ref ref) =>
     DioClient(dio: Dio(), authLocalDataSource: ref.watch(authLocalDataSourceProvider));
+
+@Riverpod(keepAlive: true)
+Stream<List<ConnectivityResult>> connectivityStream(Ref ref) =>
+    Connectivity().onConnectivityChanged;
