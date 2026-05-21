@@ -1,4 +1,5 @@
 import 'package:kegiatin/domain/usecases/base_usecase.dart';
+import 'package:kegiatin/presentation/controllers/attendance/my_attendance_controller.dart';
 import 'package:kegiatin/presentation/providers/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -15,7 +16,10 @@ class SyncController extends _$SyncController {
     final result = await useCase(NoInput.instance);
     state = result.fold(
       (failure) => AsyncError(failure, StackTrace.current),
-      (_) => const AsyncData(null),
+      (_) {
+        ref.invalidate(myAttendanceControllerProvider);
+        return const AsyncData(null);
+      },
     );
   }
 }

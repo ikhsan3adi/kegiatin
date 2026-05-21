@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/core/theme/custom.dart';
 import 'package:kegiatin/domain/entities/event.dart';
+import 'package:kegiatin/domain/enums/attendance_status.dart';
 import 'package:kegiatin/domain/enums/event_status.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
+import 'package:kegiatin/presentation/controllers/attendance/my_attendance_controller.dart';
 import 'package:kegiatin/presentation/controllers/rsvp/my_rsvp_controller.dart';
 
 /// Shared card for listing events (admin & peserta dashboards/lists).
@@ -171,12 +173,25 @@ class EventListCard extends ConsumerWidget {
     final myRsvps = ref.watch(myRsvpControllerProvider).value ?? [];
     final alreadyRsvp = myRsvps.any((rsvp) => rsvp.eventId == event.id);
 
+    final myAttendances = ref.watch(myAttendanceControllerProvider).value ?? [];
+    final alreadyAttended = myAttendances.any((att) {
+      return event.sessions.any((session) => att.sessionId == session.id) &&
+          (att.status == AttendanceStatus.present || att.status == AttendanceStatus.late);
+    });
+
     if (alreadyRsvp) {
-      // Jika sudah daftar, selalu tampilkan Lihat QR (fitur Absen belum ada)
-      bgColor = colorScheme.tertiaryContainer;
-      textColor = colorScheme.onTertiaryContainer;
-      text = 'Lihat QR';
-      icon = Icons.qr_code_2;
+      if (alreadyAttended) {
+        bgColor = colorScheme.primary.withValues(alpha: 0.1);
+        textColor = colorScheme.primary;
+        text = 'Sudah Hadir';
+        icon = Icons.check_circle_outline;
+      } else {
+        // Jika sudah daftar, selalu tampilkan Lihat QR
+        bgColor = colorScheme.tertiaryContainer;
+        textColor = colorScheme.onTertiaryContainer;
+        text = 'Lihat QR';
+        icon = Icons.qr_code_2;
+      }
     } else if (event.status == EventStatus.completed) {
       // Belum daftar & sudah selesai
       bgColor = colorScheme.surfaceContainerHighest;

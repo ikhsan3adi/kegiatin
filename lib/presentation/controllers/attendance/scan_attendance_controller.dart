@@ -1,5 +1,6 @@
 import 'package:kegiatin/domain/entities/attendance.dart';
 import 'package:kegiatin/domain/usecases/attendance/record_attendance_usecase.dart';
+import 'package:kegiatin/presentation/controllers/attendance/my_attendance_controller.dart';
 import 'package:kegiatin/presentation/providers/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -16,7 +17,10 @@ class ScanAttendanceController extends _$ScanAttendanceController {
     final result = await useCase(RecordAttendanceParams(qrToken: qrToken, sessionId: sessionId));
     state = result.fold(
       (failure) => AsyncError(failure, StackTrace.current),
-      (attendance) => AsyncData(attendance),
+      (attendance) {
+        ref.invalidate(myAttendanceControllerProvider);
+        return AsyncData(attendance);
+      },
     );
   }
 }
