@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kegiatin/domain/entities/event.dart';
+import 'package:kegiatin/domain/enums/attendance_status.dart';
 import 'package:kegiatin/domain/enums/event_status.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
 import 'package:kegiatin/domain/enums/event_visibility.dart';
+import 'package:kegiatin/presentation/controllers/attendance/my_attendance_controller.dart';
 import 'package:kegiatin/presentation/controllers/rsvp/create_rsvp_controller.dart';
 import 'package:kegiatin/presentation/controllers/rsvp/my_rsvp_controller.dart';
 
@@ -159,11 +161,25 @@ class _PesertaActionButton extends ConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final myRsvpAsync = ref.watch(myRsvpControllerProvider);
     final createState = ref.watch(createRsvpControllerProvider);
+    final myAttendanceAsync = ref.watch(myAttendanceControllerProvider);
 
     final isCreating = createState.isLoading;
     final alreadyRsvp = myRsvpAsync.value?.any((r) => r.eventId == event.id) ?? false;
+    final alreadyAttended = myAttendanceAsync.value?.any((att) {
+      return event.sessions.any((session) => att.sessionId == session.id) &&
+          (att.status == AttendanceStatus.present || att.status == AttendanceStatus.late);
+    }) ?? false;
 
     if (alreadyRsvp) {
+      if (alreadyAttended) {
+        return _ActionChip(
+          icon: Icons.check_circle_outline,
+          label: 'Sudah Hadir',
+          backgroundColor: colorScheme.primary.withValues(alpha: 0.1),
+          foregroundColor: colorScheme.primary,
+          onTap: () => context.go('/peserta/qr/${event.id}'),
+        );
+      }
       return _ActionChip(
         icon: Icons.qr_code_2,
         label: 'Lihat QR',
