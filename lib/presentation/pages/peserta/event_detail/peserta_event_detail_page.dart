@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/presentation/controllers/event/event_detail_controller.dart';
-import 'package:kegiatin/presentation/pages/peserta/widget/peserta_event_detail_body.dart';
-import 'package:kegiatin/presentation/pages/peserta/widget/peserta_event_detail_header.dart';
-import 'package:kegiatin/presentation/pages/peserta/widget/peserta_event_detail_listeners.dart';
+import 'widget/peserta_event_detail_body.dart';
+import 'widget/peserta_event_detail_header.dart';
+import 'widget/peserta_event_detail_listeners.dart';
 
 class PesertaEventDetailPage extends ConsumerWidget {
   const PesertaEventDetailPage({super.key, required this.eventId});

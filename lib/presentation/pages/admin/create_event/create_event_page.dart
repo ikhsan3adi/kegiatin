@@ -9,13 +9,13 @@ import 'package:kegiatin/presentation/controllers/event/create_event_controller.
 import 'package:kegiatin/presentation/widgets/gradient_header.dart';
 import 'package:kegiatin/presentation/widgets/section_label.dart';
 
-import 'create_event/shared.dart';
-import 'create_event/widget/event_form_actions.dart';
-import 'create_event/widget/event_form_header.dart';
-import 'create_event/widget/event_metadata_fields.dart';
-import 'create_event/widget/event_time_section.dart';
-import 'create_event/widget/event_type_selector.dart';
-import 'create_event/widget/event_series_settings.dart';
+import 'create_event_types.dart';
+import 'widget/event_form_actions.dart';
+import 'widget/event_form_header.dart';
+import 'widget/event_metadata_fields.dart';
+import 'widget/event_time_section.dart';
+import 'widget/event_type_selector.dart';
+import 'widget/event_series_settings.dart';
 
 /// Halaman form untuk membuat kegiatan baru.
 ///

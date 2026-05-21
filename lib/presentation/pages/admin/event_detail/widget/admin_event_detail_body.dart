@@ -7,8 +7,8 @@ import 'package:kegiatin/domain/enums/attendance_status.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
 import 'package:kegiatin/domain/enums/event_visibility.dart';
 import 'package:kegiatin/presentation/controllers/attendance/attendance_list_controller.dart';
-import 'package:kegiatin/presentation/pages/admin/widget/admin_rsvp_list.dart';
-import 'package:kegiatin/presentation/pages/admin/widget/session_management_section.dart';
+import 'admin_rsvp_list.dart';
+import 'session_management_section.dart';
 
 class AdminEventDetailBody extends ConsumerWidget {
   const AdminEventDetailBody({super.key, required this.event});

@@ -115,7 +115,7 @@ class _AdminDashboardPageState extends ConsumerState<AdminDashboardPage> {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Dashboard Admin',
+                  'Kalender Kegiatan',
                   style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -143,6 +143,7 @@ class _AdminDashboardPageState extends ConsumerState<AdminDashboardPage> {
                 ),
               ),
             ),
+            const SizedBox(height: 12),
 
             statsState.when(
               data: (stats) => Padding(
