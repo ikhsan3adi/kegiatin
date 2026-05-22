@@ -7,10 +7,10 @@ import 'package:kegiatin/presentation/controllers/event/complete_event_controlle
 import 'package:kegiatin/presentation/controllers/event/event_detail_controller.dart';
 import 'package:kegiatin/presentation/controllers/event/publish_event_controller.dart';
 import 'package:kegiatin/presentation/controllers/event/start_event_controller.dart';
-import 'package:kegiatin/presentation/pages/admin/widget/admin_event_detail_body.dart';
-import 'package:kegiatin/presentation/pages/admin/widget/admin_event_detail_bottom_bar.dart';
-import 'package:kegiatin/presentation/pages/admin/widget/admin_event_detail_header.dart';
-import 'package:kegiatin/presentation/pages/admin/widget/admin_event_detail_listeners.dart';
+import 'widget/admin_event_detail_body.dart';
+import 'widget/admin_event_detail_bottom_bar.dart';
+import 'widget/admin_event_detail_header.dart';
+import 'widget/admin_event_detail_listeners.dart';
 
 class AdminEventDetailPage extends ConsumerWidget {
   const AdminEventDetailPage({super.key, required this.eventId});
