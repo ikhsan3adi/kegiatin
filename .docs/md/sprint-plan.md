@@ -80,72 +80,101 @@
 
 ---
 
-## Sprint 3: Attendance + Offline + Sync
+## Sprint 3: Attendance + Offline + Sync + PCD Scanner
 
-**Tujuan:** Admin bisa scan QR secara offline, data tersinkronisasi otomatis saat online.
+**Tujuan:** Admin bisa scan QR secara offline, data tersinkronisasi otomatis saat online. PCD Document Scanner terintegrasi untuk materi kegiatan.
 
 ### Backlog
 
-| #   | Item                                                                            | Prioritas   |
-| --- | ------------------------------------------------------------------------------- | ----------- |
-| 1   | QR scan: Admin scan QR peserta via kamera (mobile_scanner)                      | Must Have   |
-| 2   | Validasi offline: Cek QR terhadap local cache Hive                              | Must Have   |
-| 3   | Record attendance: Simpan ke Hive dengan sync_status PENDING                    | Must Have   |
-| 4   | Deferred validation: Accept PENDING_VALIDATION jika QR tidak di cache + offline | Must Have   |
-| 5   | Sync engine: Auto-sync attendance saat device online                            | Should Have |
-| 6   | Sync backend: POST /attendance/sync (bulk validation)                           | Should Have |
-| 7   | Conflict resolution: Duplicate -> reject, Invalid QR -> no-show                 | Should Have |
-| 8   | Connectivity detection: Trigger sync saat network available                     | Should Have |
-| 9   | Admin: Rekap daftar hadir per sesi (read-only screen)                           | Should Have |
-| 10  | API lookup fallback: Jika QR tidak di cache + device online                     | Should Have |
-| 11  | Desain UI/UX: Scan screen + attendance list + sync indicator                    | Should Have |
-| 12  | Session Capacity Check: Implement Soft Warning UI jika kapasitas fisik penuh    | Should Have |
+| #   | Item                                                                            | Prioritas   | Status |
+| --- | ------------------------------------------------------------------------------- | ----------- | ------ |
+| 1   | QR scan: Admin scan QR peserta via kamera (`mobile_scanner`)                    | Must Have   | ✅ Done |
+| 2   | Validasi offline: Cek QR terhadap local cache Hive                              | Must Have   | ✅ Done |
+| 3   | Record attendance: Simpan ke Hive dengan sync_status PENDING                    | Must Have   | ✅ Done |
+| 4   | Deferred validation: Accept PENDING_VALIDATION jika QR tidak di cache + offline | Must Have   | ✅ Done |
+| 5   | Sync engine: Auto-sync attendance saat device online                            | Should Have | ✅ Done |
+| 6   | Sync backend: POST /attendance/sync (bulk validation)                           | Should Have | ✅ Done |
+| 7   | Conflict resolution: Duplicate -> reject, Invalid QR -> absent                  | Should Have | ✅ Done |
+| 8   | Connectivity detection: Trigger sync saat network available                     | Should Have | ✅ Done |
+| 9   | Admin: Rekap daftar hadir per sesi (read-only screen)                           | Should Have | ✅ Done |
+| 10  | API lookup fallback: Jika QR tidak di cache + device online                     | Should Have | ✅ Done |
+| 11  | API Search Users: Dukungan pencarian anggota untuk Invite Only Event            | Should Have | ✅ Done |
+| 12  | PCD: Integrasi `google_mlkit_document_scanner`                                  | Must Have   | ✅ Done |
+| 13  | PCD: Image Enhancement Pipeline (Histogram Eq + Unsharp Mask di Isolate)        | Must Have   | ✅ Done |
+| 14  | PCD: Enhancement Preview UI (3 Mode Toggle)                                     | Must Have   | ✅ Done |
+| 15  | PCD: Upload Materi Bottom Sheet (Scan + File + Link)                            | Must Have   | ✅ Done |
+| 16  | Session Capacity Check: Implement Soft Warning UI jika kapasitas fisik penuh    | Should Have | ⏳ Sprint 4 |
 
 ### Definition of Done
 - Admin bisa scan QR peserta dan mencatat kehadiran tanpa internet
 - QR yang ada di local cache langsung divalidasi dan di-record
-- QR yang tidak ada di cache saat offline diterima sebagai PENDING_VALIDATION
 - Saat device online, data attendance otomatis tersinkronisasi ke server
 - Server mendeteksi dan menolak duplicate attendance (userId + sessionId)
-- QR yang invalid saat deferred validation otomatis di-mark sebagai ABSENT
-- Admin bisa melihat rekap daftar hadir per sesi
-
-### Risiko
-- Sprint ini adalah yang paling kompleks secara teknis (offline + sync + conflict resolution)
-- Perlu testing menyeluruh untuk edge case: scan saat transisi online/offline, batch sync gagal di tengah
-- Jika beban terlalu berat, conflict resolution UI bisa di-defer ke Sprint 4
+- Admin bisa scan dokumen materi fisik dengan deteksi tepi dan perataan otomatis
+- Hasil scan dokumen dapat ditingkatkan kualitasnya (enhancement) sebelum digunakan
 
 ---
 
-## Sprint 4: History + Polish + Testing
+## Sprint 4: Archive + Riwayat + Profile + Polish + Testing
 
-**Tujuan:** Peserta bisa lihat riwayat kegiatan. Aplikasi stabil dan teruji.
+**Tujuan:** Fitur materi (archive) berjalan end-to-end, peserta bisa lihat riwayat kegiatan, modul server pendukung (profile, uploads) selesai, UI/UX di-polish, dan sistem teruji.
 
 ### Backlog
 
-| #   | Item                                                          | Prioritas   |
-| --- | ------------------------------------------------------------- | ----------- |
-| 1   | Peserta: Histori kegiatan + status kehadiran                  | Should Have |
-| 2   | Histori offline: Cache riwayat di Hive, akses tanpa internet  | Should Have |
-| 3   | Admin: Laporan daftar hadir per event (screen)                | Should Have |
-| 4   | Role-based dashboard: Tampilan berbeda Admin vs Peserta       | Should Have |
-| 5   | Error handling: Loading states, empty states, retry mechanism | Must Have   |
-| 6   | Unit test: Use Cases + Repository (mock dengan mocktail)      | Must Have   |
-| 7   | Integration test: Auth flow + RSVP flow + Scan flow           | Should Have |
-| 8   | Bug fixing dan polish UI                                      | Must Have   |
-| 9   | Dokumentasi: README, setup guide, API documentation           | Must Have   |
+#### Phase 1: Critical Fixes
+| #   | Item                                                                        | Prioritas |
+| --- | --------------------------------------------------------------------------- | --------- |
+| 1   | PCD Fix: Mencegah over-processing (set default `original` untuk ML Kit)     | Must Have |
+| 2   | QR Scan Fix: Tangani error agar lebih user-friendly (jangan expose failure) | Must Have |
+| 3   | Konfirmasi Dialog: Saat Admin melakukan Publish, Start, dan Selesai Event   | Must Have |
+| 4   | Konfirmasi Dialog: Saat Peserta melakukan RSVP                              | Must Have |
+
+#### Phase 2: Server Backend (Profile & Uploads)
+| #   | Item                                                                        | Prioritas |
+| --- | --------------------------------------------------------------------------- | --------- |
+| 5   | Server: Implementasi `profile.module` (GET/PATCH `/profile/me`)             | Must Have |
+| 6   | Server: Implementasi `GET /profile/history` (sesuai schema `ActivityRecord`)| Must Have |
+| 7   | Server: Implementasi `uploads.module` (POST `/uploads/image` multipart)     | Must Have |
+
+#### Phase 3: Server Backend (Archive)
+| #   | Item                                                                        | Prioritas |
+| --- | --------------------------------------------------------------------------- | --------- |
+| 8   | OpenAPI: Desain endpoint Archive (POST, GET, DELETE materi per session)     | Must Have |
+| 9   | Server: Implementasi `archives.module` sesuai desain OpenAPI terbaru        | Must Have |
+
+#### Phase 4: Flutter (Archive & Riwayat)
+| #   | Item                                                                        | Prioritas |
+| --- | --------------------------------------------------------------------------- | --------- |
+| 10  | Data Layer: `ArchiveModel` + DataSource + Repository + Use Cases            | Must Have |
+| 11  | UI: Sambungkan Upload Materi Bottom Sheet ke endpoint Archive sesungguhnya  | Must Have |
+| 12  | UI: Tampilkan daftar materi di halaman Detail Event                         | Must Have |
+| 13  | Data Layer: `ActivityRecord` model + History DataSource                     | Must Have |
+| 14  | UI: Halaman Riwayat Peserta (menampilkan histori + status kehadiran)        | Must Have |
+| 15  | UI: Akses materi dari Riwayat (hanya untuk peserta yang hadir/terlambat)    | Should Have |
+| 16  | UI: Hapus pilihan sesi saat upload materi untuk Single Event                | Should Have |
+
+#### Phase 5: PCD & UX Polish
+| #   | Item                                                                        | Prioritas |
+| --- | --------------------------------------------------------------------------- | --------- |
+| 17  | Fitur: Gunakan Smart Camera (`CameraMode.photo`) untuk upload Banner Event  | Should Have |
+| 18  | UI: Sembunyikan section "Sesi" di Detail Event untuk tipe Single Event      | Should Have |
+| 19  | UI: Pindahkan Daftar Hadir & Peserta ke sub-halaman agar scroll tidak dalam | Should Have |
+| 20  | UI: Konsistensi heading dan hapus hardcoded colors (gunakan colorScheme)    | Should Have |
+| 21  | UI: Fitur pencarian kegiatan di halaman QR Scan (menggunakan `GET /events`) | Should Have |
+
+#### Phase 6: Testing & Docs
+| #   | Item                                                                        | Prioritas |
+| --- | --------------------------------------------------------------------------- | --------- |
+| 22  | Unit test: PCD pipeline (`ImageEnhancer`) dan Use Cases                     | Must Have |
+| 23  | Audit: Pastikan ada loading/empty/error states di semua screen              | Must Have |
+| 24  | Dokumentasi: README dan panduan setup                                       | Must Have |
 
 ### Definition of Done
-- Peserta bisa melihat daftar kegiatan yang pernah diikuti beserta status kehadiran
-- Riwayat kegiatan bisa diakses offline dari cache Hive
-- Dashboard menampilkan konten yang sesuai role (Admin: kelola event, Peserta: riwayat + RSVP)
-- Semua screen memiliki loading state, empty state, dan error state yang proper
-- Minimal 1 unit test per Use Case dan 1 per Repository
-- Tidak ada crash atau unhandled exception pada happy path dan common error path
-
-### Risiko
-- Testing dari nol di sprint terakhir bisa kekurangan waktu
-- Sebaiknya test infrastructure (mock setup, test helpers) disiapkan sejak Sprint 1
+- Admin dapat mengunggah materi (via scan PCD, file, atau link) yang terhubung ke server.
+- Peserta dapat melihat daftar kegiatan yang pernah diikuti beserta status kehadirannya.
+- Endpoint profil, histori, dan upload gambar di server telah berfungsi.
+- Semua tindakan destruktif/kritis (seperti membatalkan RSVP atau merilis kegiatan) memunculkan dialog konfirmasi.
+- Tidak ada crash atau unhandled exception pada skenario happy path maupun common error path.
 
 ---
 
@@ -155,9 +184,10 @@ Fitur-fitur berikut tidak masuk ke 4 sprint utama. Dikerjakan jika ada waktu ter
 
 | Fitur                      | Referensi | Catatan                                      |
 | -------------------------- | --------- | -------------------------------------------- |
-| Upload materi/dokumentasi  | UR-09/10  | Archive module sudah di-design di arsitektur |
 | Statistik & visualisasi    | UR-11     | Grafik jumlah peserta di dashboard admin     |
 | Auto-fill NPA via API      | -         | Integrasi API NPA organisasi                 |
 | Ekspor laporan (PDF/Excel) | UR-13     | Server-side report generation                |
 | Google OAuth login         | UR-01     | Tambahan di atas email/password              |
 | Push notification (FCM/WS) | UC-01/04  | Delivery mechanism TBD                       |
+| Caching Dashboard          | -         | Untuk menghindari fetch ulang yang berlebihan|
+| Soft Warning Kapasitas Sesi| -         | Peringatan bila jumlah RSVP mendekati batas  |
