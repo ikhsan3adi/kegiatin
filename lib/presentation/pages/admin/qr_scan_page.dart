@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/core/errors/failures.dart';
@@ -5,7 +7,6 @@ import 'package:kegiatin/core/theme/custom.dart';
 import 'package:kegiatin/domain/entities/attendance.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/entities/session.dart';
-import 'package:kegiatin/domain/entities/paginated_result.dart';
 import 'package:kegiatin/presentation/controllers/attendance/attendance_list_controller.dart';
 import 'package:kegiatin/presentation/controllers/attendance/scan_attendance_controller.dart';
 import 'package:kegiatin/presentation/controllers/event/event_list_controller.dart';
@@ -116,17 +117,12 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
         ref.invalidate(attendanceListControllerProvider(_selectedSession!.id));
       }
     });
-
-    // Watch event list — ambil semua (limit tinggi) tanpa filter agar dropdown lengkap
-    final eventsAsync = ref.watch(eventListControllerProvider(limit: 100));
-
     return Scaffold(
       backgroundColor: colorScheme.surface,
       body: Column(
         children: [
           // Header melengkung
           _ScanHeader(
-            eventsAsync: eventsAsync,
             selectedEvent: _selectedEvent,
             selectedSession: _selectedSession,
             totalScanned: _totalScanned,
@@ -142,7 +138,6 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
             },
             onSessionChanged: (session) => setState(() => _selectedSession = session),
             onBack: () => Navigator.of(context).pop(),
-            onRetry: () => ref.invalidate(eventListControllerProvider(limit: 100)),
           ),
 
           // TabBar
@@ -191,24 +186,20 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
 // Header
 class _ScanHeader extends StatelessWidget {
   const _ScanHeader({
-    required this.eventsAsync,
     required this.selectedEvent,
     required this.selectedSession,
     required this.totalScanned,
     required this.onEventChanged,
     required this.onSessionChanged,
     required this.onBack,
-    required this.onRetry,
   });
 
-  final AsyncValue<PaginatedResult<Event>> eventsAsync;
   final Event? selectedEvent;
   final Session? selectedSession;
   final int totalScanned;
   final ValueChanged<Event?> onEventChanged;
   final ValueChanged<Session?> onSessionChanged;
   final VoidCallback onBack;
-  final VoidCallback onRetry;
 
   @override
   Widget build(BuildContext context) {
@@ -264,15 +255,10 @@ class _ScanHeader extends StatelessWidget {
               ),
               const SizedBox(height: 12),
 
-              // Dropdown kegiatan aktif dari database
+              // Dropdown kegiatan aktif dari database dengan pencarian bottom sheet
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: _EventDropdown(
-                  eventsAsync: eventsAsync,
-                  selected: selectedEvent,
-                  onChanged: onEventChanged,
-                  onRetry: onRetry,
-                ),
+                child: _EventDropdown(selected: selectedEvent, onChanged: onEventChanged),
               ),
 
               // Dropdown sesi kegiatan jika ada kegiatan terpilih dan memiliki sesi
@@ -295,163 +281,28 @@ class _ScanHeader extends StatelessWidget {
   }
 }
 
-/// Dropdown pemilih kegiatan dari database dengan state loading/error/data.
-class _EventDropdown extends StatelessWidget {
-  const _EventDropdown({
-    required this.eventsAsync,
-    required this.selected,
-    required this.onChanged,
-    required this.onRetry,
-  });
+/// Dropdown pemilih kegiatan dari database menggunakan Bottom Sheet.
+class _EventDropdown extends ConsumerWidget {
+  const _EventDropdown({required this.selected, required this.onChanged});
 
-  final AsyncValue<PaginatedResult<Event>> eventsAsync;
   final Event? selected;
   final ValueChanged<Event?> onChanged;
-  final VoidCallback onRetry;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final textTheme = Theme.of(context).textTheme;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-      decoration: BoxDecoration(
-        color: KegiatinCustomTheme.glassInput,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: KegiatinCustomTheme.glassInputBorder),
-      ),
-      child: eventsAsync.when(
-        loading: () => _buildLoadingState(textTheme),
-        error: (_, _) => _buildErrorState(textTheme),
-        data: (result) {
-          final events = result.data;
-          return _buildDropdown(context, textTheme, events);
-        },
-      ),
-    );
-  }
-
-  Widget _buildLoadingState(TextTheme textTheme) {
-    return SizedBox(
-      height: 40,
-      child: Row(
-        children: [
-          const Icon(
-            Icons.event_note_outlined,
-            size: 16,
-            color: KegiatinCustomTheme.onGradientSecondary,
-          ),
-          const SizedBox(width: 8),
-          Text(
-            'Memuat kegiatan...',
-            style: textTheme.bodyMedium?.copyWith(color: KegiatinCustomTheme.onGradientSecondary),
-          ),
-          const Spacer(),
-          const SizedBox(
-            width: 16,
-            height: 16,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              color: KegiatinCustomTheme.onGradientSecondary,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildErrorState(TextTheme textTheme) {
-    return SizedBox(
-      height: 40,
-      child: Row(
-        children: [
-          const Icon(Icons.error_outline, size: 16, color: KegiatinCustomTheme.onGradientSecondary),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              'Gagal memuat kegiatan',
-              style: textTheme.bodyMedium?.copyWith(color: KegiatinCustomTheme.onGradientSecondary),
-            ),
-          ),
-          TextButton(
-            onPressed: onRetry,
-            style: TextButton.styleFrom(
-              foregroundColor: KegiatinCustomTheme.onGradient,
-              padding: EdgeInsets.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              minimumSize: Size.zero,
-            ),
-            child: Text(
-              'Coba lagi',
-              style: textTheme.labelSmall?.copyWith(color: KegiatinCustomTheme.onGradient),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDropdown(BuildContext context, TextTheme textTheme, List<Event> events) {
-    if (events.isEmpty) {
-      return SizedBox(
-        height: 40,
-        child: Row(
-          children: [
-            const Icon(
-              Icons.event_busy_outlined,
-              size: 16,
-              color: KegiatinCustomTheme.onGradientSecondary,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              'Belum ada kegiatan tersedia',
-              style: textTheme.bodyMedium?.copyWith(color: KegiatinCustomTheme.onGradientSecondary),
-            ),
-          ],
+    return InkWell(
+      onTap: () => _showSearchBottomSheet(context, ref),
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: KegiatinCustomTheme.glassInput,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: KegiatinCustomTheme.glassInputBorder),
         ),
-      );
-    }
-
-    // Pastikan nilai selected masih valid setelah data dimuat
-    final validSelected = events.any((e) => e.id == selected?.id) ? selected : null;
-
-    return DropdownButtonHideUnderline(
-      child: DropdownButton<Event>(
-        value: validSelected,
-        dropdownColor: KegiatinCustomTheme.appBarTop,
-        iconEnabledColor: KegiatinCustomTheme.onGradient,
-        isExpanded: true,
-        icon: const Icon(Icons.keyboard_arrow_down_rounded),
-        style: textTheme.bodyMedium?.copyWith(color: KegiatinCustomTheme.onGradient),
-        items: events
-            .map(
-              (e) => DropdownMenuItem<Event>(
-                value: e,
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.event_note_outlined,
-                      size: 16,
-                      color: KegiatinCustomTheme.onGradientSecondary,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        e.title,
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: KegiatinCustomTheme.onGradient,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            )
-            .toList(),
-        onChanged: onChanged,
-        hint: Row(
+        child: Row(
           children: [
             const Icon(
               Icons.event_note_outlined,
@@ -459,13 +310,156 @@ class _EventDropdown extends StatelessWidget {
               color: KegiatinCustomTheme.onGradientSecondary,
             ),
             const SizedBox(width: 8),
-            Text(
-              'Pilih Kegiatan',
-              style: textTheme.bodyMedium?.copyWith(color: KegiatinCustomTheme.onGradientSecondary),
+            Expanded(
+              child: Text(
+                selected?.title ?? 'Pilih Kegiatan',
+                style: textTheme.bodyMedium?.copyWith(
+                  color: selected != null
+                      ? KegiatinCustomTheme.onGradient
+                      : KegiatinCustomTheme.onGradientSecondary,
+                  fontWeight: selected != null ? FontWeight.w500 : FontWeight.normal,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
+            const Icon(Icons.keyboard_arrow_down_rounded, color: KegiatinCustomTheme.onGradient),
           ],
         ),
       ),
+    );
+  }
+
+  void _showSearchBottomSheet(BuildContext context, WidgetRef ref) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _EventSearchBottomSheet(onSelected: onChanged),
+    );
+  }
+}
+
+class _EventSearchBottomSheet extends ConsumerStatefulWidget {
+  const _EventSearchBottomSheet({required this.onSelected});
+
+  final ValueChanged<Event?> onSelected;
+
+  @override
+  ConsumerState<_EventSearchBottomSheet> createState() => _EventSearchBottomSheetState();
+}
+
+class _EventSearchBottomSheetState extends ConsumerState<_EventSearchBottomSheet> {
+  final _searchController = TextEditingController();
+  String _searchQuery = '';
+  Timer? _debounce;
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      setState(() {
+        _searchQuery = query;
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    final eventsState = ref.watch(
+      eventListControllerProvider(limit: 20, search: _searchQuery.isEmpty ? null : _searchQuery),
+    );
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.7,
+      maxChildSize: 0.9,
+      minChildSize: 0.5,
+      builder: (context, scrollController) {
+        return Container(
+          decoration: BoxDecoration(
+            color: colorScheme.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          ),
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+          child: Column(
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: colorScheme.outlineVariant,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+              Text(
+                'Cari Kegiatan',
+                style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _searchController,
+                onChanged: _onSearchChanged,
+                autofocus: true,
+                decoration: InputDecoration(
+                  hintText: 'Masukkan nama kegiatan...',
+                  prefixIcon: const Icon(Icons.search),
+                  suffixIcon: _searchController.text.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            _searchController.clear();
+                            _onSearchChanged('');
+                          },
+                        )
+                      : null,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: eventsState.when(
+                  data: (paginated) {
+                    final events = paginated.data;
+                    if (events.isEmpty) {
+                      return const Center(child: Text('Kegiatan tidak ditemukan'));
+                    }
+                    return ListView.builder(
+                      controller: scrollController,
+                      itemCount: events.length,
+                      itemBuilder: (context, index) {
+                        final event = events[index];
+                        return ListTile(
+                          title: Text(event.title),
+                          subtitle: Text(event.location),
+                          leading: const Icon(Icons.event),
+                          onTap: () {
+                            widget.onSelected(event);
+                            Navigator.pop(context);
+                          },
+                        );
+                      },
+                    );
+                  },
+                  loading: () => const Center(child: CircularProgressIndicator()),
+                  error: (e, _) => Center(child: Text('Gagal memuat: $e')),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

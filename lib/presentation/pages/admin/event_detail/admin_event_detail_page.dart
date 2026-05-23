@@ -8,6 +8,7 @@ import 'package:kegiatin/presentation/controllers/event/event_detail_controller.
 import 'package:kegiatin/presentation/controllers/event/publish_event_controller.dart';
 import 'package:kegiatin/presentation/controllers/event/start_event_controller.dart';
 
+import 'widget/admin_event_attendance_body.dart';
 import 'widget/admin_event_detail_body.dart';
 import 'widget/admin_event_detail_bottom_bar.dart';
 import 'widget/admin_event_detail_header.dart';
@@ -75,37 +76,43 @@ class _AdminEventDetailLoaded extends ConsumerWidget {
     final cancelState = ref.watch(cancelEventControllerProvider);
 
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
     return AdminEventDetailListeners(
       eventId: event.id,
-      child: Scaffold(
-        backgroundColor: colorScheme.surfaceContainer,
-        body: Column(
-          children: [
-            AdminEventDetailHeader(event: event),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Center(
-                child: Text(
-                  'Detail Kegiatan (Admin)',
-                  style: textTheme.titleLarge?.copyWith(
-                    color: colorScheme.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
+      child: DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          backgroundColor: colorScheme.surfaceContainer,
+          body: Column(
+            children: [
+              AdminEventDetailHeader(event: event),
+              TabBar(
+                tabs: const [
+                  Tab(text: 'Informasi'),
+                  Tab(text: 'Kehadiran & Peserta'),
+                ],
+                labelColor: colorScheme.primary,
+                unselectedLabelColor: colorScheme.onSurfaceVariant,
+                indicatorColor: colorScheme.primary,
+                indicatorSize: TabBarIndicatorSize.tab,
+              ),
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    AdminEventDetailBody(event: event),
+                    AdminEventAttendanceBody(event: event),
+                  ],
                 ),
               ),
-            ),
-            Expanded(child: AdminEventDetailBody(event: event)),
-            AdminEventDetailBottomBar(
-              event: event,
-              isPublishing: publishState.isLoading,
-              isStarting: startState.isLoading,
-              isCompleting: completeState.isLoading,
-              isCancelling: cancelState.isLoading,
-            ),
-          ],
+              AdminEventDetailBottomBar(
+                event: event,
+                isPublishing: publishState.isLoading,
+                isStarting: startState.isLoading,
+                isCompleting: completeState.isLoading,
+                isCancelling: cancelState.isLoading,
+              ),
+            ],
+          ),
         ),
       ),
     );
