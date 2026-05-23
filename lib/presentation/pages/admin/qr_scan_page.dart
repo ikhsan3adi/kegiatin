@@ -40,21 +40,7 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
 
   Future<void> _preloadRsvpForEvent(String eventId) async {
     try {
-      final result = await ref.read(eventRsvpListControllerProvider(eventId).future);
-      final localDataSource = ref.read(rsvpLocalDataSourceProvider);
-      final rsvpModels = result.data
-          .map(
-            (r) => RsvpModel(
-              id: r.id,
-              userId: r.userId,
-              eventId: r.eventId,
-              qrToken: r.qrToken,
-              status: r.status,
-              createdAt: r.createdAt,
-            ),
-          )
-          .toList();
-      await localDataSource.cacheRsvps(eventId, rsvpModels);
+      await ref.read(eventRsvpListControllerProvider(eventId).future);
     } catch (_) {}
   }
 
@@ -105,6 +91,7 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
         } else {
           message = error.toString();
         }
+        message = message.replaceAll(RegExp(r'^[a-zA-Z]+Failure:\s*'), '').trim();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(

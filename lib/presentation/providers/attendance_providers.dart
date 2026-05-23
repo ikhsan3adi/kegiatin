@@ -9,6 +9,7 @@ import 'package:kegiatin/domain/usecases/attendance/get_session_attendance_useca
 import 'package:kegiatin/domain/usecases/attendance/record_attendance_usecase.dart';
 import 'package:kegiatin/domain/usecases/attendance/sync_attendance_usecase.dart';
 import 'package:kegiatin/presentation/providers/core_providers.dart';
+import 'package:kegiatin/presentation/providers/rsvp_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'attendance_providers.g.dart';
@@ -29,6 +30,7 @@ AttendanceRepository attendanceRepository(Ref ref) => AttendanceRepositoryImpl(
   remoteDataSource: ref.watch(attendanceRemoteDataSourceProvider),
   localDataSource: ref.watch(attendanceLocalDataSourceProvider),
   networkInfo: ref.watch(networkInfoProvider),
+  rsvpLocalDataSource: ref.watch(rsvpLocalDataSourceProvider),
 );
 
 @riverpod

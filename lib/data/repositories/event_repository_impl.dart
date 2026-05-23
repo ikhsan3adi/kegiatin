@@ -23,6 +23,51 @@ class EventRepositoryImpl implements EventRepository {
     required this.networkInfo,
   });
 
+  List<Event> _filterEvents(
+    List<Event> events, {
+    EventStatus? status,
+    EventType? type,
+    String? search,
+  }) {
+    var result = events;
+    if (status != null) {
+      result = result.where((e) => e.status == status).toList();
+    }
+    if (type != null) {
+      result = result.where((e) => e.type == type).toList();
+    }
+    if (search != null && search.isNotEmpty) {
+      final query = search.toLowerCase();
+      result = result
+          .where(
+            (e) =>
+                e.title.toLowerCase().contains(query) ||
+                e.description.toLowerCase().contains(query) ||
+                e.location.toLowerCase().contains(query),
+          )
+          .toList();
+    }
+    return result;
+  }
+
+  PaginatedResult<Event> _paginateEvents(
+    List<Event> events, {
+    required int page,
+    required int limit,
+  }) {
+    final startIndex = (page - 1) * limit;
+    if (startIndex >= events.length) {
+      return PaginatedResult<Event>(data: [], total: events.length, page: page, limit: limit);
+    }
+    final endIndex = (startIndex + limit) > events.length ? events.length : (startIndex + limit);
+    return PaginatedResult<Event>(
+      data: events.sublist(startIndex, endIndex),
+      total: events.length,
+      page: page,
+      limit: limit,
+    );
+  }
+
   @override
   Future<Either<Failure, PaginatedResult<Event>>> getEvents({
     int page = 1,
@@ -35,9 +80,8 @@ class EventRepositoryImpl implements EventRepository {
     if (!forceRefresh) {
       final cached = await localDataSource.getCachedEvents();
       if (cached.isNotEmpty) {
-        return Right(
-          PaginatedResult<Event>(data: cached, total: cached.length, page: 1, limit: cached.length),
-        );
+        final filtered = _filterEvents(cached, status: status, type: type, search: search);
+        return Right(_paginateEvents(filtered, page: page, limit: limit));
       }
     }
 
@@ -63,14 +107,8 @@ class EventRepositoryImpl implements EventRepository {
         if (!forceRefresh) {
           final cached = await localDataSource.getCachedEvents();
           if (cached.isNotEmpty) {
-            return Right(
-              PaginatedResult<Event>(
-                data: cached,
-                total: cached.length,
-                page: 1,
-                limit: cached.length,
-              ),
-            );
+            final filtered = _filterEvents(cached, status: status, type: type, search: search);
+            return Right(_paginateEvents(filtered, page: page, limit: limit));
           }
         }
         return Left(ServerFailure(e.message, statusCode: e.statusCode));
@@ -78,9 +116,8 @@ class EventRepositoryImpl implements EventRepository {
     }
     final cached = await localDataSource.getCachedEvents();
     if (cached.isNotEmpty) {
-      return Right(
-        PaginatedResult<Event>(data: cached, total: cached.length, page: 1, limit: cached.length),
-      );
+      final filtered = _filterEvents(cached, status: status, type: type, search: search);
+      return Right(_paginateEvents(filtered, page: page, limit: limit));
     }
     return const Left(NetworkFailure());
   }

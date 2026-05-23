@@ -8,8 +8,9 @@ class GetHistoryParams {
   final int page;
   final int limit;
   final String? search;
+  final bool forceRefresh;
 
-  const GetHistoryParams({this.page = 1, this.limit = 20, this.search});
+  const GetHistoryParams({this.page = 1, this.limit = 20, this.search, this.forceRefresh = false});
 }
 
 class GetHistoryUseCase extends UseCase<List<ActivityRecord>, GetHistoryParams> {
@@ -19,6 +20,11 @@ class GetHistoryUseCase extends UseCase<List<ActivityRecord>, GetHistoryParams> 
 
   @override
   Future<Either<Failure, List<ActivityRecord>>> call(GetHistoryParams params) async {
-    return repository.getHistory(page: params.page, limit: params.limit, search: params.search);
+    return repository.getHistory(
+      page: params.page,
+      limit: params.limit,
+      search: params.search,
+      forceRefresh: params.forceRefresh,
+    );
   }
 }

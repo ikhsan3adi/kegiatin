@@ -94,12 +94,57 @@ class RsvpRepositoryImpl implements RsvpRepository {
           limit: limit,
           search: search,
         );
+        await localDataSource.cacheRsvps(eventId, result.data.toList());
         return Right(result);
       } on ServerException catch (e) {
+        final cached = await localDataSource.getCachedRsvps(eventId);
+        if (cached.isNotEmpty) {
+          var filtered = cached;
+          if (search != null && search.isNotEmpty) {
+            final query = search.toLowerCase();
+            filtered = filtered
+                .where(
+                  (r) =>
+                      r.user.displayName.toLowerCase().contains(query) ||
+                      (r.user.npa?.toLowerCase().contains(query) ?? false),
+                )
+                .toList();
+          }
+          return Right(
+            PaginatedResult<RsvpWithUser>(
+              data: filtered,
+              total: filtered.length,
+              page: page,
+              limit: limit,
+            ),
+          );
+        }
         return Left(ServerFailure(e.message, statusCode: e.statusCode));
       } catch (e) {
         return Left(ServerFailure(e.toString()));
       }
+    }
+    final cached = await localDataSource.getCachedRsvps(eventId);
+    if (cached.isNotEmpty) {
+      var filtered = cached;
+      if (search != null && search.isNotEmpty) {
+        final query = search.toLowerCase();
+        filtered = filtered
+            .where(
+              (r) =>
+                  r.user.displayName.toLowerCase().contains(query) ||
+                  (r.user.npa?.toLowerCase().contains(query) ?? false),
+            )
+            .toList();
+      }
+      return Right(
+        PaginatedResult<RsvpWithUser>(
+          data: filtered,
+          total: filtered.length,
+          page: page,
+          limit: limit,
+        ),
+      );
     }
     return const Left(NetworkFailure());
   }

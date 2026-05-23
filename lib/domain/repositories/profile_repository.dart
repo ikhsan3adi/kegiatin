@@ -10,5 +10,6 @@ abstract class ProfileRepository {
     int page = 1,
     int limit = 20,
     String? search,
+    bool forceRefresh = false,
   });
 }

@@ -33,9 +33,40 @@ class ProfileRepositoryImpl implements ProfileRepository {
     int page = 1,
     int limit = 20,
     String? search,
+    bool forceRefresh = false,
   }) async {
     final cacheKey = 'p${page}_l${limit}_${search ?? ''}';
     if (await networkInfo.isConnected) {
+      if (forceRefresh) {
+        try {
+          final models = await historyRemoteDataSource.getHistory(
+            page: page,
+            limit: limit,
+            search: search,
+          );
+          await historyLocalDataSource.cacheHistory(cacheKey, models);
+          return Right(
+            models
+                .map(
+                  (m) => ActivityRecord(
+                    event: m.event,
+                    attendancePerSession: m.attendancePerSession
+                        .map(
+                          (a) => SessionAttendance(
+                            session: a.session,
+                            status: a.status,
+                            checkedInAt: a.checkedInAt,
+                          ),
+                        )
+                        .toList(),
+                  ),
+                )
+                .toList(),
+          );
+        } on Exception catch (e) {
+          return Left(ServerFailure(e.toString()));
+        }
+      }
       try {
         final models = await historyRemoteDataSource.getHistory(
           page: page,

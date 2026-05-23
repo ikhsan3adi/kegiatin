@@ -24,7 +24,7 @@ abstract class EventModel with _$EventModel implements Event {
     @JsonKey(fromJson: stringFromJson) required String contactPerson,
     String? imageUrl,
     int? maxParticipants,
-    required String createdBy,
+    @JsonKey(fromJson: stringFromJson) required String createdBy,
     @Default([]) List<SessionModel> sessions,
     required DateTime createdAt,
     required DateTime updatedAt,
