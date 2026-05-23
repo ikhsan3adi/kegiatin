@@ -87,9 +87,7 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
               children: [
                 const Icon(Icons.error_outline, color: KegiatinCustomTheme.onGradient, size: 20),
                 const SizedBox(width: 10),
-                Expanded(
-                  child: Text(message, maxLines: 2, overflow: TextOverflow.ellipsis),
-                ),
+                Expanded(child: Text(message, maxLines: 2, overflow: TextOverflow.ellipsis)),
               ],
             ),
             backgroundColor: colorScheme.error,

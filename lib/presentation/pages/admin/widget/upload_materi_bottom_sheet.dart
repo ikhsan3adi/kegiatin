@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -6,6 +7,8 @@ import 'package:kegiatin/core/pcd/enhancement_options.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/entities/processed_image.dart';
 import 'package:kegiatin/domain/entities/session.dart';
+import 'package:kegiatin/domain/enums/archive_type.dart';
+import 'package:kegiatin/presentation/controllers/archive/upload_materi_controller.dart';
 import 'package:kegiatin/presentation/widgets/smart_camera_launcher.dart';
 
 class UploadMateriBottomSheet extends ConsumerStatefulWidget {
@@ -22,7 +25,6 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
   Session? _selectedSession;
   final _titleController = TextEditingController();
   final _linkController = TextEditingController();
-
   ProcessedImage? _scannedFile;
 
   @override
@@ -49,10 +51,58 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
     }
   }
 
+  Future<void> _handleUpload() async {
+    if (_selectedSession == null || _titleController.text.trim().isEmpty) {
+      unawaited(
+        showDialog(
+          context: context,
+          builder: (_) => const AlertDialog(
+            title: Text('Lengkapi Data'),
+            content: Text('Pilih sesi dan masukkan judul materi.'),
+          ),
+        ),
+      );
+      return;
+    }
+
+    final uploadCtrl = ref.read(uploadMateriControllerProvider.notifier);
+    await uploadCtrl.upload(
+      UploadMateriArgs(
+        sessionId: _selectedSession!.id,
+        title: _titleController.text.trim(),
+        type: _selectedType == 'FILE' ? ArchiveType.material : ArchiveType.material,
+        filePath: _scannedFile?.filePath,
+        linkUrl: _selectedType == 'LINK' ? _linkController.text.trim() : null,
+      ),
+    );
+
+    if (!mounted) return;
+    await Future.microtask(() {});
+    if (!mounted) return;
+    final currentState = ref.read(uploadMateriControllerProvider);
+    currentState.whenOrNull(
+      error: (err, _) {
+        unawaited(
+          showDialog(
+            context: context,
+            builder: (_) => AlertDialog(title: const Text('Gagal'), content: Text('$err')),
+          ),
+        );
+      },
+      data: (_) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Materi berhasil diunggah')));
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final uploadState = ref.watch(uploadMateriControllerProvider);
 
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
@@ -73,7 +123,6 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
                 ),
               ),
             ),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -90,7 +139,6 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
               ],
             ),
             const SizedBox(height: 24),
-
             if (_availableSessions.length > 1) ...[
               InputDecorator(
                 decoration: InputDecoration(
@@ -118,7 +166,6 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
               ),
               const SizedBox(height: 16),
             ],
-
             TextField(
               controller: _titleController,
               decoration: InputDecoration(
@@ -129,7 +176,6 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
               ),
             ),
             const SizedBox(height: 24),
-
             Text('Tipe Materi', style: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             SegmentedButton<String>(
@@ -147,7 +193,6 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
               },
             ),
             const SizedBox(height: 16),
-
             if (_selectedType == 'FILE') ...[
               if (_scannedFile != null) ...[
                 ClipRRect(
@@ -242,19 +287,22 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
                 ),
               ),
             const SizedBox(height: 32),
-
             FilledButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
+              onPressed: uploadState.isLoading ? null : _handleUpload,
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              child: const Text(
-                'Unggah Materi',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
+              child: uploadState.isLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text(
+                      'Unggah Materi',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
             ),
           ],
         ),

@@ -67,225 +67,223 @@ class AdminEventDetailBottomBar extends ConsumerWidget {
               ),
             ),
             const SizedBox(width: 8),
-if (isDraft) ...[
-               Expanded(
-                 child: FilledButton.icon(
-                   onPressed: isPublishing
-                       ? null
-                       : () => _confirmPublish(context, ref),
-                   icon: isPublishing
-                       ? const SizedBox(
-                           width: 18,
-                           height: 18,
-                           child: CircularProgressIndicator(strokeWidth: 2),
-                         )
-                       : const Icon(Icons.publish_rounded, size: 18),
-                   label: Text(isPublishing ? 'Loading...' : 'Publish'),
-                   style: FilledButton.styleFrom(
-                     backgroundColor: colorScheme.tertiary,
-                     foregroundColor: colorScheme.onTertiary,
-                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                     padding: const EdgeInsets.symmetric(vertical: 16),
-                   ),
-                 ),
-               ),
-               const SizedBox(width: 8),
-               FilledButton(
-                 onPressed: isCancelling ? null : () => _confirmCancel(context, ref),
-                 style: FilledButton.styleFrom(
-                   backgroundColor: colorScheme.errorContainer,
-                   foregroundColor: colorScheme.onErrorContainer,
-                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                   padding: const EdgeInsets.all(16),
-                   minimumSize: const Size(0, 0),
-                 ),
-                 child: isCancelling
-                     ? const SizedBox(
-                         width: 20,
-                         height: 20,
-                         child: CircularProgressIndicator(strokeWidth: 2),
-                       )
-                     : const Icon(Icons.cancel_outlined, size: 20),
-               ),
-             ],
-if (isPublished) ...[
-               const SizedBox(width: 8),
-               Expanded(
-                 child: FilledButton.icon(
-                   onPressed: isStarting
-                       ? null
-                       : () => _confirmStart(context, ref),
-                   icon: isStarting
-                       ? const SizedBox(
-                           width: 18,
-                           height: 18,
-                           child: CircularProgressIndicator(strokeWidth: 2),
-                         )
-                       : const Icon(Icons.play_arrow_rounded, size: 18),
-                   label: Text(isStarting ? 'Loading...' : 'Mulai'),
-                   style: FilledButton.styleFrom(
-                     backgroundColor: colorScheme.tertiary,
-                     foregroundColor: colorScheme.onTertiary,
-                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                     padding: const EdgeInsets.symmetric(vertical: 16),
-                   ),
-                 ),
-               ),
-             ],
-if (isOngoing) ...[
-               const SizedBox(width: 8),
-               Expanded(
-                 child: FilledButton.icon(
-                   onPressed: isCompleting
-                       ? null
-                       : () => _confirmComplete(context, ref),
-                   icon: isCompleting
-                       ? const SizedBox(
-                           width: 18,
-                           height: 18,
-                           child: CircularProgressIndicator(strokeWidth: 2),
-                         )
-                       : const Icon(Icons.check_circle_outline, size: 18),
-                   label: Text(isCompleting ? 'Loading...' : 'Selesai'),
-                   style: FilledButton.styleFrom(
-                     backgroundColor: colorScheme.tertiary,
-                     foregroundColor: colorScheme.onTertiary,
-                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                     padding: const EdgeInsets.symmetric(vertical: 16),
-                   ),
-                 ),
-               ),
-             ],
+            if (isDraft) ...[
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: isPublishing ? null : () => _confirmPublish(context, ref),
+                  icon: isPublishing
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.publish_rounded, size: 18),
+                  label: Text(isPublishing ? 'Loading...' : 'Publish'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: colorScheme.tertiary,
+                    foregroundColor: colorScheme.onTertiary,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              FilledButton(
+                onPressed: isCancelling ? null : () => _confirmCancel(context, ref),
+                style: FilledButton.styleFrom(
+                  backgroundColor: colorScheme.errorContainer,
+                  foregroundColor: colorScheme.onErrorContainer,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding: const EdgeInsets.all(16),
+                  minimumSize: const Size(0, 0),
+                ),
+                child: isCancelling
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.cancel_outlined, size: 20),
+              ),
+            ],
+            if (isPublished) ...[
+              const SizedBox(width: 8),
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: isStarting ? null : () => _confirmStart(context, ref),
+                  icon: isStarting
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.play_arrow_rounded, size: 18),
+                  label: Text(isStarting ? 'Loading...' : 'Mulai'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: colorScheme.tertiary,
+                    foregroundColor: colorScheme.onTertiary,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                ),
+              ),
+            ],
+            if (isOngoing) ...[
+              const SizedBox(width: 8),
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: isCompleting ? null : () => _confirmComplete(context, ref),
+                  icon: isCompleting
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.check_circle_outline, size: 18),
+                  label: Text(isCompleting ? 'Loading...' : 'Selesai'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: colorScheme.tertiary,
+                    foregroundColor: colorScheme.onTertiary,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),
     );
   }
 
-void _confirmPublish(BuildContext context, WidgetRef ref) {
-     final colorScheme = Theme.of(context).colorScheme;
-     showDialog<void>(
-       context: context,
-       builder: (ctx) => AlertDialog(
-         title: const Text('Publikasikan Kegiatan?'),
-         content: const Text('Apakah Anda yakin ingin mempublikasikan kegiatan ini? Peserta akan mulai bisa mendaftar.'),
-         actions: [
-           TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Batal')),
-           FilledButton(
-             onPressed: () {
-               Navigator.of(ctx).pop();
-               ref.read(publishEventControllerProvider.notifier).publish(event.id);
-             },
-             style: FilledButton.styleFrom(
-               backgroundColor: colorScheme.tertiary,
-               foregroundColor: colorScheme.onTertiary,
-             ),
-             child: const Text('Ya, Publikasikan'),
-           ),
-         ],
-       ),
-     );
-   }
+  void _confirmPublish(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Publikasikan Kegiatan?'),
+        content: const Text(
+          'Apakah Anda yakin ingin mempublikasikan kegiatan ini? Peserta akan mulai bisa mendaftar.',
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Batal')),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              ref.read(publishEventControllerProvider.notifier).publish(event.id);
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: colorScheme.tertiary,
+              foregroundColor: colorScheme.onTertiary,
+            ),
+            child: const Text('Ya, Publikasikan'),
+          ),
+        ],
+      ),
+    );
+  }
 
-   void _confirmStart(BuildContext context, WidgetRef ref) {
-     final colorScheme = Theme.of(context).colorScheme;
-     showDialog<void>(
-       context: context,
-       builder: (ctx) => AlertDialog(
-         title: const Text('Mulai Kegiatan?'),
-         content: const Text('Mulai kegiatan ini? Status akan menjadi ONGOING.'),
-         actions: [
-           TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Batal')),
-           FilledButton(
-             onPressed: () {
-               Navigator.of(ctx).pop();
-               ref.read(startEventControllerProvider.notifier).start(event.id);
-             },
-             style: FilledButton.styleFrom(
-               backgroundColor: colorScheme.tertiary,
-               foregroundColor: colorScheme.onTertiary,
-             ),
-             child: const Text('Ya, Mulai'),
-           ),
-         ],
-       ),
-     );
-   }
+  void _confirmStart(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Mulai Kegiatan?'),
+        content: const Text('Mulai kegiatan ini? Status akan menjadi ONGOING.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Batal')),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              ref.read(startEventControllerProvider.notifier).start(event.id);
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: colorScheme.tertiary,
+              foregroundColor: colorScheme.onTertiary,
+            ),
+            child: const Text('Ya, Mulai'),
+          ),
+        ],
+      ),
+    );
+  }
 
-   void _confirmComplete(BuildContext context, WidgetRef ref) {
-     final colorScheme = Theme.of(context).colorScheme;
-     showDialog<void>(
-       context: context,
-       builder: (ctx) => AlertDialog(
-         title: const Text('Selesaikan Kegiatan?'),
-         content: const Text('Selesaikan kegiatan ini? Status tidak bisa dikembalikan dan kegiatan akan masuk ke riwayat.'),
-         actions: [
-           TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Batal')),
-           FilledButton(
-             onPressed: () {
-               Navigator.of(ctx).pop();
-               ref.read(completeEventControllerProvider.notifier).complete(event.id);
-             },
-             style: FilledButton.styleFrom(
-               backgroundColor: colorScheme.tertiary,
-               foregroundColor: colorScheme.onTertiary,
-             ),
-             child: const Text('Ya, Selesaikan'),
-           ),
-         ],
-       ),
-     );
-   }
+  void _confirmComplete(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Selesaikan Kegiatan?'),
+        content: const Text(
+          'Selesaikan kegiatan ini? Status tidak bisa dikembalikan dan kegiatan akan masuk ke riwayat.',
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Batal')),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              ref.read(completeEventControllerProvider.notifier).complete(event.id);
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: colorScheme.tertiary,
+              foregroundColor: colorScheme.onTertiary,
+            ),
+            child: const Text('Ya, Selesaikan'),
+          ),
+        ],
+      ),
+    );
+  }
 
-   void _confirmCancel(BuildContext context, WidgetRef ref) {
-     final colorScheme = Theme.of(context).colorScheme;
-     showDialog<void>(
-       context: context,
-       builder: (ctx) => AlertDialog(
-         title: const Text('Batalkan Kegiatan?'),
-         content: const Text('Kegiatan yang dibatalkan tidak dapat di-publish kembali. Lanjutkan?'),
-         actions: [
-           TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Tidak')),
-           FilledButton(
-             onPressed: () {
-               Navigator.of(ctx).pop();
-               ref.read(cancelEventControllerProvider.notifier).cancel(event.id);
-             },
-             style: FilledButton.styleFrom(
-               backgroundColor: colorScheme.error,
-               foregroundColor: colorScheme.onError,
-             ),
-             child: const Text('Ya, Batalkan'),
-           ),
-         ],
-       ),
-     );
-   }
+  void _confirmCancel(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Batalkan Kegiatan?'),
+        content: const Text('Kegiatan yang dibatalkan tidak dapat di-publish kembali. Lanjutkan?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Tidak')),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              ref.read(cancelEventControllerProvider.notifier).cancel(event.id);
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: colorScheme.error,
+              foregroundColor: colorScheme.onError,
+            ),
+            child: const Text('Ya, Batalkan'),
+          ),
+        ],
+      ),
+    );
+  }
 
-   void _confirmEdit(BuildContext context) {
-     final colorScheme = Theme.of(context).colorScheme;
-     showDialog<void>(
-       context: context,
-       builder: (ctx) => AlertDialog(
-         title: const Text('Edit Kegiatan Aktif?'),
-         content: const Text(
-           'Kegiatan ini sudah dipublish atau sedang berlangsung. Perubahan data mungkin membingungkan peserta. Lanjutkan edit?',
-         ),
-         actions: [
-           TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Batal')),
-           FilledButton(
-             onPressed: () {
-               Navigator.of(ctx).pop();
-               context.push('/admin/event-edit/${event.id}');
-             },
-             style: FilledButton.styleFrom(
-               backgroundColor: colorScheme.primary,
-               foregroundColor: colorScheme.onPrimary,
-             ),
-             child: const Text('Ya, Edit'),
-           ),
-         ],
-       ),
-     );
-   }
+  void _confirmEdit(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Edit Kegiatan Aktif?'),
+        content: const Text(
+          'Kegiatan ini sudah dipublish atau sedang berlangsung. Perubahan data mungkin membingungkan peserta. Lanjutkan edit?',
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Batal')),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              context.push('/admin/event-edit/${event.id}');
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: colorScheme.primary,
+              foregroundColor: colorScheme.onPrimary,
+            ),
+            child: const Text('Ya, Edit'),
+          ),
+        ],
+      ),
+    );
+  }
 }

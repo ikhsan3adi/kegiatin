@@ -40,6 +40,13 @@ class ApiConstants {
   static const String profile = '/profile';
   static const String profileHistory = '/profile/history';
 
+  // Archives
+  static String sessionArchives(String sessionId) => '/sessions/$sessionId/archives';
+  static String archiveById(String id) => '/archives/$id';
+
+  // Uploads
+  static const String uploadImage = '/uploads/image';
+
   // Users
   static const String usersSearch = '/users/search';
 }

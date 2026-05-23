@@ -231,13 +231,13 @@ class _PesertaActionButton extends ConsumerWidget {
       );
     }
 
-return _ActionChip(
-       icon: Icons.assignment_outlined,
-       label: 'Daftar Kegiatan',
-       backgroundColor: colorScheme.primaryContainer,
-       foregroundColor: colorScheme.onPrimaryContainer,
-       onTap: () => _confirmRsvp(context, ref, event.id, event.title),
-     );
+    return _ActionChip(
+      icon: Icons.assignment_outlined,
+      label: 'Daftar Kegiatan',
+      backgroundColor: colorScheme.primaryContainer,
+      foregroundColor: colorScheme.onPrimaryContainer,
+      onTap: () => _confirmRsvp(context, ref, event.id, event.title),
+    );
   }
 }
 
@@ -292,7 +292,9 @@ void _confirmRsvp(BuildContext context, WidgetRef ref, String eventId, String ev
     context: context,
     builder: (ctx) => AlertDialog(
       title: const Text('Konfirmasi RSVP'),
-      content: Text('Apakah Anda yakin ingin mendaftar ke kegiatan "$eventTitle"? Kuota Anda akan terpakai.'),
+      content: Text(
+        'Apakah Anda yakin ingin mendaftar ke kegiatan "$eventTitle"? Kuota Anda akan terpakai.',
+      ),
       actions: [
         TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Batal')),
         FilledButton(

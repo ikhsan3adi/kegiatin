@@ -101,12 +101,12 @@ class ImageEnhancer {
     return result;
   }
 
-static img.Image _unsharpMask(
-  img.Image src, {
-  double amount = 0.8,
-  int radius = 1,
-  int threshold = 5,
-}) {
+  static img.Image _unsharpMask(
+    img.Image src, {
+    double amount = 0.8,
+    int radius = 1,
+    int threshold = 5,
+  }) {
     final blurred = img.gaussianBlur(src, radius: radius);
     final width = src.width;
     final height = src.height;

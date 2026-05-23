@@ -25,9 +25,7 @@ class MyAttendanceController extends _$MyAttendanceController {
     final list = <Attendance>[];
     for (final raw in box.values) {
       if (raw is String) {
-        final model = AttendanceModel.fromJson(
-          Map<String, dynamic>.from(jsonDecode(raw) as Map),
-        );
+        final model = AttendanceModel.fromJson(Map<String, dynamic>.from(jsonDecode(raw) as Map));
         if (model.userId == authState.id) {
           list.add(model.toEntity());
         }

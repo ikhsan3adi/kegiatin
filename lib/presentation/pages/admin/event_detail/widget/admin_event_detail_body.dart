@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kegiatin/domain/entities/archive_item.dart';
 import 'package:kegiatin/domain/entities/attendance.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/entities/session.dart';
 import 'package:kegiatin/domain/enums/attendance_status.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
 import 'package:kegiatin/domain/enums/event_visibility.dart';
+import 'package:kegiatin/presentation/controllers/archive/session_archives_controller.dart';
 import 'package:kegiatin/presentation/controllers/attendance/attendance_list_controller.dart';
 import 'package:kegiatin/presentation/pages/admin/event_detail/widget/admin_rsvp_list.dart';
 import 'package:kegiatin/presentation/pages/admin/event_detail/widget/session_management_section.dart';
@@ -74,50 +76,8 @@ class AdminEventDetailBody extends ConsumerWidget {
           const SizedBox(height: 16),
           SessionManagementSection(event: event),
           const SizedBox(height: 16),
-          _SurfaceCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.folder_copy_outlined, size: 20, color: colorScheme.onSurfaceVariant),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Materi Kegiatan',
-                      style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                Center(
-                  child: Column(
-                    children: [
-                      Text(
-                        'Belum ada materi yang diunggah.',
-                        style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
-                      ),
-                      const SizedBox(height: 16),
-                      FilledButton.tonalIcon(
-                        onPressed: () {
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            useSafeArea: true,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-                            ),
-                            builder: (_) => UploadMateriBottomSheet(event: event),
-                          );
-                        },
-                        icon: const Icon(Icons.upload_file_rounded),
-                        label: const Text('Unggah Materi'),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
+          _MaterialSection(event: event),
+          const SizedBox(height: 16),
           const SizedBox(height: 16),
           // Daftar Hadir per sesi
           _AttendanceSection(sessions: event.sessions),
@@ -142,6 +102,160 @@ class AdminEventDetailBody extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 40),
+        ],
+      ),
+    );
+  }
+}
+
+class _MaterialSection extends ConsumerWidget {
+  const _MaterialSection({required this.event});
+
+  final Event event;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return _SurfaceCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.folder_copy_outlined, size: 20, color: colorScheme.onSurfaceVariant),
+              const SizedBox(width: 12),
+              Text(
+                'Materi Kegiatan',
+                style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (event.sessions.isEmpty)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Text(
+                  'Tidak ada sesi',
+                  style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+                ),
+              ),
+            )
+          else
+            ...event.sessions.map((s) => _SessionArchiveSection(session: s)),
+          const SizedBox(height: 8),
+          Center(
+            child: FilledButton.tonalIcon(
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  useSafeArea: true,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                  ),
+                  builder: (_) => UploadMateriBottomSheet(event: event),
+                );
+              },
+              icon: const Icon(Icons.upload_file_rounded),
+              label: const Text('Unggah Materi'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SessionArchiveSection extends ConsumerWidget {
+  const _SessionArchiveSection({required this.session});
+
+  final Session session;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final archiveAsync = ref.watch(sessionArchivesControllerProvider(session.id));
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(session.title, style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+          const SizedBox(height: 8),
+          archiveAsync.when(
+            loading: () => const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ),
+            error: (e, _) => Row(
+              children: [
+                Icon(Icons.error_outline, size: 16, color: colorScheme.error),
+                const SizedBox(width: 6),
+                Text(
+                  'Gagal memuat',
+                  style: textTheme.bodySmall?.copyWith(color: colorScheme.error),
+                ),
+              ],
+            ),
+            data: (list) {
+              if (list.isEmpty) {
+                return Text(
+                  'Belum ada materi',
+                  style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
+                );
+              }
+              return Column(children: list.map((a) => _ArchiveRow(archive: a)).toList());
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ArchiveRow extends ConsumerWidget {
+  const _ArchiveRow({required this.archive});
+
+  final ArchiveItem archive;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Icon(Icons.description_outlined, size: 16, color: colorScheme.primary),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              archive.title,
+              style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurface),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.open_in_new, size: 16, color: colorScheme.primary),
+            visualDensity: VisualDensity.compact,
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: Icon(Icons.delete_outline, size: 16, color: colorScheme.error),
+            visualDensity: VisualDensity.compact,
+            onPressed: () {},
+          ),
         ],
       ),
     );
