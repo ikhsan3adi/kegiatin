@@ -18,6 +18,7 @@ tags:
   - name: Attendance
   - name: Profile
   - name: Uploads
+  - name: Archives
   - name: Users
 
 components:
@@ -53,6 +54,25 @@ components:
     SyncStatus:
       type: string
       enum: [PENDING, SYNCING, SYNCED, CONFLICT]
+    ArchiveType:
+      type: string
+      enum: [MATERIAL, PHOTO, EVALUATION]
+    ArchiveResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        sessionId:
+          type: string
+        title:
+          type: string
+        type:
+          $ref: "#/components/schemas/ArchiveType"
+        fileUrl:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
 
     # ── Response Envelope ──
     ApiResponse:
@@ -1408,3 +1428,100 @@ paths:
                       meta: { $ref: "#/components/schemas/PaginationMeta" }
         "401":
           description: Unauthorized
+
+  # ════════════ ARCHIVES ════════════
+  /sessions/{id}/archives:
+    get:
+      tags: [Archives]
+      summary: Daftar materi per sesi
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Daftar materi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ApiResponse"
+                  - properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/ArchiveResponse"
+        "403":
+          description: User tidak memiliki akses (attendance tidak verified)
+        "401":
+          description: Unauthorized
+    post:
+      tags: [Archives]
+      summary: Tambah materi ke sesi (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, type, fileUrl]
+              properties:
+                title:
+                  type: string
+                type:
+                  $ref: "#/components/schemas/ArchiveType"
+                fileUrl:
+                  type: string
+      responses:
+        "201":
+          description: Materi berhasil ditambahkan
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ApiResponse"
+                  - properties:
+                      data:
+                        $ref: "#/components/schemas/ArchiveResponse"
+        "400":
+          description: Validasi gagal
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden (bukan admin)
+        "404":
+          description: Sesi tidak ditemukan
+
+  /archives/{id}:
+    delete:
+      tags: [Archives]
+      summary: Hapus materi (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Materi berhasil dihapus
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden (bukan admin)
+        "404":
+          description: Materi tidak ditemukan
