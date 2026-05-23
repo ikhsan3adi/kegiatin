@@ -40,3 +40,10 @@ SyncAttendanceUseCase syncAttendanceUseCase(Ref ref) =>
 @riverpod
 GetSessionAttendanceUseCase getSessionAttendanceUseCase(Ref ref) =>
     GetSessionAttendanceUseCase(ref.watch(attendanceRepositoryProvider));
+
+@riverpod
+Future<int> pendingAttendanceCount(Ref ref) async {
+  final localDataSource = ref.watch(attendanceLocalDataSourceProvider);
+  final pending = await localDataSource.getPendingRecords();
+  return pending.length;
+}

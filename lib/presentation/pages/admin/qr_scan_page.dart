@@ -4,14 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/core/errors/failures.dart';
 import 'package:kegiatin/core/theme/custom.dart';
+import 'package:kegiatin/data/models/rsvp_model.dart';
 import 'package:kegiatin/domain/entities/attendance.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/entities/session.dart';
 import 'package:kegiatin/presentation/controllers/attendance/attendance_list_controller.dart';
 import 'package:kegiatin/presentation/controllers/attendance/scan_attendance_controller.dart';
+import 'package:kegiatin/presentation/controllers/attendance/sync_controller.dart';
 import 'package:kegiatin/presentation/controllers/event/event_list_controller.dart';
+import 'package:kegiatin/presentation/controllers/rsvp/event_rsvp_list_controller.dart';
 import 'package:kegiatin/presentation/pages/admin/widget/manual_input_tab.dart';
 import 'package:kegiatin/presentation/pages/admin/widget/qr_scanner_tab.dart';
+import 'package:kegiatin/presentation/providers/providers.dart';
 
 /// Halaman Pindai QR Presensi untuk Admin.
 class QrScanPage extends ConsumerStatefulWidget {
@@ -24,10 +28,7 @@ class QrScanPage extends ConsumerStatefulWidget {
 class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProviderStateMixin {
   late final TabController _tabController;
 
-  /// Kegiatan yang dipilih admin di dropdown.
   Event? _selectedEvent;
-
-  /// Sesi yang dipilih admin di dropdown.
   Session? _selectedSession;
   int _totalScanned = 0;
 
@@ -35,6 +36,26 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+  }
+
+  Future<void> _preloadRsvpForEvent(String eventId) async {
+    try {
+      final result = await ref.read(eventRsvpListControllerProvider(eventId).future);
+      final localDataSource = ref.read(rsvpLocalDataSourceProvider);
+      final rsvpModels = result.data
+          .map(
+            (r) => RsvpModel(
+              id: r.id,
+              userId: r.userId,
+              eventId: r.eventId,
+              qrToken: r.qrToken,
+              status: r.status,
+              createdAt: r.createdAt,
+            ),
+          )
+          .toList();
+      await localDataSource.cacheRsvps(eventId, rsvpModels);
+    } catch (_) {}
   }
 
   @override
@@ -71,6 +92,8 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+
+    final pendingCountAsync = ref.watch(pendingAttendanceCountProvider);
 
     ref.listen<AsyncValue<Attendance?>>(scanAttendanceControllerProvider, (prev, next) {
       if (next is AsyncError) {
@@ -126,6 +149,7 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
             selectedEvent: _selectedEvent,
             selectedSession: _selectedSession,
             totalScanned: _totalScanned,
+            pendingSyncCount: pendingCountAsync.asData?.value ?? 0,
             onEventChanged: (event) {
               setState(() {
                 _selectedEvent = event;
@@ -135,6 +159,7 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
                   _selectedSession = null;
                 }
               });
+              if (event != null) _preloadRsvpForEvent(event.id);
             },
             onSessionChanged: (session) => setState(() => _selectedSession = session),
             onBack: () => Navigator.of(context).pop(),
@@ -184,11 +209,12 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
 }
 
 // Header
-class _ScanHeader extends StatelessWidget {
+class _ScanHeader extends ConsumerWidget {
   const _ScanHeader({
     required this.selectedEvent,
     required this.selectedSession,
     required this.totalScanned,
+    required this.pendingSyncCount,
     required this.onEventChanged,
     required this.onSessionChanged,
     required this.onBack,
@@ -197,13 +223,17 @@ class _ScanHeader extends StatelessWidget {
   final Event? selectedEvent;
   final Session? selectedSession;
   final int totalScanned;
+  final int pendingSyncCount;
   final ValueChanged<Event?> onEventChanged;
   final ValueChanged<Session?> onSessionChanged;
   final VoidCallback onBack;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final syncState = ref.watch(syncControllerProvider);
+    final isLoading = syncState.isLoading;
 
     return Container(
       decoration: const BoxDecoration(
@@ -224,7 +254,6 @@ class _ScanHeader extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Tombol kembali + Judul
               Row(
                 children: [
                   IconButton(
@@ -233,26 +262,77 @@ class _ScanHeader extends StatelessWidget {
                     color: KegiatinCustomTheme.onGradient,
                     tooltip: 'Kembali',
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Pindai QR Presensi',
-                        style: textTheme.titleMedium?.copyWith(
-                          color: KegiatinCustomTheme.onGradient,
-                          fontWeight: FontWeight.w700,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Pindai QR Presensi',
+                          style: textTheme.titleMedium?.copyWith(
+                            color: KegiatinCustomTheme.onGradient,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
-                      ),
-                      Text(
-                        '$totalScanned sudah dipindai',
-                        style: textTheme.bodySmall?.copyWith(
-                          color: KegiatinCustomTheme.onGradientDim,
+                        Row(
+                          children: [
+                            Text(
+                              '$totalScanned sudah dipindai',
+                              style: textTheme.bodySmall?.copyWith(
+                                color: KegiatinCustomTheme.onGradientDim,
+                              ),
+                            ),
+                            if (pendingSyncCount > 0) ...[
+                              const SizedBox(width: 12),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: colorScheme.error.withValues(alpha: 0.9),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  '$pendingSyncCount pending',
+                                  style: textTheme.labelSmall?.copyWith(
+                                    color: colorScheme.onError,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
+              if (pendingSyncCount > 0)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: isLoading
+                          ? null
+                          : () => ref.read(syncControllerProvider.notifier).syncNow(),
+                      icon: isLoading
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.sync_rounded, size: 18),
+                      label: Text(isLoading ? 'Menyinkronkan...' : 'Sinkronkan Sekarang'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: KegiatinCustomTheme.onGradient,
+                        side: BorderSide(
+                          color: KegiatinCustomTheme.onGradient.withValues(alpha: 0.4),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
+                  ),
+                ),
               const SizedBox(height: 12),
 
               // Dropdown kegiatan aktif dari database dengan pencarian bottom sheet

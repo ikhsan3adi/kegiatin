@@ -21,7 +21,7 @@ class HistoryRemoteDataSourceImpl implements HistoryRemoteDataSource {
     String? search,
   }) async {
     try {
-      final queryParams = {'page': page, 'limit': limit, if (search != null) 'search': search};
+      final queryParams = {'page': page, 'limit': limit, 'search': ?search};
       final response = await dio.get(ApiConstants.profileHistory, queryParameters: queryParams);
       final body = _asMap(response.data);
       final data = (body['data'] as List).map((json) {
