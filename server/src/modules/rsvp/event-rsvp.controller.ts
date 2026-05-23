@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   Param,
@@ -26,6 +27,15 @@ export class EventRsvpController {
   createRsvp(@Param('id') eventId: string, @Req() req: Request) {
     const user = req.user as RequestUser;
     return this.rsvpService.createRsvp(user.userId, eventId);
+  }
+
+  @Post(':id/rsvp/invite')
+  @Roles(UserRole.ADMIN)
+  inviteUser(
+    @Param('id') eventId: string,
+    @Body('userId') userId: string,
+  ) {
+    return this.rsvpService.createRsvp(userId, eventId);
   }
 
   @Get(':id/rsvp')

@@ -37,6 +37,21 @@ class RsvpRepositoryImpl implements RsvpRepository {
   }
 
   @override
+  Future<Either<Failure, Rsvp>> inviteUser(String eventId, String userId) async {
+    if (!await networkInfo.isConnected) {
+      return const Left(NetworkFailure());
+    }
+    try {
+      final result = await remoteDataSource.inviteUser(eventId, userId);
+      return Right(result);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, statusCode: e.statusCode));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, PaginatedResult<Rsvp>>> getMyRsvps({int page = 1, int limit = 20}) async {
     if (await networkInfo.isConnected) {
       try {

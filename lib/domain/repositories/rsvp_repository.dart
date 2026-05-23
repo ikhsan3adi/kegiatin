@@ -11,6 +11,9 @@ abstract class RsvpRepository {
   /// Server menolak dengan 409 jika user sudah RSVP ke event yang sama.
   Future<Either<Failure, Rsvp>> createRsvp(String eventId);
 
+  /// Mengundang [userId] ke event (Admin, invite-only events).
+  Future<Either<Failure, Rsvp>> inviteUser(String eventId, String userId);
+
   /// Mengambil daftar RSVP milik user yang sedang login.
   Future<Either<Failure, PaginatedResult<Rsvp>>> getMyRsvps({int page = 1, int limit = 20});
 

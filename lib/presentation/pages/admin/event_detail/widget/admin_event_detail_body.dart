@@ -12,6 +12,7 @@ import 'package:kegiatin/presentation/controllers/rsvp/event_rsvp_list_controlle
 import 'package:kegiatin/presentation/pages/admin/event_detail/widget/admin_attendance_page.dart';
 import 'package:kegiatin/presentation/pages/admin/event_detail/widget/admin_participants_page.dart';
 import 'package:kegiatin/presentation/pages/admin/event_detail/widget/session_management_section.dart';
+import 'package:kegiatin/presentation/pages/admin/widget/invite_member_sheet.dart';
 import 'package:kegiatin/presentation/pages/admin/widget/upload_materi_bottom_sheet.dart';
 
 class AdminEventDetailBody extends ConsumerWidget {
@@ -71,6 +72,27 @@ class AdminEventDetailBody extends ConsumerWidget {
                 ),
                 const SizedBox(height: 16),
                 _DetailRow(label: 'Narahubung', value: event.contactPerson),
+                if (event.visibility == EventVisibility.inviteOnly) ...[
+                  const SizedBox(height: 16),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: FilledButton.tonalIcon(
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          useSafeArea: true,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                          ),
+                          builder: (_) => InviteMemberSheet(eventId: event.id),
+                        );
+                      },
+                      icon: const Icon(Icons.person_add_alt_rounded, size: 18),
+                      label: const Text('Undang Anggota'),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

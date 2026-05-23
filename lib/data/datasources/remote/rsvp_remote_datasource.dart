@@ -11,6 +11,9 @@ abstract class RsvpRemoteDataSource {
   /// Membuat RSVP baru: `POST /events/{eventId}/rsvp`.
   Future<RsvpModel> createRsvp(String eventId);
 
+  /// Mengundang user ke event (Admin): `POST /events/{eventId}/rsvp/invite`.
+  Future<RsvpModel> inviteUser(String eventId, String userId);
+
   /// Mengambil RSVP milik user yang sedang login: `GET /rsvp/me`.
   Future<PaginatedResult<RsvpModel>> getMyRsvps({int page = 1, int limit = 20});
 
@@ -48,6 +51,23 @@ class RsvpRemoteDataSourceImpl implements RsvpRemoteDataSource {
     } on DioException catch (e) {
       throw ServerException(
         _extractErrorMessage(e, 'Gagal mendaftar ke kegiatan'),
+        statusCode: e.response?.statusCode,
+      );
+    }
+  }
+
+  @override
+  Future<RsvpModel> inviteUser(String eventId, String userId) async {
+    try {
+      final response = await dio.post(
+        ApiConstants.eventRsvpInvite(eventId),
+        data: {'userId': userId},
+      );
+      final body = _asMap(response.data);
+      return RsvpModel.fromJson(_asMap(body['data']));
+    } on DioException catch (e) {
+      throw ServerException(
+        _extractErrorMessage(e, 'Gagal mengundang anggota'),
         statusCode: e.response?.statusCode,
       );
     }

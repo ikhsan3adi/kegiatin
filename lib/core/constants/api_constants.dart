@@ -26,6 +26,7 @@ class ApiConstants {
 
   // RSVP
   static String eventRsvp(String eventId) => '/events/$eventId/rsvp';
+  static String eventRsvpInvite(String eventId) => '/events/$eventId/rsvp/invite';
   static String cancelRsvp(String rsvpId) => '/rsvp/$rsvpId';
   static String rsvpQr(String rsvpId) => '/rsvp/$rsvpId/qr';
   static const String myRsvps = '/rsvp/me';

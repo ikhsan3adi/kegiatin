@@ -5,6 +5,7 @@ import 'package:kegiatin/domain/repositories/rsvp_repository.dart';
 import 'package:kegiatin/domain/usecases/create_rsvp_usecase.dart';
 import 'package:kegiatin/domain/usecases/get_event_rsvps_usecase.dart';
 import 'package:kegiatin/domain/usecases/get_my_rsvps_usecase.dart';
+import 'package:kegiatin/domain/usecases/rsvp/invite_user_usecase.dart';
 import 'package:kegiatin/presentation/providers/core_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -38,3 +39,7 @@ GetMyRsvpsUseCase getMyRsvpsUseCase(Ref ref) =>
 @Riverpod(keepAlive: true)
 GetEventRsvpsUseCase getEventRsvpsUseCase(Ref ref) =>
     GetEventRsvpsUseCase(ref.watch(rsvpRepositoryProvider));
+
+@Riverpod(keepAlive: true)
+InviteUserUseCase inviteUserUseCase(Ref ref) =>
+    InviteUserUseCase(ref.watch(rsvpRepositoryProvider));
