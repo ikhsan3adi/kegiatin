@@ -22,6 +22,7 @@ UploadsRemoteDataSource uploadsRemoteDataSource(Ref ref) =>
 ArchiveRepository archiveRepository(Ref ref) => ArchiveRepositoryImpl(
   archiveRemoteDataSource: ref.watch(archiveRemoteDataSourceProvider),
   uploadsRemoteDataSource: ref.watch(uploadsRemoteDataSourceProvider),
+  localDataSource: ref.watch(archiveLocalDataSourceProvider),
   networkInfo: ref.watch(networkInfoProvider),
 );
 

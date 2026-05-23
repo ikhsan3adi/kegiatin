@@ -9,4 +9,6 @@ class DbConstants {
   static const String rsvpBox = 'rsvp_box';
   static const String eventCacheBox = 'event_cache_box';
   static const String attendanceBox = 'attendance_box';
+  static const String archiveBox = 'archive_box';
+  static const String profileBox = 'profile_box';
 }

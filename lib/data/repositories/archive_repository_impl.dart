@@ -1,6 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:kegiatin/core/errors/failures.dart';
 import 'package:kegiatin/core/network/network_info.dart';
+import 'package:kegiatin/data/datasources/local/archive_local_datasource.dart';
 import 'package:kegiatin/data/datasources/remote/archive_remote_datasource.dart';
 import 'package:kegiatin/data/datasources/remote/uploads_remote_datasource.dart';
 import 'package:kegiatin/data/models/archive_model.dart';
@@ -11,11 +12,13 @@ import 'package:kegiatin/domain/repositories/archive_repository.dart';
 class ArchiveRepositoryImpl implements ArchiveRepository {
   final ArchiveRemoteDataSource archiveRemoteDataSource;
   final UploadsRemoteDataSource uploadsRemoteDataSource;
+  final ArchiveLocalDataSource localDataSource;
   final NetworkInfo networkInfo;
 
   ArchiveRepositoryImpl({
     required this.archiveRemoteDataSource,
     required this.uploadsRemoteDataSource,
+    required this.localDataSource,
     required this.networkInfo,
   });
 
@@ -41,12 +44,20 @@ class ArchiveRepositoryImpl implements ArchiveRepository {
 
   @override
   Future<Either<Failure, List<ArchiveItem>>> getArchives(String sessionId) async {
-    try {
-      final models = await archiveRemoteDataSource.getArchives(sessionId);
-      return Right(models.map(_toEntity).toList());
-    } on Exception catch (e) {
-      return Left(ServerFailure(e.toString()));
+    if (await networkInfo.isConnected) {
+      try {
+        final models = await archiveRemoteDataSource.getArchives(sessionId);
+        await localDataSource.cacheArchives(sessionId, models);
+        return Right(models.map(_toEntity).toList());
+      } on Exception catch (e) {
+        final cached = await localDataSource.getCachedArchives(sessionId);
+        if (cached.isNotEmpty) return Right(cached.map(_toEntity).toList());
+        return Left(ServerFailure(e.toString()));
+      }
     }
+    final cached = await localDataSource.getCachedArchives(sessionId);
+    if (cached.isNotEmpty) return Right(cached.map(_toEntity).toList());
+    return const Left(NetworkFailure());
   }
 
   @override

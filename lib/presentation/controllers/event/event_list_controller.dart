@@ -56,7 +56,36 @@ class EventListController extends _$EventListController {
   }
 
   Future<void> refresh() async {
-    ref.invalidateSelf();
-    await future;
+    final useCase = ref.read(getEventsUseCaseProvider);
+    final currentStatus = status;
+    EventStatus? eventStatus;
+    if (currentStatus != null) {
+      eventStatus = EventStatus.values.firstWhere(
+        (e) => e.name.toUpperCase() == currentStatus.toUpperCase(),
+        orElse: () => EventStatus.published,
+      );
+    }
+    final currentType = type;
+    EventType? eventType;
+    if (currentType != null) {
+      eventType = EventType.values.firstWhere(
+        (e) => e.name.toUpperCase() == currentType.toUpperCase(),
+        orElse: () => EventType.single,
+      );
+    }
+    final result = await useCase(
+      GetEventsUseCaseParams(
+        page: page,
+        limit: limit,
+        search: search,
+        status: eventStatus,
+        type: eventType,
+        forceRefresh: true,
+      ),
+    );
+    state = result.fold(
+      (failure) => AsyncError(Exception(failure.message), StackTrace.current),
+      (data) => AsyncData(data),
+    );
   }
 }

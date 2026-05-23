@@ -14,6 +14,7 @@ HistoryRemoteDataSource historyRemoteDataSource(Ref ref) =>
 @Riverpod(keepAlive: true)
 ProfileRepository profileRepository(Ref ref) => ProfileRepositoryImpl(
   historyRemoteDataSource: ref.watch(historyRemoteDataSourceProvider),
+  historyLocalDataSource: ref.watch(historyLocalDataSourceProvider),
   networkInfo: ref.watch(networkInfoProvider),
 );
 

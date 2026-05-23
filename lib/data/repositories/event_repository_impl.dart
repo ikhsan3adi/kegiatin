@@ -30,7 +30,17 @@ class EventRepositoryImpl implements EventRepository {
     EventStatus? status,
     EventType? type,
     String? search,
+    bool forceRefresh = false,
   }) async {
+    if (!forceRefresh) {
+      final cached = await localDataSource.getCachedEvents();
+      if (cached.isNotEmpty) {
+        return Right(
+          PaginatedResult<Event>(data: cached, total: cached.length, page: 1, limit: cached.length),
+        );
+      }
+    }
+
     if (await networkInfo.isConnected) {
       try {
         final result = await remoteDataSource.getEvents(
@@ -50,13 +60,29 @@ class EventRepositoryImpl implements EventRepository {
           ),
         );
       } on ServerException catch (e) {
+        if (!forceRefresh) {
+          final cached = await localDataSource.getCachedEvents();
+          if (cached.isNotEmpty) {
+            return Right(
+              PaginatedResult<Event>(
+                data: cached,
+                total: cached.length,
+                page: 1,
+                limit: cached.length,
+              ),
+            );
+          }
+        }
         return Left(ServerFailure(e.message, statusCode: e.statusCode));
       }
     }
     final cached = await localDataSource.getCachedEvents();
-    return Right(
-      PaginatedResult<Event>(data: cached, total: cached.length, page: 1, limit: cached.length),
-    );
+    if (cached.isNotEmpty) {
+      return Right(
+        PaginatedResult<Event>(data: cached, total: cached.length, page: 1, limit: cached.length),
+      );
+    }
+    return const Left(NetworkFailure());
   }
 
   @override
