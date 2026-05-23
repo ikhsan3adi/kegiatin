@@ -21,7 +21,7 @@ abstract class ActivityRecordModel with _$ActivityRecordModel {
 abstract class SessionAttendanceModel with _$SessionAttendanceModel {
   const factory SessionAttendanceModel({
     required SessionModel session,
-    required AttendanceStatus status,
+    required AttendanceStatus? status,
     DateTime? checkedInAt,
   }) = _SessionAttendanceModel;
 

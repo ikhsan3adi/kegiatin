@@ -16,8 +16,8 @@ class ActivityRecord {
 /// Status kehadiran peserta pada satu sesi dalam konteks activity history.
 class SessionAttendance {
   final Session session;
-  final AttendanceStatus status;
+  final AttendanceStatus? status;
   final DateTime? checkedInAt;
 
-  const SessionAttendance({required this.session, required this.status, this.checkedInAt});
+  const SessionAttendance({required this.session, this.status, this.checkedInAt});
 }
