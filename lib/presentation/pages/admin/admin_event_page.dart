@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -156,100 +157,111 @@ class _AdminEventPageState extends ConsumerState<AdminEventPage> {
             ],
           ),
         ),
-        SizedBox(
-          width: double.infinity,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Container(
-              constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width),
-              alignment: Alignment.center,
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildFilterChip('Semua', null, colorScheme, textTheme),
-                  const SizedBox(width: 8),
-                  _buildFilterChip('Berlangsung', 'ONGOING', colorScheme, textTheme),
-                  const SizedBox(width: 8),
-                  _buildFilterChip('Akan Datang', 'PUBLISHED', colorScheme, textTheme),
-                ],
-              ),
-            ),
-          ),
-        ),
-        Expanded(
-          child: RefreshIndicator(
-            onRefresh: () async {
-              ref.invalidate(
-                eventListControllerProvider(
-                  search: _searchQuery.isEmpty ? null : _searchQuery,
-                  status: _selectedStatus,
-                ),
-              );
-              try {
-                await ref.read(
-                  eventListControllerProvider(
-                    search: _searchQuery.isEmpty ? null : _searchQuery,
-                    status: _selectedStatus,
-                  ).future,
-                );
-              } catch (_) {}
-            },
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  eventsState.when(
-                    data: (paginatedData) {
-                      final events = paginatedData.data;
 
-                      if (events.isEmpty) {
-                        return Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(32.0),
-                            child: Text(
-                              'Belum ada kegiatan',
-                              style: textTheme.bodyMedium?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
+        Expanded(
+          child: Stack(
+            children: [
+              Positioned(
+                top: 0,
+                right: 0,
+                left: 0,
+                bottom: 0,
+                child: RefreshIndicator(
+                  onRefresh: () async {
+                    ref.invalidate(
+                      eventListControllerProvider(
+                        search: _searchQuery.isEmpty ? null : _searchQuery,
+                        status: _selectedStatus,
+                      ),
+                    );
+                    try {
+                      await ref.read(
+                        eventListControllerProvider(
+                          search: _searchQuery.isEmpty ? null : _searchQuery,
+                          status: _selectedStatus,
+                        ).future,
+                      );
+                    } catch (_) {}
+                  },
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 54),
+                        eventsState.when(
+                          data: (paginatedData) {
+                            final events = paginatedData.data;
+
+                            if (events.isEmpty) {
+                              return Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(32.0),
+                                  child: Text(
+                                    'Belum ada kegiatan',
+                                    style: textTheme.bodyMedium?.copyWith(
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }
+
+                            return ListView.builder(
+                              padding: const EdgeInsets.only(top: 8),
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: events.length,
+                              itemBuilder: (context, index) {
+                                final event = events[index];
+                                return EventListCard(
+                                  event: event,
+                                  showActionButton: false,
+                                  onTap: () => context.push('/admin/event-detail/${event.id}'),
+                                );
+                              },
+                            );
+                          },
+                          loading: () => const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(32.0),
+                              child: CircularProgressIndicator(),
                             ),
                           ),
-                        );
-                      }
-
-                      return ListView.builder(
-                        padding: const EdgeInsets.only(top: 8),
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: events.length,
-                        itemBuilder: (context, index) {
-                          final event = events[index];
-                          return EventListCard(
-                            event: event,
-                            showActionButton: false,
-                            onTap: () => context.push('/admin/event-detail/${event.id}'),
-                          );
-                        },
-                      );
-                    },
-                    loading: () => const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(32.0),
-                        child: CircularProgressIndicator(),
-                      ),
-                    ),
-                    error: (e, _) => Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(32.0),
-                        child: Text('Gagal memuat kegiatan: $e'),
-                      ),
+                          error: (e, _) => Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(32.0),
+                              child: Text('Gagal memuat kegiatan: $e'),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 80), // Padding bawah agar tidak tertutup navbar
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 80), // Padding bawah agar tidak tertutup navbar
-                ],
+                ),
               ),
-            ),
+
+              Align(
+                alignment: Alignment.topCenter,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _buildFilterChip('Semua', null, colorScheme, textTheme),
+                        const SizedBox(width: 8),
+                        _buildFilterChip('Berlangsung', 'ONGOING', colorScheme, textTheme),
+                        const SizedBox(width: 8),
+                        _buildFilterChip('Akan Datang', 'PUBLISHED', colorScheme, textTheme),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ],

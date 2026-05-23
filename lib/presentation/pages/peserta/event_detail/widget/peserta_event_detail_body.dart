@@ -165,10 +165,12 @@ class _PesertaActionButton extends ConsumerWidget {
 
     final isCreating = createState.isLoading;
     final alreadyRsvp = myRsvpAsync.value?.any((r) => r.eventId == event.id) ?? false;
-    final alreadyAttended = myAttendanceAsync.value?.any((att) {
-      return event.sessions.any((session) => att.sessionId == session.id) &&
-          (att.status == AttendanceStatus.present || att.status == AttendanceStatus.late);
-    }) ?? false;
+    final alreadyAttended =
+        myAttendanceAsync.value?.any((att) {
+          return event.sessions.any((session) => att.sessionId == session.id) &&
+              (att.status == AttendanceStatus.present || att.status == AttendanceStatus.late);
+        }) ??
+        false;
 
     if (alreadyRsvp) {
       if (alreadyAttended) {
