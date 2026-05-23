@@ -1,42 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/domain/entities/attendance.dart';
-import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/entities/session.dart';
 import 'package:kegiatin/domain/enums/attendance_status.dart';
 import 'package:kegiatin/presentation/controllers/attendance/attendance_list_controller.dart';
-import 'admin_rsvp_list.dart';
 
-class AdminEventAttendanceBody extends ConsumerWidget {
-  const AdminEventAttendanceBody({super.key, required this.event});
+class AdminAttendancePage extends ConsumerWidget {
+  const AdminAttendancePage({super.key, required this.sessions, required this.eventId});
 
-  final Event event;
+  final List<Session> sessions;
+  final String eventId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
+    return Scaffold(
+      backgroundColor: colorScheme.surfaceContainer,
+      appBar: AppBar(
+        title: const Text('Kelola Kehadiran'),
+        backgroundColor: colorScheme.surfaceContainer,
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(20),
         children: [
-          _SurfaceCard(
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: colorScheme.shadow.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Icon(Icons.fact_check_outlined, size: 20, color: colorScheme.onSurfaceVariant),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Daftar Hadir',
-                      style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                    ),
-                  ],
+                Text(
+                  'Daftar Hadir',
+                  style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 12),
-                if (event.sessions.isEmpty)
+                if (sessions.isEmpty)
                   Center(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -47,27 +58,7 @@ class AdminEventAttendanceBody extends ConsumerWidget {
                     ),
                   )
                 else
-                  ...event.sessions.map((session) => _SessionAttendanceCard(session: session)),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          _SurfaceCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.people_alt_outlined, size: 20, color: colorScheme.onSurfaceVariant),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Peserta Terdaftar',
-                      style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                AdminRsvpList(eventId: event.id),
+                  ...sessions.map((session) => _SessionCard(session: session)),
               ],
             ),
           ),
@@ -78,8 +69,8 @@ class AdminEventAttendanceBody extends ConsumerWidget {
   }
 }
 
-class _SessionAttendanceCard extends ConsumerWidget {
-  const _SessionAttendanceCard({required this.session});
+class _SessionCard extends ConsumerWidget {
+  const _SessionCard({required this.session});
 
   final Session session;
 
@@ -176,34 +167,6 @@ class _AttendanceRow extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _SurfaceCard extends StatelessWidget {
-  const _SurfaceCard({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: child,
     );
   }
 }

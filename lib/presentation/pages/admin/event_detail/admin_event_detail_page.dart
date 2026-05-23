@@ -8,7 +8,6 @@ import 'package:kegiatin/presentation/controllers/event/event_detail_controller.
 import 'package:kegiatin/presentation/controllers/event/publish_event_controller.dart';
 import 'package:kegiatin/presentation/controllers/event/start_event_controller.dart';
 
-import 'widget/admin_event_attendance_body.dart';
 import 'widget/admin_event_detail_body.dart';
 import 'widget/admin_event_detail_bottom_bar.dart';
 import 'widget/admin_event_detail_header.dart';
@@ -17,7 +16,6 @@ import 'widget/admin_event_detail_listeners.dart';
 class AdminEventDetailPage extends ConsumerWidget {
   const AdminEventDetailPage({super.key, required this.eventId});
 
-  /// UUID dari route `/admin/event-detail/:eventId`.
   final String eventId;
 
   @override
@@ -79,40 +77,20 @@ class _AdminEventDetailLoaded extends ConsumerWidget {
 
     return AdminEventDetailListeners(
       eventId: event.id,
-      child: DefaultTabController(
-        length: 2,
-        child: Scaffold(
-          backgroundColor: colorScheme.surfaceContainer,
-          body: Column(
-            children: [
-              AdminEventDetailHeader(event: event),
-              TabBar(
-                tabs: const [
-                  Tab(text: 'Informasi'),
-                  Tab(text: 'Kehadiran & Peserta'),
-                ],
-                labelColor: colorScheme.primary,
-                unselectedLabelColor: colorScheme.onSurfaceVariant,
-                indicatorColor: colorScheme.primary,
-                indicatorSize: TabBarIndicatorSize.tab,
-              ),
-              Expanded(
-                child: TabBarView(
-                  children: [
-                    AdminEventDetailBody(event: event),
-                    AdminEventAttendanceBody(event: event),
-                  ],
-                ),
-              ),
-              AdminEventDetailBottomBar(
-                event: event,
-                isPublishing: publishState.isLoading,
-                isStarting: startState.isLoading,
-                isCompleting: completeState.isLoading,
-                isCancelling: cancelState.isLoading,
-              ),
-            ],
-          ),
+      child: Scaffold(
+        backgroundColor: colorScheme.surfaceContainer,
+        body: Column(
+          children: [
+            AdminEventDetailHeader(event: event),
+            Expanded(child: AdminEventDetailBody(event: event)),
+            AdminEventDetailBottomBar(
+              event: event,
+              isPublishing: publishState.isLoading,
+              isStarting: startState.isLoading,
+              isCompleting: completeState.isLoading,
+              isCancelling: cancelState.isLoading,
+            ),
+          ],
         ),
       ),
     );

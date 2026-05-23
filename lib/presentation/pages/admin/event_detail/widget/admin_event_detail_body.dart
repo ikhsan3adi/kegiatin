@@ -3,9 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/domain/entities/archive_item.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/entities/session.dart';
+import 'package:kegiatin/domain/enums/attendance_status.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
 import 'package:kegiatin/domain/enums/event_visibility.dart';
 import 'package:kegiatin/presentation/controllers/archive/session_archives_controller.dart';
+import 'package:kegiatin/presentation/controllers/attendance/attendance_list_controller.dart';
+import 'package:kegiatin/presentation/controllers/rsvp/event_rsvp_list_controller.dart';
+import 'package:kegiatin/presentation/pages/admin/event_detail/widget/admin_attendance_page.dart';
+import 'package:kegiatin/presentation/pages/admin/event_detail/widget/admin_participants_page.dart';
 import 'package:kegiatin/presentation/pages/admin/event_detail/widget/session_management_section.dart';
 import 'package:kegiatin/presentation/pages/admin/widget/upload_materi_bottom_sheet.dart';
 
@@ -75,6 +80,10 @@ class AdminEventDetailBody extends ConsumerWidget {
             const SizedBox(height: 16),
           ],
           _MaterialSection(event: event),
+          const SizedBox(height: 16),
+          _AttendanceSummaryCard(sessions: event.sessions, eventId: event.id),
+          const SizedBox(height: 16),
+          _ParticipantsSummaryCard(eventId: event.id),
           const SizedBox(height: 40),
         ],
       ),
@@ -232,6 +241,159 @@ class _ArchiveRow extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _AttendanceSummaryCard extends ConsumerWidget {
+  const _AttendanceSummaryCard({required this.sessions, required this.eventId});
+
+  final List<Session> sessions;
+  final String eventId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return _SurfaceCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.fact_check_outlined, size: 20, color: colorScheme.onSurfaceVariant),
+              const SizedBox(width: 12),
+              Text(
+                'Daftar Hadir',
+                style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (sessions.isEmpty)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text(
+                  'Belum ada sesi',
+                  style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+                ),
+              ),
+            )
+          else
+            ...sessions.map((s) => _SessionSummaryRow(session: s)),
+          const SizedBox(height: 16),
+          Center(
+            child: FilledButton.tonalIcon(
+              onPressed: () => _openAttendancePage(context),
+              icon: const Icon(Icons.visibility_outlined),
+              label: const Text('Kelola Kehadiran'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _openAttendancePage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AdminAttendancePage(sessions: sessions, eventId: eventId),
+      ),
+    );
+  }
+}
+
+class _SessionSummaryRow extends ConsumerWidget {
+  const _SessionSummaryRow({required this.session});
+
+  final Session session;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final attendanceAsync = ref.watch(attendanceListControllerProvider(session.id));
+
+    final list = attendanceAsync.asData?.value ?? [];
+    final total = list.length;
+    final hadir = list.where((a) => a.status == AttendanceStatus.present).length;
+    final terlambat = list.where((a) => a.status == AttendanceStatus.late).length;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              session.title,
+              style: textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text('$hadir/$total', style: textTheme.labelSmall?.copyWith(color: colorScheme.primary)),
+          if (terlambat > 0) ...[
+            const SizedBox(width: 6),
+            Icon(Icons.access_time, size: 12, color: colorScheme.tertiary),
+            const SizedBox(width: 2),
+            Text('$terlambat', style: textTheme.labelSmall?.copyWith(color: colorScheme.tertiary)),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _ParticipantsSummaryCard extends ConsumerWidget {
+  const _ParticipantsSummaryCard({required this.eventId});
+
+  final String eventId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final rsvpsAsync = ref.watch(eventRsvpListControllerProvider(eventId));
+    final total = rsvpsAsync.asData?.value.data.length ?? 0;
+
+    return _SurfaceCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.people_alt_outlined, size: 20, color: colorScheme.onSurfaceVariant),
+              const SizedBox(width: 12),
+              Text(
+                'Peserta Terdaftar',
+                style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            '$total peserta',
+            style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+          ),
+          const SizedBox(height: 16),
+          Center(
+            child: FilledButton.tonalIcon(
+              onPressed: () => _openParticipantsPage(context),
+              icon: const Icon(Icons.visibility_outlined),
+              label: const Text('Kelola Peserta'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _openParticipantsPage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => AdminParticipantsPage(eventId: eventId)),
     );
   }
 }
