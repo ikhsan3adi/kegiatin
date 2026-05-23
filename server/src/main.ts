@@ -6,6 +6,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { NestFactory, Reflector } from '@nestjs/core';
 import * as morgan from 'morgan';
+import { join } from 'path';
 import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './core/filters/http-exception.filter';
 import { TransformInterceptor } from './core/interceptors/transform.interceptor';
@@ -13,6 +14,10 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  app.useStaticAssets(join(process.cwd(), 'public', 'uploads'), {
+    prefix: '/uploads',
+  });
 
   app.use(morgan.default('combined'));
 
