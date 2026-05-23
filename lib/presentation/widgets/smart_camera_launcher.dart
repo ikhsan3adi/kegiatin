@@ -35,7 +35,8 @@ Future<ProcessedImage?> launchSmartCamera(
 
   if (captureResult == null || !context.mounted) return null;
 
-  final selectedMode = await EnhancementPreview.show(context, imageBytes: captureResult.imageBytes);
+  final defaultMode = mode == CameraMode.document ? EnhancementMode.original : EnhancementMode.enhanced;
+  final selectedMode = await EnhancementPreview.show(context, imageBytes: captureResult.imageBytes, defaultMode: defaultMode);
 
   if (selectedMode == null || !context.mounted) return null;
 

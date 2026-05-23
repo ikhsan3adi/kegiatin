@@ -236,7 +236,7 @@ return _ActionChip(
        label: 'Daftar Kegiatan',
        backgroundColor: colorScheme.primaryContainer,
        foregroundColor: colorScheme.onPrimaryContainer,
-       onTap: () => _confirmRsvp(context, ref, event.id),
+       onTap: () => _confirmRsvp(context, ref, event.id, event.title),
      );
   }
 }
@@ -286,13 +286,13 @@ class _ActionChip extends StatelessWidget {
   }
 }
 
-void _confirmRsvp(BuildContext context, WidgetRef ref, String eventId) {
+void _confirmRsvp(BuildContext context, WidgetRef ref, String eventId, String eventTitle) {
   final colorScheme = Theme.of(context).colorScheme;
   showDialog<void>(
     context: context,
     builder: (ctx) => AlertDialog(
       title: const Text('Konfirmasi RSVP'),
-      content: const Text('Apakah Anda yakin ingin mendaftar ke kegiatan ini? Kuota Anda akan terpakai.'),
+      content: Text('Apakah Anda yakin ingin mendaftar ke kegiatan "$eventTitle"? Kuota Anda akan terpakai.'),
       actions: [
         TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Batal')),
         FilledButton(

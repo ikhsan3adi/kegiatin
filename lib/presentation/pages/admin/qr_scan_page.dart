@@ -71,34 +71,34 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-ref.listen<AsyncValue<Attendance?>>(scanAttendanceControllerProvider, (prev, next) {
-         if (next is AsyncError) {
-           ScaffoldMessenger.of(context).clearSnackBars();
-           final error = next.error;
-           String message = 'Terjadi kesalahan';
-           if (error is Failure) {
-             message = error.message;
-           } else {
-             message = error.toString();
-           }
-           ScaffoldMessenger.of(context).showSnackBar(
-             SnackBar(
-               content: Row(
-                 children: [
-                   const Icon(Icons.error_outline, color: KegiatinCustomTheme.onGradient, size: 20),
-                   const SizedBox(width: 10),
-                   Expanded(
-                     child: Text(message, maxLines: 2, overflow: TextOverflow.ellipsis),
-                   ),
-                 ],
-               ),
-               backgroundColor: colorScheme.error,
-               behavior: SnackBarBehavior.floating,
-               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-               margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-             ),
-           );
-         } else if (next is AsyncData && next.value != null && _selectedSession != null) {
+    ref.listen<AsyncValue<Attendance?>>(scanAttendanceControllerProvider, (prev, next) {
+      if (next is AsyncError) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        final error = next.error;
+        String message = 'Terjadi kesalahan';
+        if (error is Failure) {
+          message = error.message;
+        } else {
+          message = error.toString();
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: KegiatinCustomTheme.onGradient, size: 20),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(message, maxLines: 2, overflow: TextOverflow.ellipsis),
+                ),
+              ],
+            ),
+            backgroundColor: colorScheme.error,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          ),
+        );
+      } else if (next is AsyncData && next.value != null && _selectedSession != null) {
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
