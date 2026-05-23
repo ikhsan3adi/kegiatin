@@ -6,6 +6,7 @@ import 'package:kegiatin/domain/entities/session_input.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
 import 'package:kegiatin/domain/enums/event_visibility.dart';
 import 'package:kegiatin/presentation/controllers/event/create_event_controller.dart';
+import 'package:kegiatin/presentation/widgets/event_banner_picker.dart';
 import 'package:kegiatin/presentation/widgets/gradient_header.dart';
 import 'package:kegiatin/presentation/widgets/section_label.dart';
 
@@ -42,6 +43,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
   EventType? _tipe;
   EventVisibility? _visibilitas;
   RepeatPattern? _polaPengulangan;
+  String? _bannerImageUrl;
 
   /// Tanggal kegiatan â€” digunakan bersama oleh waktu mulai dan waktu selesai.
   DateTime? _tanggal;
@@ -243,6 +245,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
       location: _lokasiController.text.trim(),
       contactPerson: _narahubungController.text.trim(),
       sessions: sessions,
+      imageUrl: _bannerImageUrl,
     );
 
     final errorMsg = await ref.read(createEventControllerProvider.notifier).submit(input);
@@ -329,6 +332,12 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                         }),
                         labelTipe: _labelTipe,
                       ),
+                    ),
+                    const SizedBox(height: 16),
+                    EventBannerPicker(
+                      currentImageUrl: _bannerImageUrl,
+                      onImagePicked: (url) => setState(() => _bannerImageUrl = url),
+                      onRemove: () => setState(() => _bannerImageUrl = null),
                     ),
                     const SizedBox(height: 20),
 
