@@ -19,5 +19,6 @@ abstract class RsvpRepository {
     String eventId, {
     int page = 1,
     int limit = 100,
+    String? search,
   });
 }

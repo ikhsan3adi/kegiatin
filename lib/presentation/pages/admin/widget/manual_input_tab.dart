@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/core/theme/custom.dart';
@@ -23,9 +25,11 @@ class ManualInputTab extends ConsumerStatefulWidget {
 class _ManualInputTabState extends ConsumerState<ManualInputTab> {
   final _searchController = TextEditingController();
   String _query = '';
+  Timer? _debounce;
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _searchController.dispose();
     super.dispose();
   }
@@ -102,7 +106,7 @@ class _ManualInputTabState extends ConsumerState<ManualInputTab> {
       );
     }
 
-    final rsvpsAsync = ref.watch(eventRsvpListControllerProvider(widget.eventId!));
+    final rsvpsAsync = ref.watch(eventRsvpListControllerProvider(widget.eventId!, search: _query));
     final attendancesAsync = ref.watch(attendanceListControllerProvider(widget.sessionId!));
     final scanState = ref.watch(scanAttendanceControllerProvider);
     final isLoadingScan = scanState.isLoading;
@@ -116,7 +120,12 @@ class _ManualInputTabState extends ConsumerState<ManualInputTab> {
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
               child: TextField(
                 controller: _searchController,
-                onChanged: (v) => setState(() => _query = v),
+                onChanged: (v) {
+                  _debounce?.cancel();
+                  _debounce = Timer(const Duration(milliseconds: 400), () {
+                    setState(() => _query = v.trim());
+                  });
+                },
                 style: textTheme.bodyMedium,
                 decoration: InputDecoration(
                   hintText: 'Cari Nama Anggota / NPA',
@@ -190,22 +199,14 @@ class _ManualInputTabState extends ConsumerState<ManualInputTab> {
                     data: (attendances) {
                       final rsvps = rsvpResult.data;
 
-                      // Filter RSVP terdaftar berdasarkan kueri pencarian (Nama / NPA)
-                      final filteredRsvps = rsvps.where((rsvp) {
-                        if (_query.isEmpty) return true;
-                        final q = _query.toLowerCase();
-                        final nameMatch = rsvp.user.displayName.toLowerCase().contains(q);
-                        final npaMatch = rsvp.user.npa?.toLowerCase().contains(q) ?? false;
-                        return nameMatch || npaMatch;
-                      }).toList();
-
-                      if (filteredRsvps.isEmpty) {
+                      if (rsvps.isEmpty) {
+                        final isEmptyState = _query.isEmpty;
                         return Center(
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
-                                rsvps.isEmpty
+                                isEmptyState
                                     ? Icons.group_add_outlined
                                     : Icons.person_search_outlined,
                                 size: 48,
@@ -213,7 +214,7 @@ class _ManualInputTabState extends ConsumerState<ManualInputTab> {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                rsvps.isEmpty
+                                isEmptyState
                                     ? 'Belum ada peserta terdaftar (RSVP)'
                                     : 'Peserta tidak ditemukan',
                                 style: textTheme.bodyMedium?.copyWith(
@@ -241,10 +242,10 @@ class _ManualInputTabState extends ConsumerState<ManualInputTab> {
                           Expanded(
                             child: ListView.separated(
                               padding: const EdgeInsets.fromLTRB(16, 4, 16, 80),
-                              itemCount: filteredRsvps.length,
+                              itemCount: rsvps.length,
                               separatorBuilder: (_, _) => const SizedBox(height: 8),
                               itemBuilder: (context, i) {
-                                final rsvp = filteredRsvps[i];
+                                final rsvp = rsvps[i];
                                 final isPresent = attendances.any(
                                   (att) => att.userId == rsvp.userId,
                                 );

@@ -19,6 +19,7 @@ abstract class RsvpRemoteDataSource {
     String eventId, {
     int page = 1,
     int limit = 100,
+    String? search,
   });
 }
 
@@ -81,11 +82,14 @@ class RsvpRemoteDataSourceImpl implements RsvpRemoteDataSource {
     String eventId, {
     int page = 1,
     int limit = 100,
+    String? search,
   }) async {
     try {
+      final queryParams = <String, dynamic>{'page': page, 'limit': limit};
+      if (search != null && search.isNotEmpty) queryParams['search'] = search;
       final response = await dio.get(
         ApiConstants.eventRsvpList(eventId),
-        queryParameters: {'page': page, 'limit': limit},
+        queryParameters: queryParams,
       );
       final body = _asMap(response.data);
       final data = (body['data'] as List).map((item) {

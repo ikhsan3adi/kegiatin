@@ -69,10 +69,16 @@ class RsvpRepositoryImpl implements RsvpRepository {
     String eventId, {
     int page = 1,
     int limit = 100,
+    String? search,
   }) async {
     if (await networkInfo.isConnected) {
       try {
-        final result = await remoteDataSource.getEventRsvps(eventId, page: page, limit: limit);
+        final result = await remoteDataSource.getEventRsvps(
+          eventId,
+          page: page,
+          limit: limit,
+          search: search,
+        );
         return Right(result);
       } on ServerException catch (e) {
         return Left(ServerFailure(e.message, statusCode: e.statusCode));
