@@ -7,10 +7,11 @@ import 'package:kegiatin/presentation/controllers/event/complete_event_controlle
 import 'package:kegiatin/presentation/controllers/event/event_detail_controller.dart';
 import 'package:kegiatin/presentation/controllers/event/publish_event_controller.dart';
 import 'package:kegiatin/presentation/controllers/event/start_event_controller.dart';
-import 'package:kegiatin/presentation/pages/admin/widget/admin_event_detail_body.dart';
-import 'package:kegiatin/presentation/pages/admin/widget/admin_event_detail_bottom_bar.dart';
-import 'package:kegiatin/presentation/pages/admin/widget/admin_event_detail_header.dart';
-import 'package:kegiatin/presentation/pages/admin/widget/admin_event_detail_listeners.dart';
+
+import 'widget/admin_event_detail_body.dart';
+import 'widget/admin_event_detail_bottom_bar.dart';
+import 'widget/admin_event_detail_header.dart';
+import 'widget/admin_event_detail_listeners.dart';
 
 class AdminEventDetailPage extends ConsumerWidget {
   const AdminEventDetailPage({super.key, required this.eventId});
@@ -51,10 +52,10 @@ class AdminEventDetailPage extends ConsumerWidget {
   Widget _loadingOrErrorScaffold(BuildContext context, {required Widget body}) {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: colorScheme.surfaceContainerHighest,
+      backgroundColor: colorScheme.surfaceContainer,
       appBar: AppBar(
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
-        backgroundColor: colorScheme.surfaceContainerHighest,
+        backgroundColor: colorScheme.surfaceContainer,
       ),
       body: body,
     );
@@ -79,18 +80,17 @@ class _AdminEventDetailLoaded extends ConsumerWidget {
     return AdminEventDetailListeners(
       eventId: event.id,
       child: Scaffold(
-        backgroundColor: colorScheme.surfaceContainerHighest,
+        backgroundColor: colorScheme.surfaceContainer,
         body: Column(
           children: [
             AdminEventDetailHeader(event: event),
             Container(
               width: double.infinity,
-              color: colorScheme.surface,
               padding: const EdgeInsets.symmetric(vertical: 16),
               child: Center(
                 child: Text(
                   'Detail Kegiatan (Admin)',
-                  style: textTheme.titleMedium?.copyWith(
+                  style: textTheme.titleLarge?.copyWith(
                     color: colorScheme.primary,
                     fontWeight: FontWeight.bold,
                   ),

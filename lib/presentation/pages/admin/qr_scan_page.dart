@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kegiatin/core/errors/failures.dart';
 import 'package:kegiatin/core/theme/custom.dart';
 import 'package:kegiatin/domain/entities/attendance.dart';
 import 'package:kegiatin/domain/entities/event.dart';
@@ -73,6 +74,13 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
     ref.listen<AsyncValue<Attendance?>>(scanAttendanceControllerProvider, (prev, next) {
       if (next is AsyncError) {
         ScaffoldMessenger.of(context).clearSnackBars();
+        final error = next.error;
+        String message = 'Terjadi kesalahan';
+        if (error is Failure) {
+          message = error.message;
+        } else {
+          message = error.toString();
+        }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
@@ -80,7 +88,7 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
                 const Icon(Icons.error_outline, color: KegiatinCustomTheme.onGradient, size: 20),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Text(next.error.toString(), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  child: Text(message, maxLines: 2, overflow: TextOverflow.ellipsis),
                 ),
               ],
             ),

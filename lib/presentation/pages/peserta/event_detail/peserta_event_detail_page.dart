@@ -3,9 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/presentation/controllers/event/event_detail_controller.dart';
-import 'package:kegiatin/presentation/pages/peserta/widget/peserta_event_detail_body.dart';
-import 'package:kegiatin/presentation/pages/peserta/widget/peserta_event_detail_header.dart';
-import 'package:kegiatin/presentation/pages/peserta/widget/peserta_event_detail_listeners.dart';
+
+import 'widget/peserta_event_detail_body.dart';
+import 'widget/peserta_event_detail_header.dart';
+import 'widget/peserta_event_detail_listeners.dart';
 
 class PesertaEventDetailPage extends ConsumerWidget {
   const PesertaEventDetailPage({super.key, required this.eventId});
@@ -45,10 +46,10 @@ class PesertaEventDetailPage extends ConsumerWidget {
   Widget _fallbackScaffold(BuildContext context, Widget body) {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: colorScheme.surfaceContainerHighest,
+      backgroundColor: colorScheme.surfaceContainer,
       appBar: AppBar(
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
-        backgroundColor: colorScheme.surfaceContainerHighest,
+        backgroundColor: colorScheme.surfaceContainer,
       ),
       body: body,
     );
@@ -67,18 +68,17 @@ class _PesertaEventDetailLoaded extends ConsumerWidget {
 
     return PesertaEventDetailListeners(
       child: Scaffold(
-        backgroundColor: colorScheme.surfaceContainerHighest,
+        backgroundColor: colorScheme.surfaceContainer,
         body: Column(
           children: [
             PesertaEventDetailHeader(event: event),
             Container(
               width: double.infinity,
-              color: colorScheme.surface,
               padding: const EdgeInsets.symmetric(vertical: 16),
               child: Center(
                 child: Text(
                   'Info',
-                  style: textTheme.titleMedium?.copyWith(
+                  style: textTheme.titleLarge?.copyWith(
                     color: colorScheme.primary,
                     fontWeight: FontWeight.bold,
                   ),

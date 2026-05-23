@@ -1,7 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kegiatin/core/pcd/enhancement_options.dart';
 import 'package:kegiatin/domain/entities/event.dart';
+import 'package:kegiatin/domain/entities/processed_image.dart';
 import 'package:kegiatin/domain/entities/session.dart';
+import 'package:kegiatin/presentation/widgets/smart_camera_launcher.dart';
 
 class UploadMateriBottomSheet extends ConsumerStatefulWidget {
   const UploadMateriBottomSheet({super.key, required this.event});
@@ -13,11 +18,12 @@ class UploadMateriBottomSheet extends ConsumerStatefulWidget {
 }
 
 class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomSheet> {
-  // UI-only local state
-  String _selectedType = 'PDF'; // 'PDF' | 'LINK'
+  String _selectedType = 'FILE';
   Session? _selectedSession;
   final _titleController = TextEditingController();
   final _linkController = TextEditingController();
+
+  ProcessedImage? _scannedFile;
 
   @override
   void initState() {
@@ -36,6 +42,13 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
 
   List<Session> get _availableSessions => widget.event.sessions;
 
+  Future<void> _handleScanDocument() async {
+    final result = await launchSmartCamera(context, ref, mode: CameraMode.document);
+    if (result != null && mounted) {
+      setState(() => _scannedFile = result);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -49,7 +62,6 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // ── Handle bar ──────────────────────────────────────────────
             Center(
               child: Container(
                 width: 40,
@@ -62,7 +74,6 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
               ),
             ),
 
-            // ── Header ──────────────────────────────────────────────────
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -81,7 +92,6 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
             const SizedBox(height: 24),
 
             if (_availableSessions.length > 1) ...[
-              // ── Pilih Sesi ───────────────────────────────────────────────
               InputDecorator(
                 decoration: InputDecoration(
                   labelText: 'Pilih Sesi',
@@ -93,7 +103,6 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
                   isExpanded: true,
                   underline: const SizedBox.shrink(),
                   hint: const Text('Pilih sesi'),
-                  // Nonaktif jika belum ada kegiatan atau tidak ada sesi
                   onChanged: (_availableSessions.isEmpty)
                       ? null
                       : (val) => setState(() => _selectedSession = val),
@@ -110,7 +119,6 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
               const SizedBox(height: 16),
             ],
 
-            // ── Judul Materi ─────────────────────────────────────────────
             TextField(
               controller: _titleController,
               decoration: InputDecoration(
@@ -122,21 +130,16 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
             ),
             const SizedBox(height: 24),
 
-            // ── Toggle Tipe Materi ───────────────────────────────────────
             Text('Tipe Materi', style: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             SegmentedButton<String>(
               segments: const [
                 ButtonSegment(
-                  value: 'PDF',
-                  label: Text('Dokumen (PDF)'),
-                  icon: Icon(Icons.picture_as_pdf_rounded),
+                  value: 'FILE',
+                  label: Text('Dokumen'),
+                  icon: Icon(Icons.file_copy_outlined),
                 ),
-                ButtonSegment(
-                  value: 'LINK',
-                  label: Text('Tautan (Link)'),
-                  icon: Icon(Icons.link_rounded),
-                ),
+                ButtonSegment(value: 'LINK', label: Text('Tautan'), icon: Icon(Icons.link_rounded)),
               ],
               selected: {_selectedType},
               onSelectionChanged: (newSelection) {
@@ -145,34 +148,88 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
             ),
             const SizedBox(height: 16),
 
-            // ── Input bergantung tipe ────────────────────────────────────
-            if (_selectedType == 'PDF')
-              InkWell(
-                onTap: () {
-                  // TODO: Sambungkan file picker (misalnya file_picker package)
-                },
-                borderRadius: BorderRadius.circular(12),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: colorScheme.outlineVariant),
-                  ),
-                  child: Column(
-                    children: [
-                      Icon(Icons.upload_file_rounded, size: 48, color: colorScheme.primary),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Ketuk untuk memilih file PDF',
-                        style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
+            if (_selectedType == 'FILE') ...[
+              if (_scannedFile != null) ...[
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.file(File(_scannedFile!.filePath), height: 160, fit: BoxFit.cover),
                 ),
-              )
-            else
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Mode: ${_scannedFile!.enhancementMode} · ${(_scannedFile!.fileSize / 1024).toStringAsFixed(1)} KB',
+                        style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
+                      ),
+                    ),
+                    TextButton.icon(
+                      onPressed: _handleScanDocument,
+                      icon: const Icon(Icons.refresh, size: 18),
+                      label: const Text('Scan Ulang'),
+                    ),
+                  ],
+                ),
+              ] else ...[
+                Row(
+                  children: [
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {},
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                          decoration: BoxDecoration(
+                            color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: colorScheme.outlineVariant),
+                          ),
+                          child: Column(
+                            children: [
+                              Icon(Icons.upload_file_rounded, size: 36, color: colorScheme.primary),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Pilih File',
+                                style: textTheme.bodyMedium?.copyWith(color: colorScheme.primary),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: InkWell(
+                        onTap: _handleScanDocument,
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                          decoration: BoxDecoration(
+                            color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: colorScheme.outlineVariant),
+                          ),
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.document_scanner_rounded,
+                                size: 36,
+                                color: colorScheme.primary,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Scan Dokumen',
+                                style: textTheme.bodyMedium?.copyWith(color: colorScheme.primary),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ] else
               TextField(
                 controller: _linkController,
                 keyboardType: TextInputType.url,
@@ -186,10 +243,8 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
               ),
             const SizedBox(height: 32),
 
-            // ── Tombol Simpan ────────────────────────────────────────────
             FilledButton(
               onPressed: () {
-                // TODO: Kirim data materi ke repository
                 Navigator.pop(context);
               },
               style: FilledButton.styleFrom(

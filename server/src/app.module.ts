@@ -6,6 +6,8 @@ import { EventsModule } from './modules/events/events.module';
 import { RsvpModule } from './modules/rsvp/rsvp.module';
 import { AttendanceModule } from './modules/attendance/attendance.module';
 import { UsersModule } from './modules/users/users.module';
+import { ProfileModule } from './modules/profile/profile.module';
+import { UploadsModule } from './modules/uploads/uploads.module';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { UsersModule } from './modules/users/users.module';
     RsvpModule,
     AttendanceModule,
     UsersModule,
+    ProfileModule,
+    UploadsModule,
   ],
 })
 export class AppModule {}

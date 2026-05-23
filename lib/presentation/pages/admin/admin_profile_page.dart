@@ -81,19 +81,17 @@ class AdminProfilePage extends ConsumerWidget {
                     children: [
                       if (user != null) ProfileCard(email: user.email, joinedAt: user.createdAt),
                       const SizedBox(height: 24),
-                      FilledButton.icon(
+                      OutlinedButton.icon(
                         onPressed: () => _showLogoutDialog(context, ref),
-                        style: FilledButton.styleFrom(
+                        style: OutlinedButton.styleFrom(
                           backgroundColor: colorScheme.errorContainer,
                           foregroundColor: colorScheme.onErrorContainer,
+                          side: BorderSide(color: colorScheme.onErrorContainer),
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         ),
                         icon: const Icon(Icons.logout_rounded),
-                        label: const Text(
-                          'Keluar dari Aplikasi',
-                          style: TextStyle(fontWeight: FontWeight.w600),
-                        ),
+                        label: const Text('Keluar', style: TextStyle(fontWeight: FontWeight.bold)),
                       ),
                     ],
                   ),

@@ -11,6 +11,7 @@ export 'attendance_providers.dart';
 export 'auth_providers.dart';
 export 'core_providers.dart';
 export 'event_providers.dart';
+export 'pcd_providers.dart';
 export 'rsvp_providers.dart';
 export 'session_providers.dart';
 export 'user_providers.dart';
