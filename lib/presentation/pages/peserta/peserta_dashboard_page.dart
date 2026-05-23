@@ -51,8 +51,7 @@ class _PesertaDashboardPageState extends ConsumerState<PesertaDashboardPage> {
     return authState.when(
       data: (user) => RefreshIndicator(
         onRefresh: () async {
-          ref.invalidate(eventListControllerProvider());
-          await ref.read(eventListControllerProvider().future);
+          await ref.read(eventListControllerProvider().notifier).refresh();
         },
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),

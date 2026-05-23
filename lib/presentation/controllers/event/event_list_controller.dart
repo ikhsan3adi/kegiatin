@@ -8,7 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'event_list_controller.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 class EventListController extends _$EventListController {
   @override
   FutureOr<PaginatedResult<Event>> build({

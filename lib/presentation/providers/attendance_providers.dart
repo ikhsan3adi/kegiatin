@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:hive_ce/hive.dart';
 import 'package:kegiatin/data/datasources/local/attendance_local_datasource.dart';
 import 'package:kegiatin/data/datasources/remote/attendance_remote_datasource.dart';
@@ -42,8 +44,28 @@ GetSessionAttendanceUseCase getSessionAttendanceUseCase(Ref ref) =>
     GetSessionAttendanceUseCase(ref.watch(attendanceRepositoryProvider));
 
 @riverpod
-Future<int> pendingAttendanceCount(Ref ref) async {
-  final localDataSource = ref.watch(attendanceLocalDataSourceProvider);
-  final pending = await localDataSource.getPendingRecords();
-  return pending.length;
+Stream<int> pendingAttendanceCount(Ref ref) async* {
+  final box = ref.watch(attendanceBoxProvider);
+
+  int getCount() {
+    final values = box.values;
+    int count = 0;
+    for (final raw in values) {
+      if (raw is String) {
+        try {
+          // ignore: avoid_dynamic_calls
+          final syncStatus = jsonDecode(raw)['syncStatus'];
+          if (syncStatus == 'PENDING') {
+            count++;
+          }
+        } catch (_) {}
+      }
+    }
+    return count;
+  }
+
+  yield getCount();
+  await for (final _ in box.watch()) {
+    yield getCount();
+  }
 }

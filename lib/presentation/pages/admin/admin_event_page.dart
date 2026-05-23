@@ -168,19 +168,15 @@ class _AdminEventPageState extends ConsumerState<AdminEventPage> {
                 bottom: 0,
                 child: RefreshIndicator(
                   onRefresh: () async {
-                    ref.invalidate(
-                      eventListControllerProvider(
-                        search: _searchQuery.isEmpty ? null : _searchQuery,
-                        status: _selectedStatus,
-                      ),
-                    );
                     try {
-                      await ref.read(
-                        eventListControllerProvider(
-                          search: _searchQuery.isEmpty ? null : _searchQuery,
-                          status: _selectedStatus,
-                        ).future,
-                      );
+                      await ref
+                          .read(
+                            eventListControllerProvider(
+                              search: _searchQuery.isEmpty ? null : _searchQuery,
+                              status: _selectedStatus,
+                            ).notifier,
+                          )
+                          .refresh();
                     } catch (_) {}
                   },
                   child: SingleChildScrollView(
