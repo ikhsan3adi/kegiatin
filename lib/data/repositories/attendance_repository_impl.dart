@@ -84,6 +84,7 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
       for (final item in result.results) {
         final newStatus = switch (item.status) {
           'SYNCED' => SyncStatus.synced,
+          'CONFLICT' => SyncStatus.synced,
           _ => SyncStatus.conflict,
         };
         await localDataSource.updateSyncStatus(item.localId, newStatus);

@@ -8,7 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'event_list_controller.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class EventListController extends _$EventListController {
   @override
   FutureOr<PaginatedResult<Event>> build({
@@ -53,5 +53,10 @@ class EventListController extends _$EventListController {
     );
 
     return result.fold((failure) => throw Exception(failure.message), (data) => data);
+  }
+
+  Future<void> refresh() async {
+    ref.invalidateSelf();
+    await future;
   }
 }
