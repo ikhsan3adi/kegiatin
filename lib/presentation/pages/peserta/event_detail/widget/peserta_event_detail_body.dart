@@ -231,13 +231,13 @@ class _PesertaActionButton extends ConsumerWidget {
       );
     }
 
-    return _ActionChip(
-      icon: Icons.assignment_outlined,
-      label: 'Daftar Kegiatan',
-      backgroundColor: colorScheme.primaryContainer,
-      foregroundColor: colorScheme.onPrimaryContainer,
-      onTap: () => ref.read(createRsvpControllerProvider.notifier).createRsvp(event.id),
-    );
+return _ActionChip(
+       icon: Icons.assignment_outlined,
+       label: 'Daftar Kegiatan',
+       backgroundColor: colorScheme.primaryContainer,
+       foregroundColor: colorScheme.onPrimaryContainer,
+       onTap: () => _confirmRsvp(context, ref, event.id),
+     );
   }
 }
 
@@ -284,4 +284,29 @@ class _ActionChip extends StatelessWidget {
       ),
     );
   }
+}
+
+void _confirmRsvp(BuildContext context, WidgetRef ref, String eventId) {
+  final colorScheme = Theme.of(context).colorScheme;
+  showDialog<void>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: const Text('Konfirmasi RSVP'),
+      content: const Text('Apakah Anda yakin ingin mendaftar ke kegiatan ini? Kuota Anda akan terpakai.'),
+      actions: [
+        TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Batal')),
+        FilledButton(
+          onPressed: () {
+            Navigator.of(ctx).pop();
+            ref.read(createRsvpControllerProvider.notifier).createRsvp(eventId);
+          },
+          style: FilledButton.styleFrom(
+            backgroundColor: colorScheme.primaryContainer,
+            foregroundColor: colorScheme.onPrimaryContainer,
+          ),
+          child: const Text('Ya, Daftar'),
+        ),
+      ],
+    ),
+  );
 }
