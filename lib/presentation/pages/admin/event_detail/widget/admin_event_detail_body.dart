@@ -435,19 +435,19 @@ class _DetailRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 14)),
+        Text(label, style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant)),
         Flexible(
           child: Text(
             value,
             textAlign: TextAlign.end,
-            style: TextStyle(
-              color: colorScheme.onSurface,
-              fontSize: 14,
+            style: textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w500,
+              color: colorScheme.onSurface,
             ),
           ),
         ),
