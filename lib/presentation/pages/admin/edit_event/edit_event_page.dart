@@ -174,6 +174,12 @@ class _EditEventPageState extends ConsumerState<EditEventPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  EventBannerPicker(
+                    currentImageUrl: _bannerImageUrl,
+                    onImagePicked: (url) => setState(() => _bannerImageUrl = url),
+                    onRemove: () => setState(() => _bannerImageUrl = null),
+                  ),
+                  const SizedBox(height: 20),
                   const SectionLabel(label: 'Informasi Kegiatan', icon: Icons.info_outline_rounded),
                   const SizedBox(height: 12),
                   CustomInputCard(
@@ -223,12 +229,6 @@ class _EditEventPageState extends ConsumerState<EditEventPage> {
                           ),
                       validator: (v) => (v == null || v.trim().isEmpty) ? 'Wajib diisi' : null,
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  EventBannerPicker(
-                    currentImageUrl: _bannerImageUrl,
-                    onImagePicked: (url) => setState(() => _bannerImageUrl = url),
-                    onRemove: () => setState(() => _bannerImageUrl = null),
                   ),
                   const SizedBox(height: 20),
                   const SectionLabel(label: 'Lokasi & Kontak', icon: Icons.place_outlined),

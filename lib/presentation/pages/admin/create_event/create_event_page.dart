@@ -314,6 +314,12 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    EventBannerPicker(
+                      currentImageUrl: _bannerImageUrl,
+                      onImagePicked: (url) => setState(() => _bannerImageUrl = url),
+                      onRemove: () => setState(() => _bannerImageUrl = null),
+                    ),
+                    const SizedBox(height: 20),
                     const SectionLabel(
                       label: 'Informasi Kegiatan',
                       icon: Icons.info_outline_rounded,
@@ -332,12 +338,6 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                         }),
                         labelTipe: _labelTipe,
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    EventBannerPicker(
-                      currentImageUrl: _bannerImageUrl,
-                      onImagePicked: (url) => setState(() => _bannerImageUrl = url),
-                      onRemove: () => setState(() => _bannerImageUrl = null),
                     ),
                     const SizedBox(height: 20),
 

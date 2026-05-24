@@ -20,13 +20,14 @@ class EventBannerPicker extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (currentImageUrl != null) ...[
           ClipRRect(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(16),
             child: Stack(
               children: [
                 Image.network(
@@ -56,28 +57,119 @@ class EventBannerPicker extends ConsumerWidget {
                     ),
                   ),
                 ),
+                Positioned(
+                  bottom: 8,
+                  right: 8,
+                  child: Material(
+                    color: Colors.black54,
+                    borderRadius: BorderRadius.circular(20),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: () => _pickBanner(context, ref),
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.edit, color: Colors.white, size: 14),
+                            SizedBox(width: 4),
+                            Text('Ganti Foto', style: TextStyle(color: Colors.white, fontSize: 12)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
-          const SizedBox(height: 12),
-        ],
-        OutlinedButton.icon(
-          onPressed: () => _pickBanner(context, ref),
-          icon: Icon(Icons.camera_alt_outlined, size: 18, color: colorScheme.primary),
-          label: Text(currentImageUrl == null ? 'Ambil Foto Banner' : 'Ganti Foto Banner'),
-          style: OutlinedButton.styleFrom(
-            minimumSize: const Size(double.infinity, 44),
-            side: BorderSide(color: colorScheme.primary.withValues(alpha: 0.4)),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ] else ...[
+          InkWell(
+            onTap: () => _pickBanner(context, ref),
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              width: double.infinity,
+              height: 160,
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: colorScheme.primary.withValues(alpha: 0.3),
+                  style: BorderStyle.solid,
+                  width: 1.5,
+                ),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.add_photo_alternate_outlined, size: 40, color: colorScheme.primary),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Tambah Banner Kegiatan',
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Galeri / Smart Camera / Camera',
+                    style: textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
+        ],
       ],
     );
   }
 
   Future<void> _pickBanner(BuildContext context, WidgetRef ref) async {
+    final CameraMode? selectedMode = await showModalBottomSheet<CameraMode>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (BuildContext ctx) {
+        final localScheme = Theme.of(ctx).colorScheme;
+        final localText = Theme.of(ctx).textTheme;
+        return Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Pilih Metode Pengambilan Banner',
+                style: localText.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              ListTile(
+                leading: Icon(Icons.photo_library_outlined, color: localScheme.primary),
+                title: const Text('Pilih dari Galeri (Upload File)'),
+                onTap: () => Navigator.pop(ctx, CameraMode.gallery),
+              ),
+              ListTile(
+                leading: Icon(Icons.document_scanner_outlined, color: localScheme.primary),
+                title: const Text('Kamera Cerdas (Smart Camera)'),
+                onTap: () => Navigator.pop(ctx, CameraMode.document),
+              ),
+              ListTile(
+                leading: Icon(Icons.camera_alt_outlined, color: localScheme.primary),
+                title: const Text('Kamera Biasa'),
+                onTap: () => Navigator.pop(ctx, CameraMode.photo),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (selectedMode == null || !context.mounted) return;
+
     try {
-      final result = await launchSmartCamera(context, ref, mode: CameraMode.photo);
+      final result = await launchSmartCamera(context, ref, mode: selectedMode);
       if (result == null || !context.mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(

@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:kegiatin/core/pcd/enhancement_options.dart';
 import 'package:kegiatin/domain/entities/processed_image.dart';
 import 'package:kegiatin/domain/repositories/pcd_repository.dart';
@@ -29,8 +31,17 @@ Future<ProcessedImage?> launchSmartCamera(
   final CaptureResult? captureResult;
   if (mode == CameraMode.document) {
     captureResult = await repository.captureDocument();
-  } else {
+  } else if (mode == CameraMode.photo) {
     captureResult = await repository.capturePhoto();
+  } else {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 90);
+    if (picked == null) {
+      captureResult = null;
+    } else {
+      final bytes = await File(picked.path).readAsBytes();
+      captureResult = CaptureResult(imageBytes: bytes);
+    }
   }
 
   if (captureResult == null || !context.mounted) return null;

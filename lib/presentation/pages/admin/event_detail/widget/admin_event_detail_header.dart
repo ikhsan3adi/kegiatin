@@ -21,6 +21,116 @@ class AdminEventDetailHeader extends StatelessWidget {
         ? "${startTime.year}-${startTime.month.toString().padLeft(2, '0')}-${startTime.day.toString().padLeft(2, '0')} . ${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}"
         : 'Waktu belum ditentukan';
 
+    final hasBanner = event.imageUrl != null && event.imageUrl!.isNotEmpty;
+
+    if (hasBanner) {
+      return Container(
+        height: 250,
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(28),
+            bottomRight: Radius.circular(28),
+          ),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          children: [
+            Image.network(
+              event.imageUrl!,
+              width: double.infinity,
+              height: double.infinity,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Container(
+                color: colorScheme.primary,
+                child: const Center(child: Icon(Icons.broken_image, color: Colors.white, size: 48)),
+              ),
+            ),
+            Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.black38, Colors.black87],
+                ),
+              ),
+            ),
+            SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    InkWell(
+                      onTap: () => context.pop(),
+                      borderRadius: BorderRadius.circular(24),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: const BoxDecoration(
+                          color: Colors.black26,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
+                      ),
+                    ),
+                    const Spacer(),
+                    Row(
+                      children: [
+                        _Badge(
+                          text: _statusLabel(event.status),
+                          backgroundColor: Colors.white24,
+                          textColor: Colors.white,
+                        ),
+                        const SizedBox(width: 8),
+                        _Badge(
+                          text: event.type == EventType.series ? 'Rutin' : 'Tunggal',
+                          backgroundColor: Colors.white24,
+                          textColor: Colors.white,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      event.title,
+                      style: textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        const Icon(Icons.access_time, size: 14, color: Colors.white70),
+                        const SizedBox(width: 4),
+                        Text(dateStr, style: textTheme.bodySmall?.copyWith(color: Colors.white70)),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(Icons.location_on_outlined, size: 14, color: Colors.white70),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            event.location,
+                            style: textTheme.bodySmall?.copyWith(color: Colors.white70),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return KegiatinAppBar(
       height: null,
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),

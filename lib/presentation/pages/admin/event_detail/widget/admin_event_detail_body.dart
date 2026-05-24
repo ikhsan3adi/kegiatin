@@ -7,13 +7,14 @@ import 'package:kegiatin/domain/enums/attendance_status.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
 import 'package:kegiatin/domain/enums/event_visibility.dart';
 import 'package:kegiatin/presentation/controllers/archive/session_archives_controller.dart';
+import 'package:kegiatin/presentation/controllers/archive/delete_archive_controller.dart';
 import 'package:kegiatin/presentation/controllers/attendance/attendance_list_controller.dart';
 import 'package:kegiatin/presentation/controllers/rsvp/event_rsvp_list_controller.dart';
 import 'package:kegiatin/presentation/pages/admin/event_detail/widget/admin_attendance_page.dart';
 import 'package:kegiatin/presentation/pages/admin/event_detail/widget/admin_participants_page.dart';
 import 'package:kegiatin/presentation/pages/admin/event_detail/widget/session_management_section.dart';
-import 'package:kegiatin/presentation/pages/admin/widget/invite_member_sheet.dart';
 import 'package:kegiatin/presentation/pages/admin/widget/upload_materi_bottom_sheet.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AdminEventDetailBody extends ConsumerWidget {
   const AdminEventDetailBody({super.key, required this.event});
@@ -72,27 +73,6 @@ class AdminEventDetailBody extends ConsumerWidget {
                 ),
                 const SizedBox(height: 16),
                 _DetailRow(label: 'Narahubung', value: event.contactPerson),
-                if (event.visibility == EventVisibility.inviteOnly) ...[
-                  const SizedBox(height: 16),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: FilledButton.tonalIcon(
-                      onPressed: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          useSafeArea: true,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-                          ),
-                          builder: (_) => InviteMemberSheet(eventId: event.id),
-                        );
-                      },
-                      icon: const Icon(Icons.person_add_alt_rounded, size: 18),
-                      label: const Text('Undang Anggota'),
-                    ),
-                  ),
-                ],
               ],
             ),
           ),
@@ -254,12 +234,43 @@ class _ArchiveRow extends ConsumerWidget {
           IconButton(
             icon: Icon(Icons.open_in_new, size: 16, color: colorScheme.primary),
             visualDensity: VisualDensity.compact,
-            onPressed: () {},
+            onPressed: () async {
+              final uri = Uri.parse(archive.fileUrl);
+              if (await canLaunchUrl(uri)) {
+                await launchUrl(uri, mode: LaunchMode.externalApplication);
+              }
+            },
           ),
           IconButton(
             icon: Icon(Icons.delete_outline, size: 16, color: colorScheme.error),
             visualDensity: VisualDensity.compact,
-            onPressed: () {},
+            onPressed: () async {
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (_) => AlertDialog(
+                  title: const Text('Hapus Materi'),
+                  content: Text('Apakah Anda yakin ingin menghapus materi "${archive.title}"?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('Batal'),
+                    ),
+                    FilledButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: colorScheme.error,
+                        foregroundColor: colorScheme.onError,
+                      ),
+                      child: const Text('Hapus'),
+                    ),
+                  ],
+                ),
+              );
+              if (confirm == true) {
+                await ref.read(deleteArchiveControllerProvider.notifier).delete(archive.id);
+                ref.invalidate(sessionArchivesControllerProvider(archive.sessionId));
+              }
+            },
           ),
         ],
       ),
@@ -307,10 +318,14 @@ class _AttendanceSummaryCard extends ConsumerWidget {
             ...sessions.map((s) => _SessionSummaryRow(session: s)),
           const SizedBox(height: 16),
           Center(
-            child: FilledButton.tonalIcon(
+            child: FilledButton.icon(
               onPressed: () => _openAttendancePage(context),
-              icon: const Icon(Icons.visibility_outlined),
+              icon: const Icon(Icons.fact_check_outlined),
               label: const Text('Kelola Kehadiran'),
+              style: FilledButton.styleFrom(
+                backgroundColor: colorScheme.primaryContainer,
+                foregroundColor: colorScheme.onPrimaryContainer,
+              ),
             ),
           ),
         ],
@@ -401,10 +416,14 @@ class _ParticipantsSummaryCard extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           Center(
-            child: FilledButton.tonalIcon(
+            child: FilledButton.icon(
               onPressed: () => _openParticipantsPage(context),
-              icon: const Icon(Icons.visibility_outlined),
+              icon: const Icon(Icons.people_outline),
               label: const Text('Kelola Peserta'),
+              style: FilledButton.styleFrom(
+                backgroundColor: colorScheme.primaryContainer,
+                foregroundColor: colorScheme.onPrimaryContainer,
+              ),
             ),
           ),
         ],

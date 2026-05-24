@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/domain/entities/rsvp_with_user.dart';
 import 'package:kegiatin/domain/enums/rsvp_status.dart';
+import 'package:kegiatin/domain/enums/event_visibility.dart';
 import 'package:kegiatin/presentation/controllers/rsvp/event_rsvp_list_controller.dart';
+import 'package:kegiatin/presentation/controllers/event/event_detail_controller.dart';
+import 'package:kegiatin/presentation/pages/admin/widget/invite_member_sheet.dart';
 
 class AdminParticipantsPage extends ConsumerWidget {
   const AdminParticipantsPage({super.key, required this.eventId});
@@ -14,12 +17,32 @@ class AdminParticipantsPage extends ConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final rsvpsAsync = ref.watch(eventRsvpListControllerProvider(eventId));
+    final eventAsync = ref.watch(eventDetailControllerProvider(eventId));
+    final isInviteOnly = eventAsync.asData?.value.visibility == EventVisibility.inviteOnly;
 
     return Scaffold(
       backgroundColor: colorScheme.surfaceContainer,
       appBar: AppBar(
         title: const Text('Kelola Peserta'),
         backgroundColor: colorScheme.surfaceContainer,
+        actions: [
+          if (isInviteOnly)
+            IconButton(
+              icon: const Icon(Icons.person_add_alt_rounded),
+              tooltip: 'Undang Anggota',
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  useSafeArea: true,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                  ),
+                  builder: (_) => InviteMemberSheet(eventId: eventId),
+                );
+              },
+            ),
+        ],
       ),
       body: rsvpsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),

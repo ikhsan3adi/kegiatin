@@ -32,7 +32,7 @@ class ArchiveRemoteDataSourceImpl implements ArchiveRemoteDataSource {
     try {
       final response = await dio.post(
         ApiConstants.sessionArchives(sessionId),
-        data: {'title': title, 'type': type.name, 'fileUrl': fileUrl},
+        data: {'title': title, 'type': type.toJson(), 'fileUrl': fileUrl},
       );
       final body = _asMap(response.data);
       final data = _asMap(body['data']);

@@ -51,6 +51,13 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
     }
   }
 
+  Future<void> _handlePickFile() async {
+    final result = await launchSmartCamera(context, ref, mode: CameraMode.gallery);
+    if (result != null && mounted) {
+      setState(() => _scannedFile = result);
+    }
+  }
+
   Future<void> _handleUpload() async {
     if (_selectedSession == null || _titleController.text.trim().isEmpty) {
       unawaited(
@@ -220,7 +227,7 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
                   children: [
                     Expanded(
                       child: InkWell(
-                        onTap: () {},
+                        onTap: _handlePickFile,
                         borderRadius: BorderRadius.circular(12),
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
