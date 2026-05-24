@@ -114,7 +114,7 @@ class EventBannerPicker extends ConsumerWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Galeri / Smart Camera / Camera',
+                    'Upload Dari Galeri / Kamera',
                     style: textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant),
                   ),
                 ],
@@ -170,7 +170,7 @@ class EventBannerPicker extends ConsumerWidget {
     if (selectedMode == null || !context.mounted) return;
 
     try {
-      final result = await launchSmartCamera(context, ref, mode: selectedMode);
+      final result = await launchSmartCamera(context, ref, mode: selectedMode, cropImage: true);
       if (result == null || !context.mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(

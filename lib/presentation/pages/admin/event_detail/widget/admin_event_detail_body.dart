@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kegiatin/core/constants/api_constants.dart';
 import 'package:kegiatin/domain/entities/archive_item.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/entities/session.dart';
@@ -14,6 +15,7 @@ import 'package:kegiatin/presentation/pages/admin/event_detail/widget/admin_atte
 import 'package:kegiatin/presentation/pages/admin/event_detail/widget/admin_participants_page.dart';
 import 'package:kegiatin/presentation/pages/admin/event_detail/widget/session_management_section.dart';
 import 'package:kegiatin/presentation/pages/admin/widget/upload_materi_bottom_sheet.dart';
+import 'package:kegiatin/presentation/pages/fullscreen_image_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AdminEventDetailBody extends ConsumerWidget {
@@ -26,10 +28,73 @@ class AdminEventDetailBody extends ConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
+    final hasBanner = event.imageUrl != null && event.imageUrl!.isNotEmpty;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
+          if (hasBanner) ...[
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => FullscreenImagePage(imageUrl: event.imageUrl!),
+                        ),
+                      );
+                    },
+                    child: Stack(
+                      alignment: Alignment.bottomRight,
+                      children: [
+                        Image.network(
+                          ApiConstants.resolveImageUrl(event.imageUrl!),
+                          width: double.infinity,
+                          height: 160,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Container(
+                            height: 160,
+                            color: colorScheme.surfaceContainerHighest,
+                            child: const Center(
+                              child: Icon(Icons.broken_image_outlined, size: 40),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          right: 8,
+                          bottom: 8,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.black54,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.fullscreen, color: Colors.white, size: 16),
+                                SizedBox(width: 4),
+                                Text(
+                                  'Perbesar',
+                                  style: TextStyle(color: Colors.white, fontSize: 10),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
           _SurfaceCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
