@@ -3,6 +3,16 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 class ApiConstants {
   static String get baseUrl => dotenv.env['BASE_URL'] ?? 'http://localhost:3000/api';
 
+  static String resolveImageUrl(String url) {
+    final uploadsIndex = url.indexOf('/uploads/');
+    if (uploadsIndex != -1) {
+      final relativePath = url.substring(uploadsIndex);
+      final base = baseUrl.replaceAll('/api', '');
+      return '$base$relativePath';
+    }
+    return url;
+  }
+
   static const int connectTimeout = 15000;
   static const int receiveTimeout = 15000;
 

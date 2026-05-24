@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kegiatin/core/constants/api_constants.dart';
 import 'package:kegiatin/core/pcd/enhancement_options.dart';
 import 'package:kegiatin/core/theme/custom.dart';
 import 'package:kegiatin/presentation/providers/providers.dart';
@@ -31,7 +32,7 @@ class EventBannerPicker extends ConsumerWidget {
             child: Stack(
               children: [
                 Image.network(
-                  currentImageUrl!,
+                  ApiConstants.resolveImageUrl(currentImageUrl!),
                   width: double.infinity,
                   height: 160,
                   fit: BoxFit.cover,

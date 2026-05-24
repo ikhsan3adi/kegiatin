@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kegiatin/core/constants/api_constants.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/enums/event_status.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
@@ -42,7 +43,7 @@ class PesertaEventDetailHeader extends StatelessWidget {
         child: Stack(
           children: [
             Image.network(
-              event.imageUrl!,
+              ApiConstants.resolveImageUrl(event.imageUrl!),
               width: double.infinity,
               height: double.infinity,
               fit: BoxFit.cover,
