@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/core/theme/custom.dart';
+import 'package:kegiatin/core/utils/string_utils.dart';
 import 'package:kegiatin/domain/entities/attendance.dart';
 import 'package:kegiatin/presentation/controllers/attendance/attendance_list_controller.dart';
 import 'package:kegiatin/presentation/controllers/attendance/scan_attendance_controller.dart';
@@ -32,14 +33,6 @@ class _ManualInputTabState extends ConsumerState<ManualInputTab> {
     _debounce?.cancel();
     _searchController.dispose();
     super.dispose();
-  }
-
-  /// Menghasilkan inisial dari nama (maks 2 karakter).
-  static String _initials(String name) {
-    final parts = name.trim().split(RegExp(r'\s+'));
-    if (parts.isEmpty || parts.first.isEmpty) return '?';
-    if (parts.length == 1) return parts.first[0].toUpperCase();
-    return (parts.first[0] + parts[1][0]).toUpperCase();
   }
 
   @override
@@ -252,7 +245,7 @@ class _ManualInputTabState extends ConsumerState<ManualInputTab> {
 
                                 return _PesertaCard(
                                   name: rsvp.user.displayName,
-                                  initials: _initials(rsvp.user.displayName),
+                                  initials: StringUtils.initials(rsvp.user.displayName),
                                   isAnggota: rsvp.user.npa != null,
                                   npa: rsvp.user.npa,
                                   isPresent: isPresent,

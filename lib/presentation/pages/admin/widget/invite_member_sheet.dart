@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kegiatin/core/utils/string_utils.dart';
 import 'package:kegiatin/domain/entities/user_summary.dart';
 import 'package:kegiatin/domain/usecases/rsvp/invite_user_usecase.dart';
 import 'package:kegiatin/presentation/controllers/user/search_user_controller.dart';
@@ -168,13 +169,6 @@ class _UserCard extends StatelessWidget {
 
   const _UserCard({required this.user, required this.onInvite});
 
-  String _initials(String name) {
-    final parts = name.trim().split(RegExp(r'\s+'));
-    if (parts.isEmpty || parts.first.isEmpty) return '?';
-    if (parts.length == 1) return parts.first[0].toUpperCase();
-    return (parts.first[0] + parts[1][0]).toUpperCase();
-  }
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -192,7 +186,7 @@ class _UserCard extends StatelessWidget {
           radius: 20,
           backgroundColor: colorScheme.primaryContainer,
           child: Text(
-            _initials(user.displayName),
+            StringUtils.initials(user.displayName),
             style: textTheme.labelMedium?.copyWith(
               color: colorScheme.onPrimaryContainer,
               fontWeight: FontWeight.bold,

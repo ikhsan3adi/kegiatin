@@ -6,7 +6,6 @@ import 'package:kegiatin/domain/enums/sync_status.dart';
 part 'attendance_model.freezed.dart';
 part 'attendance_model.g.dart';
 
-/// Data model untuk [Attendance] — memetakan response attendance dari API.
 @freezed
 abstract class AttendanceModel with _$AttendanceModel implements Attendance {
   const AttendanceModel._();

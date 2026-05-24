@@ -12,7 +12,7 @@ abstract class SessionModel with _$SessionModel implements Session {
 
   const factory SessionModel({
     required String id,
-    @JsonKey(fromJson: stringFromJson) required String eventId,
+    @JsonKey(fromJson: JsonUtils.stringFromJson) required String eventId,
     required String title,
     required DateTime startTime,
     required DateTime endTime,

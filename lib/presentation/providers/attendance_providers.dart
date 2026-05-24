@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:hive_ce/hive.dart';
 import 'package:kegiatin/data/datasources/local/attendance_local_datasource.dart';
 import 'package:kegiatin/data/datasources/remote/attendance_remote_datasource.dart';
 import 'package:kegiatin/data/repositories/attendance_repository_impl.dart';
@@ -13,9 +12,6 @@ import 'package:kegiatin/presentation/providers/rsvp_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'attendance_providers.g.dart';
-
-@Riverpod(keepAlive: true)
-Box<dynamic> attendanceBox(Ref ref) => throw UnimplementedError('Override di ProviderScope');
 
 @Riverpod(keepAlive: true)
 AttendanceLocalDataSource attendanceLocalDataSource(Ref ref) =>

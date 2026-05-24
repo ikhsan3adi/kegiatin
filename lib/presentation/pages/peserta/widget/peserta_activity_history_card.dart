@@ -23,13 +23,13 @@ class _PesertaActivityHistoryCardState extends State<PesertaActivityHistoryCard>
 
     if (sessions.length == 1) {
       final end = sessions.first.session.endTime;
-      return '${first.day} ${abbreviatedMonths[first.month - 1]} ${first.year}, '
+      return '${first.day} ${DateFormatter.abbreviatedMonths[first.month - 1]} ${first.year}, '
           '${first.hour.toString().padLeft(2, '0')}:${first.minute.toString().padLeft(2, '0')} - '
           '${end.hour.toString().padLeft(2, '0')}:${end.minute.toString().padLeft(2, '0')}';
     }
 
-    return '${first.day} ${abbreviatedMonths[first.month - 1]} ${first.year} - '
-        '${last.day} ${abbreviatedMonths[last.month - 1]} ${last.year}';
+    return '${first.day} ${DateFormatter.abbreviatedMonths[first.month - 1]} ${first.year} - '
+        '${last.day} ${DateFormatter.abbreviatedMonths[last.month - 1]} ${last.year}';
   }
 
   String _formatTime(DateTime dt) {
@@ -37,7 +37,7 @@ class _PesertaActivityHistoryCardState extends State<PesertaActivityHistoryCard>
   }
 
   String _formatDate(DateTime dt) {
-    return formatDateShort(dt);
+    return DateFormatter.formatDateShort(dt);
   }
 
   @override

@@ -15,9 +15,9 @@ import 'create_event_types.dart';
 import 'widget/event_form_actions.dart';
 import 'widget/event_form_header.dart';
 import 'widget/event_metadata_fields.dart';
+import 'widget/event_series_settings.dart';
 import 'widget/event_time_section.dart';
 import 'widget/event_type_selector.dart';
-import 'widget/event_series_settings.dart';
 
 /// Halaman form untuk membuat kegiatan baru.
 ///
@@ -33,29 +33,19 @@ class CreateEventPage extends ConsumerStatefulWidget {
 class _CreateEventPageState extends ConsumerState<CreateEventPage> {
   final _formKey = GlobalKey<FormState>();
 
-  // Controllers
   final _namaController = TextEditingController();
   final _deskripsiController = TextEditingController();
   final _lokasiController = TextEditingController();
   final _narahubungController = TextEditingController();
   final _jumlahPertemuanController = TextEditingController();
 
-  // State
   EventType? _tipe;
   EventVisibility? _visibilitas;
   RepeatPattern? _polaPengulangan;
   String? _bannerImageUrl;
-
-  /// Tanggal kegiatan â€” digunakan bersama oleh waktu mulai dan waktu selesai.
   DateTime? _tanggal;
-
-  /// Jam mulai sesi.
   TimeOfDay? _jamMulai;
-
-  /// Jam selesai sesi.
   TimeOfDay? _jamSelesai;
-
-  /// Daftar tanggal sesi ter-generate (hanya untuk Series).
   List<DateTime> _generatedSessions = [];
 
   @override
@@ -272,10 +262,6 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
       );
   }
 
-  String _formatDateShort(DateTime dt) {
-    return formatDateShort(dt);
-  }
-
   // Build
 
   @override
@@ -328,7 +314,6 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                     ),
                     const SizedBox(height: 20),
 
-                    // â”€â”€ Waktu Kegiatan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     EventTimeSection(
                       tanggal: _tanggal,
                       jamMulai: _jamMulai,
@@ -338,7 +323,6 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                       onPickJamSelesai: _pickJamSelesai,
                     ),
 
-                    // â”€â”€ Pengaturan Series â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     if (_tipe == EventType.series)
                       EventSeriesSettings(
                         polaPengulangan: _polaPengulangan,
@@ -352,13 +336,12 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                         generatedSessions: _generatedSessions,
                         isCustom: _polaPengulangan == RepeatPattern.custom,
                         onEditSession: _pickSessionDate,
-                        formatDateShort: _formatDateShort,
+                        formatDateShort: DateFormatter.formatDateShort,
                         kMaxSesi: kMaxSesi,
                       ),
 
                     const SizedBox(height: 20),
 
-                    // â”€â”€ Lokasi & Kontak â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     EventMetadataFields(
                       lokasiController: _lokasiController,
                       narahubungController: _narahubungController,
@@ -368,7 +351,6 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                     ),
                     const SizedBox(height: 32),
 
-                    // â”€â”€ Tombol Simpan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     EventFormActions(isLoading: isLoading, onSimpan: _onSimpan),
                     const SizedBox(height: 24),
                   ],
@@ -380,8 +362,6 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
       ),
     );
   }
-
-  // Label Helpers
 
   String _labelTipe(EventType t) => switch (t) {
     EventType.single => 'Single Event',

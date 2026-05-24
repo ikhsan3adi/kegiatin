@@ -16,7 +16,6 @@ class ApiConstants {
   static const int connectTimeout = 15000;
   static const int receiveTimeout = 15000;
 
-  // Auth
   static const String login = '/auth/login';
   static const String register = '/auth/register';
   static const String logout = '/auth/logout';
@@ -32,13 +31,9 @@ class ApiConstants {
   static String completeEvent(String id) => '/events/$id/complete';
   static String eventSessions(String id) => '/events/$id/sessions';
   static String sessionById(String id) => '/sessions/$id';
-  static String sessionStatus(String id) => '/sessions/$id/status';
-
   // RSVP
   static String eventRsvp(String eventId) => '/events/$eventId/rsvp';
   static String eventRsvpInvite(String eventId) => '/events/$eventId/rsvp/invite';
-  static String cancelRsvp(String rsvpId) => '/rsvp/$rsvpId';
-  static String rsvpQr(String rsvpId) => '/rsvp/$rsvpId/qr';
   static const String myRsvps = '/rsvp/me';
   static String eventRsvpList(String eventId) => '/events/$eventId/rsvp';
   // Attendance
@@ -48,7 +43,6 @@ class ApiConstants {
   static String sessionAttendance(String sessionId) => '/sessions/$sessionId/attendance';
 
   // Profile
-  static const String profile = '/profile';
   static const String profileHistory = '/profile/history';
 
   // Archives

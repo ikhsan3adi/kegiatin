@@ -1,4 +1,3 @@
-/// Base failure class — digunakan sebagai Left value di `Either<Failure, T>`.
 sealed class Failure {
   final String message;
   const Failure(this.message);

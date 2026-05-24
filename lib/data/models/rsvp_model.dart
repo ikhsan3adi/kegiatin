@@ -5,7 +5,6 @@ import 'package:kegiatin/domain/enums/rsvp_status.dart';
 part 'rsvp_model.freezed.dart';
 part 'rsvp_model.g.dart';
 
-/// Data model untuk [Rsvp] — memetakan `RsvpResponse` dari API.
 @freezed
 abstract class RsvpModel with _$RsvpModel implements Rsvp {
   const RsvpModel._();

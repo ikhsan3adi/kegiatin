@@ -78,7 +78,7 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
       UploadMateriArgs(
         sessionId: _selectedSession!.id,
         title: _titleController.text.trim(),
-        type: _selectedType == 'FILE' ? ArchiveType.material : ArchiveType.material,
+        type: ArchiveType.material,
         filePath: _scannedFile?.filePath,
         linkUrl: _selectedType == 'LINK' ? _linkController.text.trim() : null,
       ),
