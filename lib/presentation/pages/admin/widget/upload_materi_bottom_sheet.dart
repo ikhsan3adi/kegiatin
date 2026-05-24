@@ -9,6 +9,7 @@ import 'package:kegiatin/domain/entities/processed_image.dart';
 import 'package:kegiatin/domain/entities/session.dart';
 import 'package:kegiatin/domain/enums/archive_type.dart';
 import 'package:kegiatin/presentation/controllers/archive/upload_materi_controller.dart';
+import 'package:kegiatin/presentation/controllers/archive/session_archives_controller.dart';
 import 'package:kegiatin/presentation/widgets/smart_camera_launcher.dart';
 
 class UploadMateriBottomSheet extends ConsumerStatefulWidget {
@@ -97,6 +98,9 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
         );
       },
       data: (_) {
+        if (_selectedSession != null) {
+          ref.invalidate(sessionArchivesControllerProvider(_selectedSession!.id));
+        }
         Navigator.pop(context);
         ScaffoldMessenger.of(
           context,

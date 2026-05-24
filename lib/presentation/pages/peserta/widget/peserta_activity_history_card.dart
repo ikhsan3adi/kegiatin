@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kegiatin/core/utils/date_formatter.dart';
 import 'package:kegiatin/domain/entities/activity_record.dart';
 import 'package:kegiatin/domain/enums/attendance_status.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
@@ -20,30 +21,15 @@ class _PesertaActivityHistoryCardState extends State<PesertaActivityHistoryCard>
     final first = sessions.first.session.startTime;
     final last = sessions.last.session.startTime;
 
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'Mei',
-      'Jun',
-      'Jul',
-      'Agu',
-      'Sep',
-      'Okt',
-      'Nov',
-      'Des',
-    ];
-
     if (sessions.length == 1) {
       final end = sessions.first.session.endTime;
-      return '${first.day} ${months[first.month - 1]} ${first.year}, '
+      return '${first.day} ${abbreviatedMonths[first.month - 1]} ${first.year}, '
           '${first.hour.toString().padLeft(2, '0')}:${first.minute.toString().padLeft(2, '0')} - '
           '${end.hour.toString().padLeft(2, '0')}:${end.minute.toString().padLeft(2, '0')}';
     }
 
-    return '${first.day} ${months[first.month - 1]} ${first.year} - '
-        '${last.day} ${months[last.month - 1]} ${last.year}';
+    return '${first.day} ${abbreviatedMonths[first.month - 1]} ${first.year} - '
+        '${last.day} ${abbreviatedMonths[last.month - 1]} ${last.year}';
   }
 
   String _formatTime(DateTime dt) {
@@ -51,21 +37,7 @@ class _PesertaActivityHistoryCardState extends State<PesertaActivityHistoryCard>
   }
 
   String _formatDate(DateTime dt) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'Mei',
-      'Jun',
-      'Jul',
-      'Agu',
-      'Sep',
-      'Okt',
-      'Nov',
-      'Des',
-    ];
-    return '${dt.day} ${months[dt.month - 1]} ${dt.year}';
+    return formatDateShort(dt);
   }
 
   @override
@@ -129,7 +101,7 @@ class _PesertaActivityHistoryCardState extends State<PesertaActivityHistoryCard>
                 const SizedBox(height: 8),
                 Text(
                   widget.record.event.title,
-                  style: textTheme.titleMedium?.copyWith(
+                  style: textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: colorScheme.onSurface,
                   ),
@@ -206,43 +178,45 @@ class _PesertaActivityHistoryCardState extends State<PesertaActivityHistoryCard>
           ),
 
           // Expandable divider & label
-          InkWell(
-            onTap: () => setState(() => _isExpanded = !_isExpanded),
-            borderRadius: const BorderRadius.only(
-              bottomLeft: Radius.circular(20),
-              bottomRight: Radius.circular(20),
-            ),
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-              decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
+          if (widget.record.event.type == EventType.series) ...[
+            InkWell(
+              onTap: () => setState(() => _isExpanded = !_isExpanded),
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(20),
+                bottomRight: Radius.circular(20),
+              ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                decoration: BoxDecoration(
+                  border: Border(
+                    top: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      _isExpanded ? 'Sembunyikan Sesi' : 'Lihat Detail Sesi',
+                      style: textTheme.labelMedium?.copyWith(
+                        color: colorScheme.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      _isExpanded
+                          ? Icons.keyboard_arrow_up_rounded
+                          : Icons.keyboard_arrow_down_rounded,
+                      size: 18,
+                      color: colorScheme.primary,
+                    ),
+                  ],
                 ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    _isExpanded ? 'Sembunyikan Sesi' : 'Lihat Detail Sesi',
-                    style: textTheme.labelMedium?.copyWith(
-                      color: colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Icon(
-                    _isExpanded
-                        ? Icons.keyboard_arrow_up_rounded
-                        : Icons.keyboard_arrow_down_rounded,
-                    size: 18,
-                    color: colorScheme.primary,
-                  ),
-                ],
-              ),
             ),
-          ),
+          ],
 
-          if (_isExpanded) ...[
+          if (_isExpanded && widget.record.event.type == EventType.series) ...[
             Container(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
               color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.15),

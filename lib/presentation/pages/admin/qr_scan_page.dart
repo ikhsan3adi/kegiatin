@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/core/errors/failures.dart';
 import 'package:kegiatin/core/theme/custom.dart';
-import 'package:kegiatin/data/models/rsvp_model.dart';
 import 'package:kegiatin/domain/entities/attendance.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/entities/session.dart';

@@ -7,8 +7,8 @@ import 'package:kegiatin/domain/entities/session.dart';
 import 'package:kegiatin/domain/enums/attendance_status.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
 import 'package:kegiatin/domain/enums/event_visibility.dart';
-import 'package:kegiatin/presentation/controllers/archive/session_archives_controller.dart';
 import 'package:kegiatin/presentation/controllers/archive/delete_archive_controller.dart';
+import 'package:kegiatin/presentation/controllers/archive/session_archives_controller.dart';
 import 'package:kegiatin/presentation/controllers/attendance/attendance_list_controller.dart';
 import 'package:kegiatin/presentation/controllers/rsvp/event_rsvp_list_controller.dart';
 import 'package:kegiatin/presentation/pages/admin/event_detail/widget/admin_attendance_page.dart';
@@ -61,9 +61,7 @@ class AdminEventDetailBody extends ConsumerWidget {
                           errorBuilder: (context, error, stackTrace) => Container(
                             height: 160,
                             color: colorScheme.surfaceContainerHighest,
-                            child: const Center(
-                              child: Icon(Icons.broken_image_outlined, size: 40),
-                            ),
+                            child: const Center(child: Icon(Icons.broken_image_outlined, size: 40)),
                           ),
                         ),
                         Positioned(
@@ -283,7 +281,7 @@ class _ArchiveRow extends ConsumerWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         children: [
           Icon(Icons.description_outlined, size: 16, color: colorScheme.primary),

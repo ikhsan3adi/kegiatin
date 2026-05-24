@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kegiatin/core/utils/date_formatter.dart';
 import 'package:kegiatin/domain/entities/create_event_input.dart';
 import 'package:kegiatin/domain/entities/session_input.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
@@ -272,21 +273,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
   }
 
   String _formatDateShort(DateTime dt) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'Mei',
-      'Jun',
-      'Jul',
-      'Agu',
-      'Sep',
-      'Okt',
-      'Nov',
-      'Des',
-    ];
-    return '${dt.day} ${months[dt.month - 1]} ${dt.year}';
+    return formatDateShort(dt);
   }
 
   // Build

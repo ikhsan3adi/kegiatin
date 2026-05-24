@@ -283,6 +283,26 @@ class _PesertaActionButton extends ConsumerWidget {
       );
     }
 
+    if (event.status == EventStatus.cancelled) {
+      return _ActionChip(
+        icon: Icons.cancel_outlined,
+        label: 'Kegiatan Dibatalkan',
+        backgroundColor: colorScheme.surfaceContainerHighest,
+        foregroundColor: colorScheme.onSurfaceVariant,
+        onTap: null,
+      );
+    }
+
+    if (event.status == EventStatus.draft) {
+      return _ActionChip(
+        icon: Icons.drafts_outlined,
+        label: 'Belum Diterbitkan',
+        backgroundColor: colorScheme.surfaceContainerHighest,
+        foregroundColor: colorScheme.onSurfaceVariant,
+        onTap: null,
+      );
+    }
+
     if (isCreating) {
       return _ActionChip(
         icon: Icons.hourglass_top,

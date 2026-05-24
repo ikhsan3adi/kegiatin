@@ -204,6 +204,18 @@ class EventListCard extends ConsumerWidget {
       textColor = colorScheme.onSurfaceVariant;
       text = 'Pendaftaran Ditutup';
       icon = Icons.event_busy;
+    } else if (event.status == EventStatus.cancelled) {
+      // Belum daftar & dibatalkan
+      bgColor = colorScheme.surfaceContainerHighest;
+      textColor = colorScheme.onSurfaceVariant;
+      text = 'Kegiatan Dibatalkan';
+      icon = Icons.cancel_outlined;
+    } else if (event.status == EventStatus.draft) {
+      // Belum daftar & draft
+      bgColor = colorScheme.surfaceContainerHighest;
+      textColor = colorScheme.onSurfaceVariant;
+      text = 'Belum Diterbitkan';
+      icon = Icons.drafts_outlined;
     } else {
       // Default: Belum daftar & Segera (Published)
       bgColor = colorScheme.primaryContainer;

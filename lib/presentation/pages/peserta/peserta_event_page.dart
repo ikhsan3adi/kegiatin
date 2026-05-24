@@ -14,7 +14,7 @@ class PesertaEventPage extends ConsumerStatefulWidget {
 }
 
 class _PesertaEventPageState extends ConsumerState<PesertaEventPage> {
-  String? _selectedStatus;
+  String? _selectedStatus = 'ONGOING';
   String _searchQuery = '';
   final _searchController = TextEditingController();
   Timer? _debounce;
@@ -243,11 +243,15 @@ class _PesertaEventPageState extends ConsumerState<PesertaEventPage> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        _buildFilterChip('Semua', null, colorScheme, textTheme),
-                        const SizedBox(width: 8),
                         _buildFilterChip('Berlangsung', 'ONGOING', colorScheme, textTheme),
                         const SizedBox(width: 8),
                         _buildFilterChip('Akan Datang', 'PUBLISHED', colorScheme, textTheme),
+                        const SizedBox(width: 8),
+                        _buildFilterChip('Selesai', 'COMPLETED', colorScheme, textTheme),
+                        const SizedBox(width: 8),
+                        _buildFilterChip('Batal', 'CANCELLED', colorScheme, textTheme),
+                        const SizedBox(width: 8),
+                        _buildFilterChip('Semua', null, colorScheme, textTheme),
                       ],
                     ),
                   ),
