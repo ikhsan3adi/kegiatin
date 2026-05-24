@@ -31,10 +31,7 @@ export class EventRsvpController {
 
   @Post(':id/rsvp/invite')
   @Roles(UserRole.ADMIN)
-  inviteUser(
-    @Param('id') eventId: string,
-    @Body('userId') userId: string,
-  ) {
+  inviteUser(@Param('id') eventId: string, @Body('userId') userId: string) {
     return this.rsvpService.createRsvp(userId, eventId);
   }
 

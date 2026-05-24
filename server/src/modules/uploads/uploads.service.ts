@@ -14,7 +14,12 @@ export class UploadsService {
     if (!existsSync(this.uploadDir)) {
       mkdirSync(this.uploadDir, { recursive: true });
     }
-    this.baseUrl = `http://localhost:${config.get<number>('PORT', 3000)}/uploads`;
+    const envBaseUrl = config.get<string>('BASE_URL');
+    if (envBaseUrl) {
+      this.baseUrl = `${envBaseUrl.replace(/\/$/, '')}/uploads`;
+    } else {
+      this.baseUrl = `http://localhost:${config.get<number>('PORT', 3000)}/uploads`;
+    }
   }
 
   saveImage(file: Express.Multer.File): { url: string } {
