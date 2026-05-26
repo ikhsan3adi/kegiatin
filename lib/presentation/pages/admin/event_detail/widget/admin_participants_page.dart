@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kegiatin/core/constants/api_constants.dart';
 import 'package:kegiatin/domain/entities/rsvp_with_user.dart';
 import 'package:kegiatin/domain/enums/rsvp_status.dart';
 import 'package:kegiatin/domain/enums/event_visibility.dart';
@@ -104,10 +105,15 @@ class _ParticipantRow extends StatelessWidget {
           CircleAvatar(
             radius: 20,
             backgroundColor: colorScheme.primaryContainer,
-            child: Text(
-              (rsvp.user.displayName.isNotEmpty ? rsvp.user.displayName[0] : '?').toUpperCase(),
-              style: textTheme.bodyMedium?.copyWith(color: colorScheme.onPrimaryContainer),
-            ),
+            backgroundImage: rsvp.user.photoUrl != null && rsvp.user.photoUrl!.isNotEmpty
+                ? NetworkImage(ApiConstants.resolveImageUrl(rsvp.user.photoUrl!))
+                : null,
+            child: rsvp.user.photoUrl == null || rsvp.user.photoUrl!.isEmpty
+                ? Text(
+                    (rsvp.user.displayName.isNotEmpty ? rsvp.user.displayName[0] : '?').toUpperCase(),
+                    style: textTheme.bodyMedium?.copyWith(color: colorScheme.onPrimaryContainer),
+                  )
+                : null,
           ),
           const SizedBox(width: 12),
           Expanded(

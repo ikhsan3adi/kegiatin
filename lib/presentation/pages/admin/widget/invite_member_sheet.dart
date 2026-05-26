@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kegiatin/core/constants/api_constants.dart';
 import 'package:kegiatin/core/utils/string_utils.dart';
 import 'package:kegiatin/domain/entities/user_summary.dart';
 import 'package:kegiatin/domain/usecases/rsvp/invite_user_usecase.dart';
@@ -185,13 +186,18 @@ class _UserCard extends StatelessWidget {
         leading: CircleAvatar(
           radius: 20,
           backgroundColor: colorScheme.primaryContainer,
-          child: Text(
-            StringUtils.initials(user.displayName),
-            style: textTheme.labelMedium?.copyWith(
-              color: colorScheme.onPrimaryContainer,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          backgroundImage: user.photoUrl != null && user.photoUrl!.isNotEmpty
+              ? NetworkImage(ApiConstants.resolveImageUrl(user.photoUrl!))
+              : null,
+          child: user.photoUrl == null || user.photoUrl!.isEmpty
+              ? Text(
+                  StringUtils.initials(user.displayName),
+                  style: textTheme.labelMedium?.copyWith(
+                    color: colorScheme.onPrimaryContainer,
+                    fontWeight: FontWeight.bold,
+                  ),
+                )
+              : null,
         ),
         title: Text(
           user.displayName,

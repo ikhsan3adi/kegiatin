@@ -6,6 +6,7 @@ import 'package:kegiatin/presentation/pages/admin/event_detail/admin_event_detai
 import 'package:kegiatin/presentation/pages/admin/create_event/create_event_page.dart';
 import 'package:kegiatin/presentation/pages/admin/edit_event/edit_event_page.dart';
 import 'package:kegiatin/presentation/pages/admin/qr_scan_page.dart';
+import 'package:kegiatin/presentation/pages/edit_profile_page.dart';
 import 'package:kegiatin/presentation/pages/peserta/widget/navbar_peserta.dart';
 import 'package:kegiatin/presentation/pages/peserta/event_detail/peserta_event_detail_page.dart';
 import 'package:kegiatin/presentation/pages/peserta/qr_display/qr_display_page.dart';
@@ -98,6 +99,7 @@ GoRouter appRouter(Ref ref) {
                 AdminEventDetailPage(eventId: state.pathParameters['eventId']!),
           ),
           GoRoute(path: 'scan', builder: (_, _) => const QrScanPage()),
+          GoRoute(path: 'edit-profile', builder: (_, _) => const EditProfilePage()),
         ],
       ),
       GoRoute(
@@ -109,6 +111,7 @@ GoRouter appRouter(Ref ref) {
             builder: (context, state) =>
                 PesertaEventDetailPage(eventId: state.pathParameters['eventId']!),
           ),
+          GoRoute(path: 'edit-profile', builder: (_, _) => const EditProfilePage()),
           GoRoute(
             path: 'qr/:eventId',
             builder: (context, state) =>

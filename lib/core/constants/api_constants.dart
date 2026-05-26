@@ -43,6 +43,7 @@ class ApiConstants {
   static String sessionAttendance(String sessionId) => '/sessions/$sessionId/attendance';
 
   // Profile
+  static const String profileMe = '/profile/me';
   static const String profileHistory = '/profile/history';
 
   // Archives

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kegiatin/core/constants/api_constants.dart';
 import 'package:kegiatin/core/theme/custom.dart';
 import 'package:kegiatin/core/utils/string_utils.dart';
 import 'package:kegiatin/domain/entities/attendance.dart';
@@ -246,6 +247,7 @@ class _ManualInputTabState extends ConsumerState<ManualInputTab> {
                                 return _PesertaCard(
                                   name: rsvp.user.displayName,
                                   initials: StringUtils.initials(rsvp.user.displayName),
+                                  photoUrl: rsvp.user.photoUrl,
                                   isAnggota: rsvp.user.npa != null,
                                   npa: rsvp.user.npa,
                                   isPresent: isPresent,
@@ -284,6 +286,7 @@ class _PesertaCard extends StatelessWidget {
   const _PesertaCard({
     required this.name,
     required this.initials,
+    this.photoUrl,
     required this.isAnggota,
     this.npa,
     required this.isPresent,
@@ -292,6 +295,7 @@ class _PesertaCard extends StatelessWidget {
 
   final String name;
   final String initials;
+  final String? photoUrl;
   final bool isAnggota;
   final String? npa;
   final bool isPresent;
@@ -329,13 +333,18 @@ class _PesertaCard extends StatelessWidget {
           CircleAvatar(
             radius: 22,
             backgroundColor: colorScheme.primaryContainer,
-            child: Text(
-              initials,
-              style: textTheme.labelMedium?.copyWith(
-                color: colorScheme.onPrimaryContainer,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            backgroundImage: photoUrl != null && photoUrl!.isNotEmpty
+                ? NetworkImage(ApiConstants.resolveImageUrl(photoUrl!))
+                : null,
+            child: photoUrl == null || photoUrl!.isEmpty
+                ? Text(
+                    initials,
+                    style: textTheme.labelMedium?.copyWith(
+                      color: colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                : null,
           ),
           const SizedBox(width: 12),
 

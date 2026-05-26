@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kegiatin/core/constants/api_constants.dart';
 import 'package:kegiatin/core/theme/custom.dart';
 import 'package:kegiatin/domain/enums/user_role.dart';
 
@@ -103,9 +104,9 @@ class _Avatar extends StatelessWidget {
         border: Border.all(color: KegiatinCustomTheme.glassElementBorder, width: 1.5),
       ),
       clipBehavior: Clip.antiAlias,
-      child: photoUrl != null
+      child: photoUrl != null && photoUrl!.isNotEmpty
           ? Image.network(
-              photoUrl!,
+              ApiConstants.resolveImageUrl(photoUrl!),
               fit: BoxFit.cover,
               errorBuilder: (_, _, _) => _InitialsFallback(_initials),
             )
