@@ -161,6 +161,7 @@ class RsvpLocalDataSourceImpl implements RsvpLocalDataSource {
   Future<void> removeRsvp(String eventId) async {
     try {
       await rsvpBox.delete(_listKey(eventId));
+      await rsvpBox.delete(eventId);
     } catch (e) {
       throw CacheException('Gagal menghapus cache RSVP: $e');
     }

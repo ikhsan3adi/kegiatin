@@ -64,9 +64,7 @@ class PesertaEventDetailBody extends ConsumerWidget {
                           errorBuilder: (context, error, stackTrace) => Container(
                             height: 160,
                             color: colorScheme.surfaceContainerHighest,
-                            child: const Center(
-                              child: Icon(Icons.broken_image_outlined, size: 40),
-                            ),
+                            child: const Center(child: Icon(Icons.broken_image_outlined, size: 40)),
                           ),
                         ),
                         Positioned(
