@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kegiatin/core/constants/api_constants.dart';
 import 'package:kegiatin/domain/entities/attendance.dart';
 import 'package:kegiatin/domain/entities/session.dart';
 import 'package:kegiatin/domain/enums/attendance_status.dart';
@@ -260,10 +261,64 @@ class _AttendanceRow extends StatelessWidget {
     final checkInTime =
         '${attendance.checkedInAt.hour.toString().padLeft(2, '0')}:${attendance.checkedInAt.minute.toString().padLeft(2, '0')}';
 
+    final hasUser = attendance.user != null;
+    final displayName = hasUser ? attendance.user!.displayName : 'User ID: ${attendance.userId}';
+    final photoUrl = hasUser ? attendance.user!.photoUrl : null;
+    final npa = hasUser ? attendance.user!.npa : null;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
+          CircleAvatar(
+            radius: 18,
+            backgroundColor: colorScheme.primaryContainer,
+            backgroundImage: photoUrl != null && photoUrl.isNotEmpty
+                ? NetworkImage(ApiConstants.resolveImageUrl(photoUrl))
+                : null,
+            child: photoUrl == null || photoUrl.isEmpty
+                ? Text(
+                    (displayName.isNotEmpty ? displayName[0] : '?').toUpperCase(),
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                : null,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  displayName,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
+                Row(
+                  children: [
+                    if (npa != null && npa.isNotEmpty) ...[
+                      Text(
+                        'NPA: $npa • ',
+                        style: textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant),
+                      ),
+                    ],
+                    Text(
+                      'Check-in: $checkInTime',
+                      style: textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
@@ -276,28 +331,6 @@ class _AttendanceRow extends StatelessWidget {
                 color: statusColor,
                 fontWeight: FontWeight.bold,
               ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'User ID: ${attendance.userId}',
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurface,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  'Check-in: $checkInTime',
-                  style: textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant),
-                ),
-              ],
             ),
           ),
         ],

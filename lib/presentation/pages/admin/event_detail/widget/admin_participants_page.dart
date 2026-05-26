@@ -92,7 +92,7 @@ class _ParticipantRow extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     final (statusLabel, statusColor) = switch (rsvp.status) {
-      RsvpStatus.confirmed => ('Hadir', colorScheme.primary),
+      RsvpStatus.confirmed => ('Terkonfirmasi', colorScheme.primary),
       RsvpStatus.waitlist => ('Menunggu', colorScheme.tertiary),
       RsvpStatus.cancelled => ('Batal', colorScheme.error),
     };

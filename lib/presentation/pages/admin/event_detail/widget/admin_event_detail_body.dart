@@ -4,6 +4,7 @@ import 'package:kegiatin/core/constants/api_constants.dart';
 import 'package:kegiatin/domain/entities/archive_item.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/entities/session.dart';
+import 'package:kegiatin/domain/enums/event_status.dart';
 import 'package:kegiatin/domain/enums/attendance_status.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
 import 'package:kegiatin/domain/enums/event_visibility.dart';
@@ -146,9 +147,15 @@ class AdminEventDetailBody extends ConsumerWidget {
           ],
           _MaterialSection(event: event),
           const SizedBox(height: 16),
-          _AttendanceSummaryCard(sessions: event.sessions, eventId: event.id),
-          const SizedBox(height: 16),
-          _ParticipantsSummaryCard(eventId: event.id),
+          if (event.status == EventStatus.ongoing || event.status == EventStatus.completed) ...[
+            _AttendanceSummaryCard(sessions: event.sessions, eventId: event.id),
+            const SizedBox(height: 16),
+            _ParticipantsSummaryCard(eventId: event.id),
+            const SizedBox(height: 16),
+          ] else if (event.status == EventStatus.draft || event.status == EventStatus.published || event.status == EventStatus.cancelled) ...[
+            _ParticipantsSummaryCard(eventId: event.id),
+            const SizedBox(height: 16),
+          ],
           const SizedBox(height: 40),
         ],
       ),
@@ -351,6 +358,8 @@ class _AttendanceSummaryCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final rsvpsAsync = ref.watch(eventRsvpListControllerProvider(eventId));
+    final totalRsvp = rsvpsAsync.asData?.value.total ?? 0;
 
     return _SurfaceCard(
       child: Column(
@@ -366,7 +375,7 @@ class _AttendanceSummaryCard extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           if (sessions.isEmpty)
             Center(
               child: Padding(
@@ -378,7 +387,7 @@ class _AttendanceSummaryCard extends ConsumerWidget {
               ),
             )
           else
-            ...sessions.map((s) => _SessionSummaryRow(session: s)),
+            ...sessions.map((s) => _SessionSummaryRow(session: s, totalRsvp: totalRsvp)),
           const SizedBox(height: 16),
           Center(
             child: FilledButton.icon(
@@ -407,9 +416,10 @@ class _AttendanceSummaryCard extends ConsumerWidget {
 }
 
 class _SessionSummaryRow extends ConsumerWidget {
-  const _SessionSummaryRow({required this.session});
+  const _SessionSummaryRow({required this.session, required this.totalRsvp});
 
   final Session session;
+  final int totalRsvp;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -418,28 +428,60 @@ class _SessionSummaryRow extends ConsumerWidget {
     final attendanceAsync = ref.watch(attendanceListControllerProvider(session.id));
 
     final list = attendanceAsync.asData?.value ?? [];
-    final total = list.length;
     final hadir = list.where((a) => a.status == AttendanceStatus.present).length;
     final terlambat = list.where((a) => a.status == AttendanceStatus.late).length;
+    final totalHadir = hadir + terlambat;
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: Text(
-              session.title,
-              style: textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  session.title,
+                  style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '$totalHadir / $totalRsvp',
+                style: textTheme.labelMedium?.copyWith(
+                  color: colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 8),
-          Text('$hadir/$total', style: textTheme.labelSmall?.copyWith(color: colorScheme.primary)),
-          if (terlambat > 0) ...[
-            const SizedBox(width: 6),
-            Icon(Icons.access_time, size: 12, color: colorScheme.tertiary),
-            const SizedBox(width: 2),
-            Text('$terlambat', style: textTheme.labelSmall?.copyWith(color: colorScheme.tertiary)),
-          ],
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              Text(
+                '$hadir hadir',
+                style: textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant),
+              ),
+              if (terlambat > 0) ...[
+                const SizedBox(width: 8),
+                Container(
+                  width: 4,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: colorScheme.outlineVariant,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Icon(Icons.access_time, size: 10, color: colorScheme.tertiary),
+                const SizedBox(width: 2),
+                Text(
+                  '$terlambat terlambat',
+                  style: textTheme.labelSmall?.copyWith(color: colorScheme.tertiary),
+                ),
+              ],
+            ],
+          ),
         ],
       ),
     );
@@ -456,7 +498,8 @@ class _ParticipantsSummaryCard extends ConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final rsvpsAsync = ref.watch(eventRsvpListControllerProvider(eventId));
-    final total = rsvpsAsync.asData?.value.data.length ?? 0;
+    final total = rsvpsAsync.asData?.value.total ?? 0;
+    final list = rsvpsAsync.asData?.value.data ?? [];
 
     return _SurfaceCard(
       child: Column(
@@ -472,11 +515,78 @@ class _ParticipantsSummaryCard extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Text(
-            '$total peserta',
-            style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
-          ),
+          const SizedBox(height: 16),
+          if (list.isEmpty)
+            Text(
+              'Belum ada peserta terdaftar',
+              style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+            )
+          else ...[
+            Row(
+              children: [
+                SizedBox(
+                  height: 32,
+                  width: (list.take(5).length * 20.0) + 12.0,
+                  child: Stack(
+                    children: List.generate(
+                      list.take(5).length,
+                      (index) {
+                        final user = list[index].user;
+                        return Positioned(
+                          left: index * 20.0,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: colorScheme.surface, width: 2),
+                            ),
+                            child: CircleAvatar(
+                              radius: 14,
+                              backgroundColor: colorScheme.primaryContainer,
+                              backgroundImage: user.photoUrl != null && user.photoUrl!.isNotEmpty
+                                  ? NetworkImage(ApiConstants.resolveImageUrl(user.photoUrl!))
+                                  : null,
+                              child: user.photoUrl == null || user.photoUrl!.isEmpty
+                                  ? Text(
+                                      (user.displayName.isNotEmpty ? user.displayName[0] : '?').toUpperCase(),
+                                      style: textTheme.labelSmall?.copyWith(
+                                        color: colorScheme.onPrimaryContainer,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 9,
+                                      ),
+                                    )
+                                  : null,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    list.length > 5
+                        ? '${list.take(3).map((e) => e.user.displayName.split(' ').first).join(', ')}, dan ${total - 3} lainnya'
+                        : list.map((e) => e.user.displayName.split(' ').first).join(', '),
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              '$total peserta terdaftar',
+              style: textTheme.bodyMedium?.copyWith(
+                color: colorScheme.primary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
           const SizedBox(height: 16),
           Center(
             child: FilledButton.icon(
