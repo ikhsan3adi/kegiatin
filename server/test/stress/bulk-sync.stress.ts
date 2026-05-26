@@ -27,9 +27,13 @@ describe('Stress: Bulk Attendance Sync', () => {
   }, 30_000);
 
   afterAll(async () => {
-    await cleanupStressTestData(sql);
-    await app.close();
-    await sql.end({ timeout: 1 });
+    if (sql) {
+      await cleanupStressTestData(sql);
+      await sql.end({ timeout: 1 });
+    }
+    if (app) {
+      await app.close();
+    }
   });
 
   it('should sync bulk attendance of sizes 50, 200, and 500', async () => {

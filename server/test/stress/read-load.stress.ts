@@ -29,9 +29,13 @@ describe('Stress: Read Load', () => {
   }, 30_000);
 
   afterAll(async () => {
-    await cleanupStressTestData(sql);
-    await app.close();
-    await sql.end({ timeout: 1 });
+    if (sql) {
+      await cleanupStressTestData(sql);
+      await sql.end({ timeout: 1 });
+    }
+    if (app) {
+      await app.close();
+    }
   });
 
   it(`should handle ${CONCURRENT_READERS} concurrent reading requests on ${EVENTS_TO_SEED} seeded events`, async () => {
@@ -90,9 +94,9 @@ describe('Stress: Read Load', () => {
     });
     console.log('Events seeded.');
 
-    // 2. Perform 100 reads in batches of 25 to avoid connection resets
+    // 2. Perform 100 reads in batches of 5 to avoid connection resets
     console.log(
-      `Firing ${CONCURRENT_READERS} GET /events requests in batches of 25...`,
+      `Firing ${CONCURRENT_READERS} GET /events requests in batches of 5...`,
     );
     const latencies: number[] = [];
     let errors = 0;

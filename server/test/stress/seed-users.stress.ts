@@ -22,9 +22,13 @@ describe('Stress: Mass User Registration', () => {
   }, 30_000);
 
   afterAll(async () => {
-    await cleanupStressTestData(sql);
-    await app.close();
-    await sql.end({ timeout: 1 });
+    if (sql) {
+      await cleanupStressTestData(sql);
+      await sql.end({ timeout: 1 });
+    }
+    if (app) {
+      await app.close();
+    }
   });
 
   for (const count of VOLUMES) {

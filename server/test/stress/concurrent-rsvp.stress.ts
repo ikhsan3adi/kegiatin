@@ -13,6 +13,7 @@ import {
   printStressResults,
   runInBatches,
 } from './helpers/auth-helper';
+import type { UserContext } from './helpers/auth-helper';
 import { cleanupStressTestData } from './helpers/cleanup';
 import { EventType } from '../../src/modules/events/domain/event.types';
 
@@ -30,9 +31,13 @@ describe('Stress: Concurrent RSVP Flood', () => {
   }, 30_000);
 
   afterAll(async () => {
-    await cleanupStressTestData(sql);
-    await app.close();
-    await sql.end({ timeout: 1 });
+    if (sql) {
+      await cleanupStressTestData(sql);
+      await sql.end({ timeout: 1 });
+    }
+    if (app) {
+      await app.close();
+    }
   });
 
   it(`should handle ${CONCURRENT} concurrent RSVPs`, async () => {
@@ -59,7 +64,7 @@ describe('Stress: Concurrent RSVP Flood', () => {
 
     // 2. Register members (sequentially to avoid registration bottlenecks during metrics)
     console.log(`Registering ${CONCURRENT} members...`);
-    const members = [];
+    const members: UserContext[] = [];
     for (let i = 0; i < CONCURRENT; i++) {
       members.push(await createUser(app, i));
     }
