@@ -15,8 +15,7 @@ ENV NODE_ENV=production
 
 COPY package.json bun.lock ./
 
-RUN bun install --production --frozen-lockfile
-
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/drizzle ./drizzle
 COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
