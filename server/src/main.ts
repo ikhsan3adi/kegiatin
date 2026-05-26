@@ -4,7 +4,7 @@ import {
   VersioningType,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { NestFactory, Reflector } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import * as morgan from 'morgan';
 import { join } from 'path';
 import { AppModule } from './app.module';
@@ -35,8 +35,6 @@ async function bootstrap() {
     }),
   );
 
-  const reflector = app.get(Reflector);
-
   app.setGlobalPrefix('api');
 
   app.enableVersioning({
@@ -57,4 +55,4 @@ async function bootstrap() {
   const port = config.get<number>('PORT', 3000);
   await app.listen(port);
 }
-bootstrap();
+void bootstrap();

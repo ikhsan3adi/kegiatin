@@ -1,4 +1,4 @@
-import { Transform, Type } from 'class-transformer';
+import { Type } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, IsString, Min } from 'class-validator';
 import { UppercaseEnum } from '../../../core/decorators/uppercase-enum.decorator';
 import { EventStatus, EventType, EventVisibility } from '../domain/event.types';

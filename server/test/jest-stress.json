@@ -1,0 +1,14 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": "..",
+  "testRegex": "test/stress/.*\\.stress\\.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": ["ts-jest", { "tsconfig": { "module": "commonjs", "moduleResolution": "node", "resolvePackageJsonExports": false } }]
+  },
+  "transformIgnorePatterns": [
+    "node_modules/(?!@faker-js/faker)"
+  ],
+  "testTimeout": 600000,
+  "testEnvironment": "node",
+  "maxWorkers": 1
+}
