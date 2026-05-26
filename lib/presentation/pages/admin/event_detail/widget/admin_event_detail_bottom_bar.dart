@@ -70,11 +70,7 @@ class AdminEventDetailBottomBar extends ConsumerWidget {
             if (isDraft) ...[
               Expanded(
                 child: FilledButton.icon(
-                  onPressed: isPublishing
-                      ? null
-                      : () {
-                          ref.read(publishEventControllerProvider.notifier).publish(event.id);
-                        },
+                  onPressed: isPublishing ? null : () => _confirmPublish(context, ref),
                   icon: isPublishing
                       ? const SizedBox(
                           width: 18,
@@ -114,11 +110,7 @@ class AdminEventDetailBottomBar extends ConsumerWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: FilledButton.icon(
-                  onPressed: isStarting
-                      ? null
-                      : () {
-                          ref.read(startEventControllerProvider.notifier).start(event.id);
-                        },
+                  onPressed: isStarting ? null : () => _confirmStart(context, ref),
                   icon: isStarting
                       ? const SizedBox(
                           width: 18,
@@ -140,11 +132,7 @@ class AdminEventDetailBottomBar extends ConsumerWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: FilledButton.icon(
-                  onPressed: isCompleting
-                      ? null
-                      : () {
-                          ref.read(completeEventControllerProvider.notifier).complete(event.id);
-                        },
+                  onPressed: isCompleting ? null : () => _confirmComplete(context, ref),
                   icon: isCompleting
                       ? const SizedBox(
                           width: 18,
@@ -164,6 +152,85 @@ class AdminEventDetailBottomBar extends ConsumerWidget {
             ],
           ],
         ),
+      ),
+    );
+  }
+
+  void _confirmPublish(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Publikasikan Kegiatan?'),
+        content: const Text(
+          'Apakah Anda yakin ingin mempublikasikan kegiatan ini? Peserta akan mulai bisa mendaftar.',
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Batal')),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              ref.read(publishEventControllerProvider.notifier).publish(event.id);
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: colorScheme.tertiary,
+              foregroundColor: colorScheme.onTertiary,
+            ),
+            child: const Text('Ya, Publikasikan'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmStart(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Mulai Kegiatan?'),
+        content: const Text('Mulai kegiatan ini? Status akan menjadi ONGOING.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Batal')),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              ref.read(startEventControllerProvider.notifier).start(event.id);
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: colorScheme.tertiary,
+              foregroundColor: colorScheme.onTertiary,
+            ),
+            child: const Text('Ya, Mulai'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmComplete(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Selesaikan Kegiatan?'),
+        content: const Text(
+          'Selesaikan kegiatan ini? Status tidak bisa dikembalikan dan kegiatan akan masuk ke riwayat.',
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Batal')),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              ref.read(completeEventControllerProvider.notifier).complete(event.id);
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: colorScheme.tertiary,
+              foregroundColor: colorScheme.onTertiary,
+            ),
+            child: const Text('Ya, Selesaikan'),
+          ),
+        ],
       ),
     );
   }

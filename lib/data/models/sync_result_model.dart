@@ -45,7 +45,6 @@ abstract class SyncResultSummary with _$SyncResultSummary {
       _$SyncResultSummaryFromJson(json);
 }
 
-/// Input record untuk batch sync ke server.
 class SyncAttendanceRecord {
   final String localId;
   final String qrToken;
@@ -70,7 +69,6 @@ class SyncAttendanceRecord {
   };
 }
 
-/// Request body wrapper untuk batch sync.
 class SyncAttendanceBatchRequest {
   final List<SyncAttendanceRecord> records;
 

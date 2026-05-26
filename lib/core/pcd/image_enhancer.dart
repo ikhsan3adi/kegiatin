@@ -103,7 +103,7 @@ class ImageEnhancer {
 
   static img.Image _unsharpMask(
     img.Image src, {
-    double amount = 1.5,
+    double amount = 0.8,
     int radius = 1,
     int threshold = 5,
   }) {

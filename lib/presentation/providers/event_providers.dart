@@ -5,7 +5,6 @@ import 'package:kegiatin/domain/repositories/event_repository.dart';
 import 'package:kegiatin/domain/usecases/cancel_event_usecase.dart';
 import 'package:kegiatin/domain/usecases/complete_event_usecase.dart';
 import 'package:kegiatin/domain/usecases/create_event_usecase.dart';
-import 'package:kegiatin/domain/usecases/event/delete_event_usecase.dart';
 import 'package:kegiatin/domain/usecases/event/update_event_usecase.dart';
 import 'package:kegiatin/domain/usecases/get_event_by_id_usecase.dart';
 import 'package:kegiatin/domain/usecases/get_events_usecase.dart';
@@ -59,10 +58,6 @@ CompleteEventUseCase completeEventUseCase(Ref ref) =>
 @riverpod
 CancelEventUseCase cancelEventUseCase(Ref ref) =>
     CancelEventUseCase(ref.watch(eventRepositoryProvider));
-
-@riverpod
-DeleteEventUseCase deleteEventUseCase(Ref ref) =>
-    DeleteEventUseCase(ref.watch(eventRepositoryProvider));
 
 @riverpod
 UpdateEventUseCase updateEventUseCase(Ref ref) =>

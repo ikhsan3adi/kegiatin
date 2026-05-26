@@ -1,3 +1,4 @@
+CREATE TYPE "public"."archive_type" AS ENUM('MATERIAL', 'PHOTO', 'EVALUATION');--> statement-breakpoint
 CREATE TYPE "public"."attendance_status" AS ENUM('PRESENT', 'LATE', 'ABSENT');--> statement-breakpoint
 CREATE TYPE "public"."event_status" AS ENUM('DRAFT', 'PUBLISHED', 'ONGOING', 'COMPLETED', 'CANCELLED');--> statement-breakpoint
 CREATE TYPE "public"."event_type" AS ENUM('SINGLE', 'SERIES');--> statement-breakpoint
@@ -74,6 +75,16 @@ CREATE TABLE "attendances" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "archives" (
+	"id" uuid PRIMARY KEY NOT NULL,
+	"session_id" uuid NOT NULL,
+	"title" varchar(500) NOT NULL,
+	"type" "archive_type" NOT NULL,
+	"file_url" varchar(1024) NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 ALTER TABLE "events" ADD CONSTRAINT "events_created_by_id_users_id_fk" FOREIGN KEY ("created_by_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "sessions" ADD CONSTRAINT "sessions_event_id_events_id_fk" FOREIGN KEY ("event_id") REFERENCES "public"."events"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "rsvps" ADD CONSTRAINT "rsvps_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
@@ -81,6 +92,7 @@ ALTER TABLE "rsvps" ADD CONSTRAINT "rsvps_event_id_events_id_fk" FOREIGN KEY ("e
 ALTER TABLE "attendances" ADD CONSTRAINT "attendances_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "attendances" ADD CONSTRAINT "attendances_session_id_sessions_id_fk" FOREIGN KEY ("session_id") REFERENCES "public"."sessions"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "attendances" ADD CONSTRAINT "attendances_rsvp_id_rsvps_id_fk" FOREIGN KEY ("rsvp_id") REFERENCES "public"."rsvps"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "archives" ADD CONSTRAINT "archives_session_id_sessions_id_fk" FOREIGN KEY ("session_id") REFERENCES "public"."sessions"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "idx_event_title" ON "events" USING btree ("title");--> statement-breakpoint
 CREATE INDEX "idx_event_status" ON "events" USING btree ("status");--> statement-breakpoint
 CREATE INDEX "idx_event_type" ON "events" USING btree ("type");--> statement-breakpoint

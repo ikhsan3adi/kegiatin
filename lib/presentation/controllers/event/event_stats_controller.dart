@@ -5,7 +5,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'event_stats_controller.g.dart';
 
-/// Dashboard statistics for admin
 class EventStats {
   final int eventsThisWeek;
   final int eventsThisMonth;
@@ -24,7 +23,6 @@ class EventStats {
 Future<EventStats> eventStatsController(Ref ref) async {
   final getEventsUseCase = ref.watch(getEventsUseCaseProvider);
 
-  // Fetch all events with large limit to get all events
   final eventsResult = await getEventsUseCase.call(
     const GetEventsUseCaseParams(page: 1, limit: 1000),
   );
@@ -44,19 +42,17 @@ Future<EventStats> eventStatsController(Ref ref) async {
       final startOfMonth = DateTime(now.year, now.month, 1);
       final endOfMonth = DateTime(now.year, now.month + 1, 0);
 
-      // Events this week
       int eventsThisWeek = 0;
       for (final event in events) {
         for (final session in event.sessions) {
           if (session.startTime.isAfter(startOfWeek) &&
               session.startTime.isBefore(endOfWeek.add(const Duration(days: 1)))) {
             eventsThisWeek++;
-            break; // Count each event once
+            break;
           }
         }
       }
 
-      // Events this month
       int eventsThisMonth = 0;
       for (final event in events) {
         for (final session in event.sessions) {
@@ -68,11 +64,8 @@ Future<EventStats> eventStatsController(Ref ref) async {
         }
       }
 
-      // Incomplete events (DRAFT status)
       final incompleteEvents = events.where((e) => e.status == EventStatus.draft).length;
 
-      // Total attendances - for now placeholder
-      // TODO: Fetch from Hive attendance box when implemented
       const totalAttendances = 0;
 
       return EventStats(

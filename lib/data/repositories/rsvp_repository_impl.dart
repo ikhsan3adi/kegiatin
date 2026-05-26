@@ -37,6 +37,21 @@ class RsvpRepositoryImpl implements RsvpRepository {
   }
 
   @override
+  Future<Either<Failure, Rsvp>> inviteUser(String eventId, String userId) async {
+    if (!await networkInfo.isConnected) {
+      return const Left(NetworkFailure());
+    }
+    try {
+      final result = await remoteDataSource.inviteUser(eventId, userId);
+      return Right(result);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, statusCode: e.statusCode));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, PaginatedResult<Rsvp>>> getMyRsvps({int page = 1, int limit = 20}) async {
     if (await networkInfo.isConnected) {
       try {
@@ -69,16 +84,67 @@ class RsvpRepositoryImpl implements RsvpRepository {
     String eventId, {
     int page = 1,
     int limit = 100,
+    String? search,
   }) async {
     if (await networkInfo.isConnected) {
       try {
-        final result = await remoteDataSource.getEventRsvps(eventId, page: page, limit: limit);
+        final result = await remoteDataSource.getEventRsvps(
+          eventId,
+          page: page,
+          limit: limit,
+          search: search,
+        );
+        await localDataSource.cacheRsvps(eventId, result.data.toList());
         return Right(result);
       } on ServerException catch (e) {
+        final cached = await localDataSource.getCachedRsvps(eventId);
+        if (cached.isNotEmpty) {
+          var filtered = cached;
+          if (search != null && search.isNotEmpty) {
+            final query = search.toLowerCase();
+            filtered = filtered
+                .where(
+                  (r) =>
+                      r.user.displayName.toLowerCase().contains(query) ||
+                      (r.user.npa?.toLowerCase().contains(query) ?? false),
+                )
+                .toList();
+          }
+          return Right(
+            PaginatedResult<RsvpWithUser>(
+              data: filtered,
+              total: filtered.length,
+              page: page,
+              limit: limit,
+            ),
+          );
+        }
         return Left(ServerFailure(e.message, statusCode: e.statusCode));
       } catch (e) {
         return Left(ServerFailure(e.toString()));
       }
+    }
+    final cached = await localDataSource.getCachedRsvps(eventId);
+    if (cached.isNotEmpty) {
+      var filtered = cached;
+      if (search != null && search.isNotEmpty) {
+        final query = search.toLowerCase();
+        filtered = filtered
+            .where(
+              (r) =>
+                  r.user.displayName.toLowerCase().contains(query) ||
+                  (r.user.npa?.toLowerCase().contains(query) ?? false),
+            )
+            .toList();
+      }
+      return Right(
+        PaginatedResult<RsvpWithUser>(
+          data: filtered,
+          total: filtered.length,
+          page: page,
+          limit: limit,
+        ),
+      );
     }
     return const Left(NetworkFailure());
   }

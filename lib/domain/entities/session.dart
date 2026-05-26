@@ -1,10 +1,5 @@
 import 'package:kegiatin/domain/enums/session_status.dart';
 
-/// Entitas sesi kegiatan.
-///
-/// Setiap event minimal memiliki 1 sesi.
-/// Field [order] menentukan urutan tampil (1, 2, 3, ...).
-/// [capacity] null berarti tidak ada batas peserta.
 class Session {
   final String id;
   final String eventId;

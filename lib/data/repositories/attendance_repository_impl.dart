@@ -4,6 +4,7 @@ import 'package:kegiatin/core/errors/exceptions.dart';
 import 'package:kegiatin/core/errors/failures.dart';
 import 'package:kegiatin/core/network/network_info.dart';
 import 'package:kegiatin/data/datasources/local/attendance_local_datasource.dart';
+import 'package:kegiatin/data/datasources/local/rsvp_local_datasource.dart';
 import 'package:kegiatin/data/datasources/remote/attendance_remote_datasource.dart';
 import 'package:kegiatin/data/models/attendance_model.dart';
 import 'package:kegiatin/data/models/sync_result_model.dart';
@@ -16,11 +17,13 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
   final AttendanceRemoteDataSource remoteDataSource;
   final AttendanceLocalDataSource localDataSource;
   final NetworkInfo networkInfo;
+  final RsvpLocalDataSource rsvpLocalDataSource;
 
   AttendanceRepositoryImpl({
     required this.remoteDataSource,
     required this.localDataSource,
     required this.networkInfo,
+    required this.rsvpLocalDataSource,
   });
 
   @override
@@ -39,11 +42,16 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
         return const Left(CacheFailure('Presensi dengan QR ini sudah tercatat sebelumnya.'));
       }
 
+      final rsvp = await rsvpLocalDataSource.getRsvpByQrToken(qrToken);
+      if (rsvp == null) {
+        return const Left(CacheFailure('Tiket QR tidak terdaftar untuk kegiatan ini.'));
+      }
+
       final record = AttendanceModel(
         id: const Uuid().v4(),
-        userId: '',
+        userId: rsvp.userId,
         sessionId: sessionId,
-        rsvpId: '',
+        rsvpId: rsvp.id,
         status: AttendanceStatus.present,
         syncStatus: SyncStatus.pending,
         qrToken: qrToken,
@@ -84,6 +92,7 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
       for (final item in result.results) {
         final newStatus = switch (item.status) {
           'SYNCED' => SyncStatus.synced,
+          'CONFLICT' => SyncStatus.synced,
           _ => SyncStatus.conflict,
         };
         await localDataSource.updateSyncStatus(item.localId, newStatus);

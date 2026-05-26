@@ -134,12 +134,13 @@ class _Badge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(16)),
       child: Text(
         text,
-        style: TextStyle(color: textColor, fontSize: 11, fontWeight: FontWeight.bold),
+        style: textTheme.labelSmall?.copyWith(color: textColor, fontWeight: FontWeight.bold),
       ),
     );
   }

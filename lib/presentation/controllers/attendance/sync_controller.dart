@@ -14,12 +14,9 @@ class SyncController extends _$SyncController {
     state = const AsyncLoading();
     final useCase = ref.read(syncAttendanceUseCaseProvider);
     final result = await useCase(NoInput.instance);
-    state = result.fold(
-      (failure) => AsyncError(failure, StackTrace.current),
-      (_) {
-        ref.invalidate(myAttendanceControllerProvider);
-        return const AsyncData(null);
-      },
-    );
+    state = result.fold((failure) => AsyncError(failure, StackTrace.current), (_) {
+      ref.invalidate(myAttendanceControllerProvider);
+      return const AsyncData(null);
+    });
   }
 }

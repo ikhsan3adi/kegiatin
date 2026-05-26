@@ -9,13 +9,15 @@ part 'event_rsvp_list_controller.g.dart';
 @riverpod
 class EventRsvpListController extends _$EventRsvpListController {
   @override
-  FutureOr<PaginatedResult<RsvpWithUser>> build(String eventId) async {
-    return _fetchRsvps(eventId);
+  FutureOr<PaginatedResult<RsvpWithUser>> build(String eventId, {String search = ''}) async {
+    return _fetchRsvps(eventId, search: search);
   }
 
-  Future<PaginatedResult<RsvpWithUser>> _fetchRsvps(String eventId) async {
+  Future<PaginatedResult<RsvpWithUser>> _fetchRsvps(String eventId, {String search = ''}) async {
     final useCase = ref.read(getEventRsvpsUseCaseProvider);
-    final result = await useCase(GetEventRsvpsParams(eventId: eventId));
+    final result = await useCase(
+      GetEventRsvpsParams(eventId: eventId, search: search.isEmpty ? null : search),
+    );
     return result.fold((failure) => throw Exception(failure.message), (data) => data);
   }
 }

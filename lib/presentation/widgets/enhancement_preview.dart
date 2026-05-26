@@ -5,15 +5,20 @@ import 'package:kegiatin/core/pcd/enhancement_options.dart';
 import 'package:kegiatin/core/pcd/image_enhancer.dart';
 
 class EnhancementPreview extends StatefulWidget {
-  const EnhancementPreview({super.key, required this.imageBytes});
+  const EnhancementPreview({super.key, required this.imageBytes, this.defaultMode});
 
   final Uint8List imageBytes;
+  final EnhancementMode? defaultMode;
 
-  static Future<EnhancementMode?> show(BuildContext context, {required Uint8List imageBytes}) {
+  static Future<EnhancementMode?> show(
+    BuildContext context, {
+    required Uint8List imageBytes,
+    EnhancementMode defaultMode = EnhancementMode.enhanced,
+  }) {
     return showModalBottomSheet<EnhancementMode>(
       context: context,
       isScrollControlled: true,
-      builder: (_) => EnhancementPreview(imageBytes: imageBytes),
+      builder: (_) => EnhancementPreview(imageBytes: imageBytes, defaultMode: defaultMode),
     );
   }
 
@@ -22,13 +27,14 @@ class EnhancementPreview extends StatefulWidget {
 }
 
 class _EnhancementPreviewState extends State<EnhancementPreview> {
-  EnhancementMode _selectedMode = EnhancementMode.enhanced;
+  late EnhancementMode _selectedMode;
   Uint8List? _previewBytes;
   bool _processing = false;
 
   @override
   void initState() {
     super.initState();
+    _selectedMode = widget.defaultMode ?? EnhancementMode.enhanced;
     _generatePreview();
   }
 
@@ -97,13 +103,26 @@ class _EnhancementPreviewState extends State<EnhancementPreview> {
                       : Container(
                           height: 200,
                           color: colorScheme.surfaceContainerHighest,
-                          child: const Center(child: CircularProgressIndicator()),
+                          child: const Center(
+                            child: SizedBox(
+                              width: 40,
+                              height: 40,
+                              child: CircularProgressIndicator(),
+                            ),
+                          ),
                         ),
                   if (_processing)
-                    Container(
-                      height: 200,
-                      color: colorScheme.scrim.withValues(alpha: 0.26),
-                      child: const CircularProgressIndicator(),
+                    Positioned.fill(
+                      child: Container(
+                        color: colorScheme.scrim.withValues(alpha: 0.26),
+                        child: const Center(
+                          child: SizedBox(
+                            width: 40,
+                            height: 40,
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
+                      ),
                     ),
                 ],
               ),
