@@ -23,11 +23,8 @@ class FullscreenImagePage extends StatelessWidget {
           child: Image.network(
             ApiConstants.resolveImageUrl(imageUrl),
             fit: BoxFit.contain,
-            errorBuilder: (context, error, stackTrace) => const Icon(
-              Icons.broken_image,
-              color: Colors.white,
-              size: 64,
-            ),
+            errorBuilder: (context, error, stackTrace) =>
+                const Icon(Icons.broken_image, color: Colors.white, size: 64),
           ),
         ),
       ),

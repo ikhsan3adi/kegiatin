@@ -11,10 +11,13 @@ import { Observable } from 'rxjs';
 export class LoggingInterceptor implements NestInterceptor {
   private readonly logger = new Logger('HTTP');
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    const request = context.switchToHttp().getRequest();
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
+    const request: {
+      method: string;
+      url: string;
+      body: unknown;
+    } = context.switchToHttp().getRequest();
     const { method, url, body } = request;
-    const now = Date.now();
 
     // Log the request details
     this.logger.log(`${method} ${url} - Body: ${JSON.stringify(body)}`);

@@ -90,6 +90,7 @@ const hasDatabase = Boolean(process.env.DATABASE_URL);
         title: `E2E ${suffix}`,
         type: 'SINGLE',
         visibility: 'OPEN',
+        location: 'E2E Location',
         sessions: [{ title: 'S1', startTime: start, endTime: end }],
       })
       .expect(201);

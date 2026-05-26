@@ -7,7 +7,10 @@ import {
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Response } from 'express';
-import { IApiResponse } from '../../shared/interfaces/api-response.interface';
+import {
+  IApiResponse,
+  IPaginationMeta,
+} from '../../shared/interfaces/api-response.interface';
 
 @Injectable()
 export class TransformInterceptor<T> implements NestInterceptor<
@@ -30,8 +33,9 @@ export class TransformInterceptor<T> implements NestInterceptor<
         if (data !== undefined && data !== null) {
           // Unwrap if data already contains { data, meta } structure
           if (typeof data === 'object' && 'data' in data && 'meta' in data) {
-            result.data = (data as any).data;
-            result.meta = (data as any).meta;
+            const wrapper = data as { data: T; meta: IPaginationMeta };
+            result.data = wrapper.data;
+            result.meta = wrapper.meta;
           } else {
             result.data = data;
           }

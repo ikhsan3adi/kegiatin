@@ -7,7 +7,6 @@ import { IEventRepository } from './domain/event.repository';
 import {
   EventStatus,
   EventType,
-  IEvent,
   IEventResponse,
   ISession,
   SessionStatus,
@@ -249,7 +248,11 @@ export class EventsService {
       );
     }
 
-    const data: any = { ...dto };
+    const data: Partial<ISession> = {
+      title: dto.title,
+      location: dto.location,
+      capacity: dto.capacity,
+    };
     if (dto.startTime) data.startTime = new Date(dto.startTime);
     if (dto.endTime) data.endTime = new Date(dto.endTime);
 

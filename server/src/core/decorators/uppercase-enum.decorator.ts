@@ -10,6 +10,6 @@ import { Transform } from 'class-transformer';
  * type: EventType;
  */
 export const UppercaseEnum = () =>
-  Transform(({ value }) =>
+  Transform(({ value }: { value: unknown }) =>
     typeof value === 'string' ? value.toUpperCase() : value,
   );

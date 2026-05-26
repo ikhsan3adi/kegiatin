@@ -53,7 +53,9 @@ Future<ProcessedImage?> launchSmartCamera(
     final colorScheme = Theme.of(context).colorScheme;
     try {
       final tempDir = await getTemporaryDirectory();
-      final tempFile = File('${tempDir.path}/crop_temp_${DateTime.now().millisecondsSinceEpoch}.jpg');
+      final tempFile = File(
+        '${tempDir.path}/crop_temp_${DateTime.now().millisecondsSinceEpoch}.jpg',
+      );
       await tempFile.writeAsBytes(captureResult.imageBytes);
 
       final croppedFile = await ImageCropper().cropImage(
@@ -65,16 +67,12 @@ Future<ProcessedImage?> launchSmartCamera(
             toolbarWidgetColor: colorScheme.onPrimary,
             initAspectRatio: CropAspectRatioPreset.ratio16x9,
             lockAspectRatio: true,
-            aspectRatioPresets: [
-              CropAspectRatioPreset.ratio16x9,
-            ],
+            aspectRatioPresets: [CropAspectRatioPreset.ratio16x9],
           ),
           IOSUiSettings(
             title: 'Potong Gambar Banner',
             aspectRatioLockEnabled: true,
-            aspectRatioPresets: [
-              CropAspectRatioPreset.ratio16x9,
-            ],
+            aspectRatioPresets: [CropAspectRatioPreset.ratio16x9],
           ),
         ],
       );
