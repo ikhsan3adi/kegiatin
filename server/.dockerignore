@@ -1,0 +1,12 @@
+node_modules
+dist
+.git
+.gitlab-ci.yml
+Dockerfile
+docker-compose.yml
+*.log
+.env
+coverage
+.vscode
+.idea
+test
