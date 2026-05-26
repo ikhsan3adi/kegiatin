@@ -11,6 +11,9 @@ abstract class RsvpRemoteDataSource {
   /// Membuat RSVP baru: `POST /events/{eventId}/rsvp`.
   Future<RsvpModel> createRsvp(String eventId);
 
+  /// Mengundang user ke event (Admin): `POST /events/{eventId}/rsvp/invite`.
+  Future<RsvpModel> inviteUser(String eventId, String userId);
+
   /// Mengambil RSVP milik user yang sedang login: `GET /rsvp/me`.
   Future<PaginatedResult<RsvpModel>> getMyRsvps({int page = 1, int limit = 20});
 
@@ -19,6 +22,7 @@ abstract class RsvpRemoteDataSource {
     String eventId, {
     int page = 1,
     int limit = 100,
+    String? search,
   });
 }
 
@@ -53,6 +57,23 @@ class RsvpRemoteDataSourceImpl implements RsvpRemoteDataSource {
   }
 
   @override
+  Future<RsvpModel> inviteUser(String eventId, String userId) async {
+    try {
+      final response = await dio.post(
+        ApiConstants.eventRsvpInvite(eventId),
+        data: {'userId': userId},
+      );
+      final body = _asMap(response.data);
+      return RsvpModel.fromJson(_asMap(body['data']));
+    } on DioException catch (e) {
+      throw ServerException(
+        _extractErrorMessage(e, 'Gagal mengundang anggota'),
+        statusCode: e.response?.statusCode,
+      );
+    }
+  }
+
+  @override
   Future<PaginatedResult<RsvpModel>> getMyRsvps({int page = 1, int limit = 20}) async {
     try {
       final response = await dio.get(
@@ -81,11 +102,14 @@ class RsvpRemoteDataSourceImpl implements RsvpRemoteDataSource {
     String eventId, {
     int page = 1,
     int limit = 100,
+    String? search,
   }) async {
     try {
+      final queryParams = <String, dynamic>{'page': page, 'limit': limit};
+      if (search != null && search.isNotEmpty) queryParams['search'] = search;
       final response = await dio.get(
         ApiConstants.eventRsvpList(eventId),
-        queryParameters: {'page': page, 'limit': limit},
+        queryParameters: queryParams,
       );
       final body = _asMap(response.data);
       final data = (body['data'] as List).map((item) {

@@ -103,13 +103,26 @@ class _EnhancementPreviewState extends State<EnhancementPreview> {
                       : Container(
                           height: 200,
                           color: colorScheme.surfaceContainerHighest,
-                          child: const Center(child: CircularProgressIndicator()),
+                          child: const Center(
+                            child: SizedBox(
+                              width: 40,
+                              height: 40,
+                              child: CircularProgressIndicator(),
+                            ),
+                          ),
                         ),
                   if (_processing)
-                    Container(
-                      height: 200,
-                      color: colorScheme.scrim.withValues(alpha: 0.26),
-                      child: const CircularProgressIndicator(),
+                    Positioned.fill(
+                      child: Container(
+                        color: colorScheme.scrim.withValues(alpha: 0.26),
+                        child: const Center(
+                          child: SizedBox(
+                            width: 40,
+                            height: 40,
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
+                      ),
                     ),
                 ],
               ),

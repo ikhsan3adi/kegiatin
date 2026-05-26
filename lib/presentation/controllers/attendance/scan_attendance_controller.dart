@@ -15,12 +15,9 @@ class ScanAttendanceController extends _$ScanAttendanceController {
     state = const AsyncLoading();
     final useCase = ref.read(recordAttendanceUseCaseProvider);
     final result = await useCase(RecordAttendanceParams(qrToken: qrToken, sessionId: sessionId));
-    state = result.fold(
-      (failure) => AsyncError(failure, StackTrace.current),
-      (attendance) {
-        ref.invalidate(myAttendanceControllerProvider);
-        return AsyncData(attendance);
-      },
-    );
+    state = result.fold((failure) => AsyncError(failure, StackTrace.current), (attendance) {
+      ref.invalidate(myAttendanceControllerProvider);
+      return AsyncData(attendance);
+    });
   }
 }

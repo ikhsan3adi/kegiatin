@@ -16,7 +16,6 @@ import 'widget/admin_event_detail_listeners.dart';
 class AdminEventDetailPage extends ConsumerWidget {
   const AdminEventDetailPage({super.key, required this.eventId});
 
-  /// UUID dari route `/admin/event-detail/:eventId`.
   final String eventId;
 
   @override

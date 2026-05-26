@@ -15,7 +15,7 @@ class AdminEventPage extends ConsumerStatefulWidget {
 }
 
 class _AdminEventPageState extends ConsumerState<AdminEventPage> {
-  String? _selectedStatus;
+  String? _selectedStatus = 'ONGOING';
   String _searchQuery = '';
   final _searchController = TextEditingController();
   Timer? _debounce;
@@ -168,19 +168,15 @@ class _AdminEventPageState extends ConsumerState<AdminEventPage> {
                 bottom: 0,
                 child: RefreshIndicator(
                   onRefresh: () async {
-                    ref.invalidate(
-                      eventListControllerProvider(
-                        search: _searchQuery.isEmpty ? null : _searchQuery,
-                        status: _selectedStatus,
-                      ),
-                    );
                     try {
-                      await ref.read(
-                        eventListControllerProvider(
-                          search: _searchQuery.isEmpty ? null : _searchQuery,
-                          status: _selectedStatus,
-                        ).future,
-                      );
+                      await ref
+                          .read(
+                            eventListControllerProvider(
+                              search: _searchQuery.isEmpty ? null : _searchQuery,
+                              status: _selectedStatus,
+                            ).notifier,
+                          )
+                          .refresh();
                     } catch (_) {}
                   },
                   child: SingleChildScrollView(
@@ -251,11 +247,17 @@ class _AdminEventPageState extends ConsumerState<AdminEventPage> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        _buildFilterChip('Semua', null, colorScheme, textTheme),
-                        const SizedBox(width: 8),
                         _buildFilterChip('Berlangsung', 'ONGOING', colorScheme, textTheme),
                         const SizedBox(width: 8),
                         _buildFilterChip('Akan Datang', 'PUBLISHED', colorScheme, textTheme),
+                        const SizedBox(width: 8),
+                        _buildFilterChip('Draft', 'DRAFT', colorScheme, textTheme),
+                        const SizedBox(width: 8),
+                        _buildFilterChip('Selesai', 'COMPLETED', colorScheme, textTheme),
+                        const SizedBox(width: 8),
+                        _buildFilterChip('Batal', 'CANCELLED', colorScheme, textTheme),
+                        const SizedBox(width: 8),
+                        _buildFilterChip('Semua', null, colorScheme, textTheme),
                       ],
                     ),
                   ),

@@ -5,8 +5,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'pcd_providers.g.dart';
 
-/// PCD (Document Scanner) repository dan use cases.
-
 @Riverpod(keepAlive: true)
 PcdRepository pcdRepository(Ref ref) => PcdRepositoryImpl();
 

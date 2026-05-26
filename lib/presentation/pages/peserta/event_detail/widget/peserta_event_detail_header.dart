@@ -27,6 +27,8 @@ class PesertaEventDetailHeader extends StatelessWidget {
               '${startTime.minute.toString().padLeft(2, '0')}'
         : 'Waktu belum ditentukan';
 
+
+
     return KegiatinAppBar(
       height: null,
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),

@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kegiatin/core/constants/api_constants.dart';
 import 'package:kegiatin/domain/entities/event.dart';
+import 'package:kegiatin/domain/entities/session.dart';
+import 'package:kegiatin/domain/entities/archive_item.dart';
+import 'package:kegiatin/domain/entities/attendance.dart';
 import 'package:kegiatin/domain/enums/attendance_status.dart';
 import 'package:kegiatin/domain/enums/event_status.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
 import 'package:kegiatin/domain/enums/event_visibility.dart';
 import 'package:kegiatin/presentation/controllers/attendance/my_attendance_controller.dart';
+import 'package:kegiatin/presentation/controllers/archive/session_archives_controller.dart';
 import 'package:kegiatin/presentation/controllers/rsvp/create_rsvp_controller.dart';
 import 'package:kegiatin/presentation/controllers/rsvp/my_rsvp_controller.dart';
+import 'package:kegiatin/presentation/pages/fullscreen_image_page.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Konten scrollable halaman detail event peserta.
 ///
@@ -24,10 +31,73 @@ class PesertaEventDetailBody extends ConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
+    final hasBanner = event.imageUrl != null && event.imageUrl!.isNotEmpty;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
+          if (hasBanner) ...[
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => FullscreenImagePage(imageUrl: event.imageUrl!),
+                        ),
+                      );
+                    },
+                    child: Stack(
+                      alignment: Alignment.bottomRight,
+                      children: [
+                        Image.network(
+                          ApiConstants.resolveImageUrl(event.imageUrl!),
+                          width: double.infinity,
+                          height: 160,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Container(
+                            height: 160,
+                            color: colorScheme.surfaceContainerHighest,
+                            child: const Center(
+                              child: Icon(Icons.broken_image_outlined, size: 40),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          right: 8,
+                          bottom: 8,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.black54,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.fullscreen, color: Colors.white, size: 16),
+                                SizedBox(width: 4),
+                                Text(
+                                  'Perbesar',
+                                  style: TextStyle(color: Colors.white, fontSize: 10),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
           _SurfaceCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,6 +144,8 @@ class PesertaEventDetailBody extends ConsumerWidget {
               ],
             ),
           ),
+          const SizedBox(height: 16),
+          _MateriKegiatanCard(event: event),
           const SizedBox(height: 24),
           SizedBox(
             width: double.infinity,
@@ -211,6 +283,26 @@ class _PesertaActionButton extends ConsumerWidget {
       );
     }
 
+    if (event.status == EventStatus.cancelled) {
+      return _ActionChip(
+        icon: Icons.cancel_outlined,
+        label: 'Kegiatan Dibatalkan',
+        backgroundColor: colorScheme.surfaceContainerHighest,
+        foregroundColor: colorScheme.onSurfaceVariant,
+        onTap: null,
+      );
+    }
+
+    if (event.status == EventStatus.draft) {
+      return _ActionChip(
+        icon: Icons.drafts_outlined,
+        label: 'Belum Diterbitkan',
+        backgroundColor: colorScheme.surfaceContainerHighest,
+        foregroundColor: colorScheme.onSurfaceVariant,
+        onTap: null,
+      );
+    }
+
     if (isCreating) {
       return _ActionChip(
         icon: Icons.hourglass_top,
@@ -231,13 +323,13 @@ class _PesertaActionButton extends ConsumerWidget {
       );
     }
 
-return _ActionChip(
-       icon: Icons.assignment_outlined,
-       label: 'Daftar Kegiatan',
-       backgroundColor: colorScheme.primaryContainer,
-       foregroundColor: colorScheme.onPrimaryContainer,
-       onTap: () => _confirmRsvp(context, ref, event.id, event.title),
-     );
+    return _ActionChip(
+      icon: Icons.assignment_outlined,
+      label: 'Daftar Kegiatan',
+      backgroundColor: colorScheme.primaryContainer,
+      foregroundColor: colorScheme.onPrimaryContainer,
+      onTap: () => _confirmRsvp(context, ref, event.id, event.title),
+    );
   }
 }
 
@@ -292,7 +384,9 @@ void _confirmRsvp(BuildContext context, WidgetRef ref, String eventId, String ev
     context: context,
     builder: (ctx) => AlertDialog(
       title: const Text('Konfirmasi RSVP'),
-      content: Text('Apakah Anda yakin ingin mendaftar ke kegiatan "$eventTitle"? Kuota Anda akan terpakai.'),
+      content: Text(
+        'Apakah Anda yakin ingin mendaftar ke kegiatan "$eventTitle"? Kuota Anda akan terpakai.',
+      ),
       actions: [
         TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Batal')),
         FilledButton(
@@ -309,4 +403,204 @@ void _confirmRsvp(BuildContext context, WidgetRef ref, String eventId, String ev
       ],
     ),
   );
+}
+
+class _MateriKegiatanCard extends ConsumerWidget {
+  const _MateriKegiatanCard({required this.event});
+
+  final Event event;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return _SurfaceCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.folder_copy_outlined, size: 20, color: colorScheme.onSurfaceVariant),
+              const SizedBox(width: 12),
+              Text(
+                'Materi Kegiatan',
+                style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (event.sessions.isEmpty)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Text(
+                  'Tidak ada sesi',
+                  style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+                ),
+              ),
+            )
+          else
+            ...event.sessions.map((s) => _PesertaSessionArchiveSection(session: s)),
+        ],
+      ),
+    );
+  }
+}
+
+class _PesertaSessionArchiveSection extends ConsumerWidget {
+  const _PesertaSessionArchiveSection({required this.session});
+
+  final Session session;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    final myAttendanceList = ref.watch(myAttendanceControllerProvider).value ?? [];
+    final attendanceRecord = myAttendanceList.cast<Attendance?>().firstWhere(
+      (a) => a?.sessionId == session.id,
+      orElse: () => null,
+    );
+
+    final isPresentOrLate =
+        attendanceRecord != null &&
+        (attendanceRecord.status == AttendanceStatus.present ||
+            attendanceRecord.status == AttendanceStatus.late);
+
+    if (!isPresentOrLate) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(session.title, style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(Icons.lock_outline, size: 14, color: colorScheme.onSurfaceVariant),
+                const SizedBox(width: 6),
+                Text(
+                  'Materi terkunci (Hadir untuk membuka)',
+                  style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    }
+
+    final archiveAsync = ref.watch(sessionArchivesControllerProvider(session.id));
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(session.title, style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+          const SizedBox(height: 8),
+          archiveAsync.when(
+            loading: () => const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ),
+            error: (e, _) => Row(
+              children: [
+                Icon(Icons.error_outline, size: 16, color: colorScheme.error),
+                const SizedBox(width: 6),
+                Text(
+                  'Gagal memuat',
+                  style: textTheme.bodySmall?.copyWith(color: colorScheme.error),
+                ),
+              ],
+            ),
+            data: (list) {
+              if (list.isEmpty) {
+                return Text(
+                  'Belum ada materi',
+                  style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
+                );
+              }
+              return Column(
+                children: list.map((a) {
+                  return _PesertaArchiveRow(archive: a, isAccessible: isPresentOrLate);
+                }).toList(),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PesertaArchiveRow extends StatelessWidget {
+  const _PesertaArchiveRow({required this.archive, required this.isAccessible});
+
+  final ArchiveItem archive;
+  final bool isAccessible;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: InkWell(
+        onTap: () async {
+          if (!isAccessible) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  'Akses materi hanya untuk peserta yang hadir/terlambat pada sesi ini',
+                ),
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+            return;
+          }
+          final uri = Uri.parse(archive.fileUrl);
+          if (await canLaunchUrl(uri)) {
+            await launchUrl(uri, mode: LaunchMode.externalApplication);
+          }
+        },
+        borderRadius: BorderRadius.circular(8),
+        child: Opacity(
+          opacity: isAccessible ? 1.0 : 0.45,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+            child: Row(
+              children: [
+                Icon(
+                  isAccessible ? Icons.description_outlined : Icons.lock_outline_rounded,
+                  size: 18,
+                  color: isAccessible ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    archive.title,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurface,
+                      fontWeight: isAccessible ? FontWeight.w500 : FontWeight.normal,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                if (isAccessible) Icon(Icons.open_in_new, size: 14, color: colorScheme.primary),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

@@ -12,7 +12,12 @@ class GetEventRsvpsUseCase extends UseCase<PaginatedResult<RsvpWithUser>, GetEve
 
   @override
   Future<Either<Failure, PaginatedResult<RsvpWithUser>>> call(GetEventRsvpsParams params) async {
-    return repository.getEventRsvps(params.eventId, page: params.page, limit: params.limit);
+    return repository.getEventRsvps(
+      params.eventId,
+      page: params.page,
+      limit: params.limit,
+      search: params.search,
+    );
   }
 }
 
@@ -20,6 +25,7 @@ class GetEventRsvpsParams {
   final String eventId;
   final int page;
   final int limit;
+  final String? search;
 
-  const GetEventRsvpsParams({required this.eventId, this.page = 1, this.limit = 100});
+  const GetEventRsvpsParams({required this.eventId, this.page = 1, this.limit = 100, this.search});
 }

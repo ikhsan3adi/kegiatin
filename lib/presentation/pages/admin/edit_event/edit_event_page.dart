@@ -7,6 +7,7 @@ import 'package:kegiatin/presentation/controllers/event/event_detail_controller.
 import 'package:kegiatin/presentation/controllers/event/update_event_controller.dart';
 import 'package:kegiatin/presentation/widgets/custom_input_card.dart';
 import 'package:kegiatin/presentation/widgets/dropdown_item_row.dart';
+import 'package:kegiatin/presentation/widgets/event_banner_picker.dart';
 import 'package:kegiatin/presentation/widgets/gradient_header.dart';
 import 'package:kegiatin/presentation/widgets/section_label.dart';
 
@@ -28,6 +29,7 @@ class _EditEventPageState extends ConsumerState<EditEventPage> {
   late final TextEditingController _narahubungController;
 
   EventVisibility? _visibilitas;
+  String? _bannerImageUrl;
 
   bool _initialized = false;
 
@@ -59,6 +61,7 @@ class _EditEventPageState extends ConsumerState<EditEventPage> {
       _lokasiController.text = event.location;
       _narahubungController.text = event.contactPerson;
       _visibilitas = event.visibility;
+      _bannerImageUrl = event.imageUrl;
       _initialized = true;
     }
   }
@@ -98,6 +101,7 @@ class _EditEventPageState extends ConsumerState<EditEventPage> {
       visibility: _visibilitas!,
       location: _lokasiController.text.trim(),
       contactPerson: _narahubungController.text.trim(),
+      imageUrl: _bannerImageUrl,
     );
 
     final errorMsg = await ref
@@ -170,6 +174,12 @@ class _EditEventPageState extends ConsumerState<EditEventPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  EventBannerPicker(
+                    currentImageUrl: _bannerImageUrl,
+                    onImagePicked: (url) => setState(() => _bannerImageUrl = url),
+                    onRemove: () => setState(() => _bannerImageUrl = null),
+                  ),
+                  const SizedBox(height: 20),
                   const SectionLabel(label: 'Informasi Kegiatan', icon: Icons.info_outline_rounded),
                   const SizedBox(height: 12),
                   CustomInputCard(

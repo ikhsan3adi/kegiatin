@@ -1,3 +1,3 @@
 enum EnhancementMode { original, enhanced, grayscaleEnhanced }
 
-enum CameraMode { document, photo }
+enum CameraMode { document, photo, gallery }
