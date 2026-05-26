@@ -10,7 +10,7 @@ workflow:
         IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
         LATEST_IMAGE_TAG: $CI_REGISTRY_IMAGE:latest
         BUILD_VERSION: $CI_COMMIT_TAG
-    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "master"
       variables:
         STAGE: development
         IMAGE_TAG: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}.${CI_COMMIT_SHORT_SHA}
@@ -44,7 +44,7 @@ build:
         -t "$IMAGE_TAG" -t "$LATEST_IMAGE_TAG" \
         --push .
   rules:
-    - if: $CI_COMMIT_TAG || $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_TAG || $CI_COMMIT_BRANCH == "master"
 
 deploy:
   stage: deploy
