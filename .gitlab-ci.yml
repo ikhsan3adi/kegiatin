@@ -36,12 +36,26 @@ build:
       docker buildx build \
         --platform linux/amd64 \
         --provenance=false \
+        --target production \
         --build-arg CI_REGISTRY_IMAGE="$CI_REGISTRY_IMAGE" \
         --build-arg BUILD_VERSION="$BUILD_VERSION" \
         --build-arg NODE_ENV="$STAGE" \
         --cache-from type=registry,ref=$LATEST_IMAGE_TAG \
         --cache-to type=inline \
         -t "$IMAGE_TAG" -t "$LATEST_IMAGE_TAG" \
+        --push .
+
+    - |
+      docker buildx build \
+        --platform linux/amd64 \
+        --provenance=false \
+        --target migration \
+        --build-arg CI_REGISTRY_IMAGE="$CI_REGISTRY_IMAGE" \
+        --build-arg BUILD_VERSION="$BUILD_VERSION" \
+        --build-arg NODE_ENV="$STAGE" \
+        --cache-from type=registry,ref=$LATEST_IMAGE_TAG \
+        --cache-to type=inline \
+        -t "${IMAGE_TAG}-migration" \
         --push .
   rules:
     - if: $CI_COMMIT_TAG || $CI_COMMIT_BRANCH == "master"
@@ -74,27 +88,27 @@ deploy:
   rules:
     - if: $CI_COMMIT_TAG
 
-migrate:
-  stage: .post
-  image:
-    name: oven/bun:1
-  tags:
-    - supermm4
-  environment:
-    name: $STAGE
-  variables:
-    GIT_STRATEGY: none
-  before_script:
-    - test -n "$KUBECONFIG" && echo "KUBECONFIG VAR OK" || (echo "KUBECONFIG EMPTY" && exit 1)
-    - echo "$KUBECONFIG" | base64 -d > kubeconfig
-    - test -s kubeconfig && echo "KUBECONFIG FILE OK" || (echo "KUBECONFIG FILE EMPTY" && exit 1)
-  script:
-    - |
-      kubectl --kubeconfig="$(pwd)/kubeconfig" \
-        create secret generic "${DEPLOYMENT_NAME}-${STAGE}" \
-        --from-env-file="${ENV}" \
-        --dry-run=client -o yaml | \
-      kubectl --kubeconfig="$(pwd)/kubeconfig" replace -f -
-    - kubectl --kubeconfig=$(pwd)/kubeconfig exec -t deployment/${DEPLOYMENT_NAME}-${STAGE} -- bun run migrate
-  rules:
-    - if: $CI_COMMIT_TAG || $CI_COMMIT_BRANCH == "master"
+# migrate:
+#   stage: .post
+#   image:
+#     name: oven/bun:1
+#   tags:
+#     - supermm4
+#   environment:
+#     name: $STAGE
+#   variables:
+#     GIT_STRATEGY: none
+#   before_script:
+#     - test -n "$KUBECONFIG" && echo "KUBECONFIG VAR OK" || (echo "KUBECONFIG EMPTY" && exit 1)
+#     - echo "$KUBECONFIG" | base64 -d > kubeconfig
+#     - test -s kubeconfig && echo "KUBECONFIG FILE OK" || (echo "KUBECONFIG FILE EMPTY" && exit 1)
+#   script:
+#     - |
+#       kubectl --kubeconfig="$(pwd)/kubeconfig" \
+#         create secret generic "${DEPLOYMENT_NAME}-${STAGE}" \
+#         --from-env-file="${ENV}" \
+#         --dry-run=client -o yaml | \
+#       kubectl --kubeconfig="$(pwd)/kubeconfig" replace -f -
+#     - kubectl --kubeconfig=$(pwd)/kubeconfig exec -t deployment/${DEPLOYMENT_NAME}-${STAGE} -- bun run migrate
+#   rules:
+#     - if: $CI_COMMIT_TAG

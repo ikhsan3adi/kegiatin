@@ -15,10 +15,18 @@ ENV NODE_ENV=production
 
 COPY package.json bun.lock ./
 
-COPY --from=builder /app/node_modules ./node_modules
+RUN bun install --production --frozen-lockfile
+
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/drizzle ./drizzle
 COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
 
 EXPOSE 3000
 CMD ["bun", "dist/src/main.js"]
+
+FROM builder AS migration
+
+COPY --from=builder /app/drizzle ./drizzle
+COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
+
+CMD ["bun", "run", "db:migrate"]
