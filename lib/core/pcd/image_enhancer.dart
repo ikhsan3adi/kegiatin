@@ -20,14 +20,7 @@ class ImageEnhancer {
     final enhanced = _histogramEqualization(image);
     final sharpened = _unsharpMask(enhanced);
 
-    img.Image result;
-    if (mode == EnhancementMode.grayscaleEnhanced) {
-      result = img.grayscale(sharpened);
-    } else {
-      result = sharpened;
-    }
-
-    final encoded = img.encodeJpg(result, quality: 92);
+    final encoded = img.encodeJpg(sharpened, quality: 92);
     return Uint8List.fromList(encoded);
   }
 

@@ -13,7 +13,7 @@ class EnhancementPreview extends StatefulWidget {
   static Future<EnhancementMode?> show(
     BuildContext context, {
     required Uint8List imageBytes,
-    EnhancementMode defaultMode = EnhancementMode.enhanced,
+    EnhancementMode defaultMode = EnhancementMode.auto,
   }) {
     return showModalBottomSheet<EnhancementMode>(
       context: context,
@@ -34,7 +34,7 @@ class _EnhancementPreviewState extends State<EnhancementPreview> {
   @override
   void initState() {
     super.initState();
-    _selectedMode = widget.defaultMode ?? EnhancementMode.enhanced;
+    _selectedMode = widget.defaultMode ?? EnhancementMode.auto;
     _generatePreview();
   }
 
@@ -139,14 +139,9 @@ class _EnhancementPreviewState extends State<EnhancementPreview> {
                   icon: Icon(Icons.image_outlined),
                 ),
                 ButtonSegment(
-                  value: EnhancementMode.enhanced,
-                  label: Text('Ditingkatkan'),
+                  value: EnhancementMode.auto,
+                  label: Text('Otomatis'),
                   icon: Icon(Icons.auto_awesome_outlined),
-                ),
-                ButtonSegment(
-                  value: EnhancementMode.grayscaleEnhanced,
-                  label: Text('Grayscale'),
-                  icon: Icon(Icons.filter_b_and_w_outlined),
                 ),
               ],
               selected: {_selectedMode},
