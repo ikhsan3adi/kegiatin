@@ -22,8 +22,9 @@ class EventLocalDataSourceImpl implements EventLocalDataSource {
   @override
   Future<void> cacheEvents(List<EventModel> events) async {
     try {
-      final encoded = events.map((e) => jsonEncode(e.toJson())).toList();
-      await eventCacheBox.put(_eventListKey, encoded);
+      for (final event in events) {
+        await eventCacheBox.put(event.id, jsonEncode(event.toJson()));
+      }
     } catch (e) {
       throw CacheException('Gagal menyimpan cache events: $e');
     }
@@ -32,13 +33,32 @@ class EventLocalDataSourceImpl implements EventLocalDataSource {
   @override
   Future<List<EventModel>> getCachedEvents() async {
     try {
-      final raw = eventCacheBox.get(_eventListKey);
-      if (raw == null) return [];
-      final list = raw as List;
-      return list
-          .whereType<String>()
-          .map((s) => EventModel.fromJson(Map<String, dynamic>.from(jsonDecode(s) as Map)))
-          .toList();
+      final list = <EventModel>[];
+      for (final key in eventCacheBox.keys) {
+        if (key is String && key != _eventListKey) {
+          final raw = eventCacheBox.get(key);
+          if (raw is String) {
+            list.add(EventModel.fromJson(Map<String, dynamic>.from(jsonDecode(raw) as Map)));
+          }
+        }
+      }
+
+      // Fallback for legacy list cache if individual cache is empty
+      if (list.isEmpty) {
+        final rawList = eventCacheBox.get(_eventListKey);
+        if (rawList is List) {
+          final legacyList = rawList
+              .whereType<String>()
+              .map((s) => EventModel.fromJson(Map<String, dynamic>.from(jsonDecode(s) as Map)))
+              .toList();
+          // Cache them individually for future accesses
+          await cacheEvents(legacyList);
+          list.addAll(legacyList);
+        }
+      }
+
+      list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return list;
     } catch (e) {
       throw CacheException('Gagal membaca cache events: $e');
     }

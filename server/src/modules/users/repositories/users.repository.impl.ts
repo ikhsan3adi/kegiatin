@@ -4,11 +4,17 @@ import { DRIZZLE } from '../../../database/drizzle.provider';
 import type { DrizzleDB } from '../../../database/drizzle.provider';
 import { users } from '../../../database/schema';
 import { IUserProfile } from '../../auth/domain/user.types';
-import { IUsersRepository, PaginatedUsers, SearchUsersParams } from '../domain/users.repository';
+import {
+  IUsersRepository,
+  PaginatedUsers,
+  SearchUsersParams,
+} from '../domain/users.repository';
 
 @Injectable()
 export class DrizzleUsersRepository extends IUsersRepository {
-  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) { super(); }
+  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) {
+    super();
+  }
 
   async search(params: SearchUsersParams): Promise<PaginatedUsers> {
     const { query, role, page, limit } = params;

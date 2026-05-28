@@ -4,7 +4,9 @@ import 'package:hive_ce/hive.dart';
 import 'package:kegiatin/core/constants/db_constants.dart';
 import 'package:kegiatin/core/network/dio_client.dart';
 import 'package:kegiatin/core/network/network_info.dart';
+import 'package:kegiatin/data/datasources/local/archive_local_datasource.dart';
 import 'package:kegiatin/data/datasources/local/auth_local_datasource.dart';
+import 'package:kegiatin/data/datasources/local/history_local_datasource.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -30,6 +32,23 @@ Box<dynamic> rsvpBox(Ref ref) => throw UnimplementedError('Override di ProviderS
 
 @Riverpod(keepAlive: true)
 Box<dynamic> eventCacheBox(Ref ref) => throw UnimplementedError('Override di ProviderScope');
+
+@Riverpod(keepAlive: true)
+Box<dynamic> archiveBox(Ref ref) => throw UnimplementedError('Override di ProviderScope');
+
+@Riverpod(keepAlive: true)
+Box<dynamic> profileBox(Ref ref) => throw UnimplementedError('Override di ProviderScope');
+
+@Riverpod(keepAlive: true)
+Box<dynamic> attendanceBox(Ref ref) => throw UnimplementedError('Override di ProviderScope');
+
+@Riverpod(keepAlive: true)
+ArchiveLocalDataSource archiveLocalDataSource(Ref ref) =>
+    ArchiveLocalDataSourceImpl(archiveBox: ref.watch(archiveBoxProvider));
+
+@Riverpod(keepAlive: true)
+HistoryLocalDataSource historyLocalDataSource(Ref ref) =>
+    HistoryLocalDataSourceImpl(profileBox: ref.watch(profileBoxProvider));
 
 @Riverpod(keepAlive: true)
 NetworkInfo networkInfo(Ref ref) => NetworkInfoImpl(Connectivity());

@@ -50,7 +50,7 @@ class _NavbarAdminState extends ConsumerState<NavbarAdmin> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
+      backgroundColor: colorScheme.surfaceContainer,
       body: Stack(
         fit: StackFit.expand,
         children: [

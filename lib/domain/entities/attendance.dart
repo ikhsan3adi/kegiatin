@@ -1,5 +1,6 @@
 import 'package:kegiatin/domain/enums/attendance_status.dart';
 import 'package:kegiatin/domain/enums/sync_status.dart';
+import 'package:kegiatin/domain/entities/user_summary.dart';
 
 /// Entitas kehadiran peserta pada satu sesi.
 ///
@@ -15,6 +16,7 @@ class Attendance {
   final DateTime checkedInAt;
   final DateTime? syncedAt;
   final DateTime createdAt;
+  final UserSummary? user;
 
   const Attendance({
     required this.id,
@@ -26,5 +28,6 @@ class Attendance {
     required this.checkedInAt,
     this.syncedAt,
     required this.createdAt,
+    this.user,
   });
 }

@@ -5,8 +5,8 @@ import 'package:kegiatin/presentation/widgets/custom_input_card.dart';
 import 'package:kegiatin/presentation/widgets/dropdown_item_row.dart';
 import 'package:kegiatin/presentation/widgets/section_label.dart';
 
-import '../../create_event_sessions.dart';
-import '../shared.dart';
+import '../create_event_sessions.dart';
+import '../create_event_types.dart';
 
 class EventSeriesSettings extends StatelessWidget {
   const EventSeriesSettings({

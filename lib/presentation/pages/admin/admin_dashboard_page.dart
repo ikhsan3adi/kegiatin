@@ -49,151 +49,162 @@ class _AdminDashboardPageState extends ConsumerState<AdminDashboardPage> {
     );
 
     return authState.when(
-      data: (user) => SingleChildScrollView(
-        child: Column(
-          children: [
-            KegiatinAppBar(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Image.asset('assets/LogoKegiaTin 2.png', width: 32, height: 32),
-                          const SizedBox(width: 8),
-                          Text(
-                            'KEGIATIN',
-                            style: textTheme.titleMedium?.copyWith(
-                              color: colorScheme.onPrimary,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 1.2,
-                            ),
-                          ),
-                        ],
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          // TODO: navigasi ke halaman notifikasi
-                        },
-                        icon: Icon(
-                          Icons.notifications_outlined,
-                          color: colorScheme.onPrimary,
-                          size: 26,
-                        ),
-                        tooltip: 'Notifikasi',
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Selamat Datang',
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onPrimary.withValues(alpha: 0.85),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    user?.displayName ?? '-',
-                    style: textTheme.headlineSmall?.copyWith(
-                      color: colorScheme.onPrimary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Calendar Section
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Dashboard Admin',
-                  style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            CalendarCard(
-              selectedDate: _selectedDate,
-              eventsByDate: eventsByDate,
-              onDateSelected: (date) {
-                setState(() {
-                  _selectedDate = date;
-                });
-              },
-            ),
-            const SizedBox(height: 24),
-
-            // Dashboard Stats Cards
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Statistik Kegiatan',
-                  style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-
-            statsState.when(
-              data: (stats) => Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  childAspectRatio: 1.0,
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
+      data: (user) => RefreshIndicator(
+        onRefresh: () async {
+          try {
+            await ref.read(eventListControllerProvider().notifier).refresh();
+            ref.invalidate(eventStatsControllerProvider);
+            await ref.read(eventStatsControllerProvider.future);
+          } catch (_) {}
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            children: [
+              KegiatinAppBar(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    DashboardCard(
-                      value: stats.eventsThisWeek.toString(),
-                      label: 'Kegiatan\nMinggu Ini',
-                      icon: Icons.event,
-                      iconColor: colorScheme.primary,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Image.asset('assets/LogoKegiaTin 2.png', width: 32, height: 32),
+                            const SizedBox(width: 8),
+                            Text(
+                              'KEGIATIN',
+                              style: textTheme.titleMedium?.copyWith(
+                                color: colorScheme.onPrimary,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                          ],
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            // TODO: navigasi ke halaman notifikasi
+                          },
+                          icon: Icon(
+                            Icons.notifications_outlined,
+                            color: colorScheme.onPrimary,
+                            size: 26,
+                          ),
+                          tooltip: 'Notifikasi',
+                        ),
+                      ],
                     ),
-                    DashboardCard(
-                      value: stats.eventsThisMonth.toString(),
-                      label: 'Kegiatan\nBulan Ini',
-                      icon: Icons.calendar_month,
-                      iconColor: colorScheme.secondary,
+                    const SizedBox(height: 16),
+                    Text(
+                      'Selamat Datang',
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onPrimary.withValues(alpha: 0.85),
+                      ),
                     ),
-                    DashboardCard(
-                      value: stats.incompleteEvents.toString(),
-                      label: 'Kegiatan\nBelum Selesai',
-                      icon: Icons.hourglass_empty,
-                      iconColor: colorScheme.error,
+                    const SizedBox(height: 4),
+                    Text(
+                      user?.displayName ?? '-',
+                      style: textTheme.headlineSmall?.copyWith(
+                        color: colorScheme.onPrimary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    DashboardCard(
-                      value: stats.totalAttendances.toString(),
-                      label: 'Presensi\nEvent',
-                      icon: Icons.people,
-                      iconColor: colorScheme.tertiary,
-                    ),
-                    const SizedBox(height: 40),
                   ],
                 ),
               ),
-              loading: () => const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: CircularProgressIndicator(),
-              ),
-              error: (e, _) => Padding(
+              const SizedBox(height: 24),
+
+              // Calendar Section
+              Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Text('Error: $e'),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Kalender Kegiatan',
+                    style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ),
               ),
-            ),
-            const SizedBox(height: 24),
-          ],
+              const SizedBox(height: 12),
+              CalendarCard(
+                selectedDate: _selectedDate,
+                eventsByDate: eventsByDate,
+                onDateSelected: (date) {
+                  setState(() {
+                    _selectedDate = date;
+                  });
+                },
+              ),
+              const SizedBox(height: 24),
+
+              // Dashboard Stats Cards
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Statistik Kegiatan',
+                    style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              statsState.when(
+                data: (stats) => Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: GridView.count(
+                    crossAxisCount: 2,
+                    childAspectRatio: 1.0,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    children: [
+                      DashboardCard(
+                        value: stats.eventsThisWeek.toString(),
+                        label: 'Kegiatan\nMinggu Ini',
+                        icon: Icons.event,
+                        iconColor: colorScheme.primary,
+                      ),
+                      DashboardCard(
+                        value: stats.eventsThisMonth.toString(),
+                        label: 'Kegiatan\nBulan Ini',
+                        icon: Icons.calendar_month,
+                        iconColor: colorScheme.secondary,
+                      ),
+                      DashboardCard(
+                        value: stats.incompleteEvents.toString(),
+                        label: 'Kegiatan\nBelum Selesai',
+                        icon: Icons.hourglass_empty,
+                        iconColor: colorScheme.error,
+                      ),
+                      DashboardCard(
+                        value: stats.totalAttendances.toString(),
+                        label: 'Presensi\nEvent',
+                        icon: Icons.people,
+                        iconColor: colorScheme.tertiary,
+                      ),
+                      const SizedBox(height: 40),
+                    ],
+                  ),
+                ),
+                loading: () => const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: CircularProgressIndicator(),
+                ),
+                error: (e, _) => Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Text('Error: $e'),
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
       ),
       loading: () => const Center(child: CircularProgressIndicator()),

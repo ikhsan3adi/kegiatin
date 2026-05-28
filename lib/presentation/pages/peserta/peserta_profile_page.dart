@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
+import 'package:kegiatin/presentation/widgets/edit_profile_card.dart';
 import 'package:kegiatin/presentation/widgets/kegiatin_app_bar.dart';
 import 'package:kegiatin/presentation/widgets/profile_card.dart';
 import 'package:kegiatin/presentation/widgets/profile_header_card.dart';
@@ -80,20 +82,29 @@ class PesertaProfilePage extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       if (user != null) ProfileCard(email: user.email, joinedAt: user.createdAt),
-                      const SizedBox(height: 24),
-                      FilledButton.icon(
+                      const SizedBox(height: 16),
+                      SettingsCard(
+                        items: [
+                          SettingsItem(
+                            icon: Icons.person_outline_rounded,
+                            label: 'Edit Profil',
+                            subtitle: 'Ubah nama, cabang, dan foto',
+                            onTap: () => context.push('/peserta/edit-profile'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      OutlinedButton.icon(
                         onPressed: () => _showLogoutDialog(context, ref),
-                        style: FilledButton.styleFrom(
+                        style: OutlinedButton.styleFrom(
                           backgroundColor: colorScheme.errorContainer,
                           foregroundColor: colorScheme.onErrorContainer,
+                          side: BorderSide(color: colorScheme.onErrorContainer),
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         ),
                         icon: const Icon(Icons.logout_rounded),
-                        label: const Text(
-                          'Keluar dari Aplikasi',
-                          style: TextStyle(fontWeight: FontWeight.w600),
-                        ),
+                        label: const Text('Keluar', style: TextStyle(fontWeight: FontWeight.bold)),
                       ),
                     ],
                   ),

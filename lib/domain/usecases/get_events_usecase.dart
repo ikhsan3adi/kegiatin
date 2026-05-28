@@ -20,6 +20,7 @@ class GetEventsUseCase extends UseCase<PaginatedResult<Event>, GetEventsUseCaseP
       status: params.status,
       type: params.type,
       search: params.search,
+      forceRefresh: params.forceRefresh,
     );
   }
 }
@@ -30,6 +31,7 @@ class GetEventsUseCaseParams {
   final EventStatus? status;
   final EventType? type;
   final String? search;
+  final bool forceRefresh;
 
   const GetEventsUseCaseParams({
     this.page = 1,
@@ -37,5 +39,6 @@ class GetEventsUseCaseParams {
     this.status,
     this.type,
     this.search,
+    this.forceRefresh = false,
   });
 }

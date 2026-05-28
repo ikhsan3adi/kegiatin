@@ -14,6 +14,7 @@ abstract class EventRepository {
     EventStatus? status,
     EventType? type,
     String? search,
+    bool forceRefresh = false,
   });
 
   Future<Either<Failure, Event>> getEventById(String id);

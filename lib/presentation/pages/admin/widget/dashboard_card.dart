@@ -1,34 +1,13 @@
 import 'package:flutter/material.dart';
 
-/// Reusable dashboard stat card component for admin dashboard.
-/// Displays a metric with icon, number, and label.
 class DashboardCard extends StatelessWidget {
-  /// The number/metric to display.
   final String value;
-
-  /// The label for the metric.
   final String label;
-
-  /// The icon to display at the top.
   final IconData icon;
-
-  /// Background color for the card.
-  /// If null, uses theme's primaryContainer.
   final Color? backgroundColor;
-
-  /// Icon color.
-  /// If null, uses theme's primary.
   final Color? iconColor;
-
-  /// Text color for value.
-  /// If null, uses theme's onSurface.
   final Color? valueColor;
-
-  /// Text color for label.
-  /// If null, uses theme's onSurfaceVariant.
   final Color? labelColor;
-
-  /// Callback when card is tapped.
   final VoidCallback? onTap;
 
   const DashboardCard({
@@ -69,7 +48,6 @@ class DashboardCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Icon
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
@@ -80,7 +58,6 @@ class DashboardCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
 
-            // Number
             Text(
               value,
               style: textTheme.headlineSmall?.copyWith(
@@ -90,7 +67,6 @@ class DashboardCard extends StatelessWidget {
             ),
             const SizedBox(height: 6),
 
-            // Label
             Text(
               label,
               style: textTheme.bodySmall?.copyWith(

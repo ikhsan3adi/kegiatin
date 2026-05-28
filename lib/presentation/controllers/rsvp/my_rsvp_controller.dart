@@ -5,12 +5,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'my_rsvp_controller.g.dart';
 
-/// Mengambil dan menyimpan daftar RSVP milik user yang sedang login.
-///
-/// Dipakai oleh halaman detail event untuk mengecek apakah user
-/// sudah RSVP ke event tersebut, tanpa request tambahan per event.
-///
-/// keepAlive: true agar data tidak di-dispose saat navigasi antar halaman.
 @Riverpod(keepAlive: true)
 class MyRsvpController extends _$MyRsvpController {
   @override
@@ -21,9 +15,6 @@ class MyRsvpController extends _$MyRsvpController {
     return result.fold((failure) => throw failure, (paginated) => paginated.data);
   }
 
-  /// Cek apakah user sudah RSVP ke event dengan [eventId].
-  ///
-  /// Mengembalikan [Rsvp] jika sudah RSVP, `null` jika belum.
   Rsvp? findByEventId(String eventId) {
     final list = state.whenOrNull(data: (v) => v);
     if (list == null) return null;

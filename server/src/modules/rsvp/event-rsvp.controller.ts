@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   Param,
@@ -13,6 +14,7 @@ import { JwtAuthGuard } from '../../core/guards/jwt-auth.guard';
 import { RolesGuard } from '../../core/guards/roles.guard';
 import { UserRole } from '../auth/domain/user.types';
 import { RequestUser } from '../auth/strategies/jwt.strategy';
+import { InviteUserDto } from './dto/invite-user.dto';
 import { RsvpQueryDto } from './dto/rsvp-query.dto';
 import { RsvpService } from './rsvp.service';
 
@@ -26,6 +28,12 @@ export class EventRsvpController {
   createRsvp(@Param('id') eventId: string, @Req() req: Request) {
     const user = req.user as RequestUser;
     return this.rsvpService.createRsvp(user.userId, eventId);
+  }
+
+  @Post(':id/rsvp/invite')
+  @Roles(UserRole.ADMIN)
+  inviteUser(@Param('id') eventId: string, @Body() body: InviteUserDto) {
+    return this.rsvpService.createRsvp(body.userId, eventId);
   }
 
   @Get(':id/rsvp')

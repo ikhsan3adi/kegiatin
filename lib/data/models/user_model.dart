@@ -13,7 +13,7 @@ abstract class UserModel with _$UserModel implements User {
   const factory UserModel({
     required String id,
     required String email,
-    @JsonKey(fromJson: stringFromJson) required String displayName,
+    @JsonKey(fromJson: JsonUtils.stringFromJson) required String displayName,
     required UserRole role,
     String? npa,
     String? cabang,

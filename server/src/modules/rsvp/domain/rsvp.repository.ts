@@ -3,7 +3,6 @@ import {
   IRsvp,
   IRsvpFilter,
   IRsvpWithUser,
-  RsvpStatus,
 } from './rsvp.types';
 
 export abstract class IRsvpRepository {

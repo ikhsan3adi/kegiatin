@@ -1,4 +1,11 @@
-import { IsOptional, IsString, MinLength, IsInt, Min, Max } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  MinLength,
+  IsInt,
+  Min,
+  Max,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class SearchUserQueryDto {

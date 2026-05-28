@@ -42,3 +42,9 @@ export const syncStatusEnum = pgEnum('sync_status', [
   'SYNCED',
   'CONFLICT',
 ]);
+
+export const archiveTypeEnum = pgEnum('archive_type', [
+  'MATERIAL',
+  'PHOTO',
+  'EVALUATION',
+]);

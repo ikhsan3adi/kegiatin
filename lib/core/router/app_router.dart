@@ -2,13 +2,14 @@ import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kegiatin/domain/enums/user_role.dart';
 import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
-import 'package:kegiatin/presentation/pages/admin/admin_event_detail_page.dart';
-import 'package:kegiatin/presentation/pages/admin/create_event_page.dart';
-import 'package:kegiatin/presentation/pages/admin/edit_event_page.dart';
+import 'package:kegiatin/presentation/pages/admin/event_detail/admin_event_detail_page.dart';
+import 'package:kegiatin/presentation/pages/admin/create_event/create_event_page.dart';
+import 'package:kegiatin/presentation/pages/admin/edit_event/edit_event_page.dart';
 import 'package:kegiatin/presentation/pages/admin/qr_scan_page.dart';
-import 'package:kegiatin/presentation/pages/peserta/peserta_home_page.dart';
-import 'package:kegiatin/presentation/pages/peserta/peserta_event_detail_page.dart';
-import 'package:kegiatin/presentation/pages/peserta/qr_display_page.dart';
+import 'package:kegiatin/presentation/pages/edit_profile_page.dart';
+import 'package:kegiatin/presentation/pages/peserta/widget/navbar_peserta.dart';
+import 'package:kegiatin/presentation/pages/peserta/event_detail/peserta_event_detail_page.dart';
+import 'package:kegiatin/presentation/pages/peserta/qr_display/qr_display_page.dart';
 import 'package:kegiatin/presentation/pages/admin/widget/navbar_admin.dart';
 import 'package:kegiatin/presentation/pages/login_page.dart';
 import 'package:kegiatin/presentation/pages/onboarding_page.dart';
@@ -98,17 +99,19 @@ GoRouter appRouter(Ref ref) {
                 AdminEventDetailPage(eventId: state.pathParameters['eventId']!),
           ),
           GoRoute(path: 'scan', builder: (_, _) => const QrScanPage()),
+          GoRoute(path: 'edit-profile', builder: (_, _) => const EditProfilePage()),
         ],
       ),
       GoRoute(
         path: '/peserta',
-        builder: (_, _) => const PesertaHomePage(),
+        builder: (_, _) => const NavbarPeserta(),
         routes: [
           GoRoute(
             path: 'event-detail/:eventId',
             builder: (context, state) =>
                 PesertaEventDetailPage(eventId: state.pathParameters['eventId']!),
           ),
+          GoRoute(path: 'edit-profile', builder: (_, _) => const EditProfilePage()),
           GoRoute(
             path: 'qr/:eventId',
             builder: (context, state) =>

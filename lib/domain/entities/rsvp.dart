@@ -1,10 +1,5 @@
 import 'package:kegiatin/domain/enums/rsvp_status.dart';
 
-/// Entitas reservasi peserta terhadap sebuah event.
-///
-/// Satu user hanya boleh punya 1 RSVP per event.
-/// Untuk Series Event, 1 RSVP mencakup seluruh sesi.
-/// [qrToken] digunakan untuk check-in via QR scan.
 class Rsvp {
   final String id;
   final String userId;
