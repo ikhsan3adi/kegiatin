@@ -1,11 +1,15 @@
-import 'dart:async';
 import 'dart:isolate';
 import 'dart:typed_data';
+
 import 'package:image/image.dart' as img;
 import 'package:kegiatin/core/pcd/enhancement_options.dart';
 
+/// Provides image enhancement algorithms for photo improvement.
 class ImageEnhancer {
-  static Future<Uint8List> enhance(Uint8List imageBytes, EnhancementMode mode) async {
+  static Future<Uint8List> enhance(
+    Uint8List imageBytes,
+    EnhancementMode mode,
+  ) async {
     if (mode == EnhancementMode.original) {
       return imageBytes;
     }
@@ -17,12 +21,18 @@ class ImageEnhancer {
     final image = img.decodeImage(imageBytes);
     if (image == null) return imageBytes;
 
-    final enhanced = _histogramEqualization(image);
-    final sharpened = _unsharpMask(enhanced);
+    final equalized = _histogramEqualization(image);
+    // Blend with original to prevent over-darkening
+    final blended = _blend(image, equalized, 0.5);
+    final result = _unsharpMask(blended);
 
-    final encoded = img.encodeJpg(sharpened, quality: 92);
+    final encoded = img.encodeJpg(result, quality: 92);
     return Uint8List.fromList(encoded);
   }
+
+  // ---------------------------------------------------------------------------
+  // Histogram Equalization
+  // ---------------------------------------------------------------------------
 
   static img.Image _histogramEqualization(img.Image src) {
     final width = src.width;
@@ -72,7 +82,8 @@ class ImageEnhancer {
         final r = pixel.r.toInt();
         final g = pixel.g.toInt();
         final b = pixel.b.toInt();
-        final luminance = (0.299 * r + 0.587 * g + 0.114 * b).round().clamp(0, 255);
+        final luminance =
+            (0.299 * r + 0.587 * g + 0.114 * b).round().clamp(0, 255);
 
         final newLuminance = lut[luminance];
 
@@ -94,13 +105,49 @@ class ImageEnhancer {
     return result;
   }
 
+  // ---------------------------------------------------------------------------
+  // Shared Helpers
+  // ---------------------------------------------------------------------------
+
+  /// Blends two images: factor 0.0 = all original, 1.0 = all enhanced.
+  static img.Image _blend(
+    img.Image original,
+    img.Image enhanced,
+    double factor,
+  ) {
+    final width = original.width;
+    final height = original.height;
+    final result = img.Image(width: width, height: height);
+    final invFactor = 1.0 - factor;
+
+    for (var y = 0; y < height; y++) {
+      for (var x = 0; x < width; x++) {
+        final origPx = original.getPixel(x, y);
+        final enhPx = enhanced.getPixel(x, y);
+
+        final r =
+            (origPx.r * invFactor + enhPx.r * factor).round().clamp(0, 255);
+        final g =
+            (origPx.g * invFactor + enhPx.g * factor).round().clamp(0, 255);
+        final b =
+            (origPx.b * invFactor + enhPx.b * factor).round().clamp(0, 255);
+
+        result.setPixelRgba(x, y, r, g, b, origPx.a.toInt());
+      }
+    }
+
+    return result;
+  }
+
+  /// Unsharp mask sharpening. Enhances edges where difference from
+  /// blurred version exceeds the threshold.
   static img.Image _unsharpMask(
     img.Image src, {
     double amount = 0.8,
     int radius = 1,
     int threshold = 5,
   }) {
-    final blurred = img.gaussianBlur(src, radius: radius);
+    final blurred = img.gaussianBlur(img.Image.from(src), radius: radius);
     final width = src.width;
     final height = src.height;
     final result = img.Image(width: width, height: height);
