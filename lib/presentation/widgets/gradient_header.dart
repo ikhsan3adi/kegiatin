@@ -54,15 +54,14 @@ class GradientHeader extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: textTheme.titleLarge?.copyWith(
+                    style: textTheme.headlineMedium?.copyWith(
                       color: KegiatinCustomTheme.onGradient,
-                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   if (subtitle != null)
                     Text(
                       subtitle!,
-                      style: textTheme.bodySmall?.copyWith(
+                      style: textTheme.bodyMedium?.copyWith(
                         color: KegiatinCustomTheme.onGradientDim,
                       ),
                     ),

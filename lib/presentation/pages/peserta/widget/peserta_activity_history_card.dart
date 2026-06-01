@@ -113,7 +113,7 @@ class _PesertaActivityHistoryCardState extends ConsumerState<PesertaActivityHist
                 const SizedBox(height: 8),
                 Text(
                   widget.record.event.title,
-                  style: textTheme.titleLarge?.copyWith(
+                  style: textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: colorScheme.onSurface,
                   ),

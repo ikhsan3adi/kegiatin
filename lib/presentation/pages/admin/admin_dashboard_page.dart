@@ -53,8 +53,7 @@ class _AdminDashboardPageState extends ConsumerState<AdminDashboardPage> {
         onRefresh: () async {
           try {
             await ref.read(eventListControllerProvider().notifier).refresh();
-            ref.invalidate(eventStatsControllerProvider);
-            await ref.read(eventStatsControllerProvider.future);
+            await ref.read(eventStatsControllerProvider.notifier).refresh();
           } catch (_) {}
         },
         child: SingleChildScrollView(
@@ -75,10 +74,9 @@ class _AdminDashboardPageState extends ConsumerState<AdminDashboardPage> {
                             const SizedBox(width: 8),
                             Text(
                               'KEGIATIN',
-                              style: textTheme.titleMedium?.copyWith(
+                              style: textTheme.titleLarge?.copyWith(
                                 color: colorScheme.onPrimary,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 1.2,
+                                letterSpacing: 1.5,
                               ),
                             ),
                           ],
@@ -106,10 +104,7 @@ class _AdminDashboardPageState extends ConsumerState<AdminDashboardPage> {
                     const SizedBox(height: 4),
                     Text(
                       user?.displayName ?? '-',
-                      style: textTheme.headlineSmall?.copyWith(
-                        color: colorScheme.onPrimary,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: textTheme.headlineLarge?.copyWith(color: colorScheme.onPrimary),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),

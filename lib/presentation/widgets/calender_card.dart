@@ -105,7 +105,7 @@ class _CalendarCardState extends State<CalendarCard> {
               children: [
                 Text(
                   DateFormat('EEEE, dd MMMM yyyy', 'id_ID').format(date),
-                  style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                  style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
                 ),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
@@ -202,10 +202,7 @@ class _CalendarCardState extends State<CalendarCard> {
             children: [
               Text(
                 DateFormat('MMMM yyyy').format(_currentMonth),
-                style: textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: colorScheme.onSurface,
-                ),
+                style: textTheme.titleLarge?.copyWith(color: colorScheme.onSurface),
               ),
               Row(
                 children: [
@@ -243,7 +240,6 @@ class _CalendarCardState extends State<CalendarCard> {
                 )
                 .toList(),
           ),
-          const SizedBox(height: 8),
 
           // Calendar grid
           GridView.builder(

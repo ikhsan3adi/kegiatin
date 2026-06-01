@@ -51,10 +51,7 @@ class ProfileHeaderCard extends StatelessWidget {
               children: [
                 Text(
                   displayName,
-                  style: textTheme.titleMedium?.copyWith(
-                    color: KegiatinCustomTheme.onGradient,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: textTheme.titleLarge?.copyWith(color: KegiatinCustomTheme.onGradient),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -101,7 +98,11 @@ class _Avatar extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: KegiatinCustomTheme.glassElement,
-        border: Border.all(color: KegiatinCustomTheme.glassElementBorder, width: 1.5),
+        border: Border.all(
+          color: KegiatinCustomTheme.glassElementBorder,
+          width: 1.5,
+          strokeAlign: BorderSide.strokeAlignOutside,
+        ),
       ),
       clipBehavior: Clip.antiAlias,
       child: photoUrl != null && photoUrl!.isNotEmpty

@@ -19,7 +19,10 @@ class AdminParticipantsPage extends ConsumerWidget {
     final textTheme = Theme.of(context).textTheme;
     final rsvpsAsync = ref.watch(eventRsvpListControllerProvider(eventId));
     final eventAsync = ref.watch(eventDetailControllerProvider(eventId));
-    final isInviteOnly = eventAsync.asData?.value.visibility == EventVisibility.inviteOnly;
+    final isInviteOnly = eventAsync.maybeWhen(
+      data: (event) => event.visibility == EventVisibility.inviteOnly,
+      orElse: () => false,
+    );
 
     return Scaffold(
       backgroundColor: colorScheme.surfaceContainer,

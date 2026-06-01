@@ -4,8 +4,8 @@ import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/enums/event_status.dart';
 import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
 import 'package:kegiatin/presentation/controllers/event/event_list_controller.dart';
-import 'package:kegiatin/presentation/widgets/event_list_card.dart';
 import 'package:kegiatin/presentation/widgets/calender_card.dart';
+import 'package:kegiatin/presentation/widgets/event_list_card.dart';
 import 'package:kegiatin/presentation/widgets/kegiatin_app_bar.dart';
 
 class PesertaDashboardPage extends ConsumerStatefulWidget {
@@ -71,10 +71,9 @@ class _PesertaDashboardPageState extends ConsumerState<PesertaDashboardPage> {
                             const SizedBox(width: 8),
                             Text(
                               'KEGIATIN',
-                              style: textTheme.titleMedium?.copyWith(
+                              style: textTheme.titleLarge?.copyWith(
                                 color: colorScheme.onPrimary,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 1.2,
+                                letterSpacing: 1.5,
                               ),
                             ),
                           ],
@@ -99,10 +98,7 @@ class _PesertaDashboardPageState extends ConsumerState<PesertaDashboardPage> {
                     const SizedBox(height: 4),
                     Text(
                       user?.displayName ?? '-',
-                      style: textTheme.headlineSmall?.copyWith(
-                        color: colorScheme.onPrimary,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: textTheme.headlineLarge?.copyWith(color: colorScheme.onPrimary),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -121,17 +117,14 @@ class _PesertaDashboardPageState extends ConsumerState<PesertaDashboardPage> {
                 ),
               ),
               const SizedBox(height: 12),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: CalendarCard(
-                  selectedDate: _selectedDate,
-                  eventsByDate: eventsByDate,
-                  onDateSelected: (date) {
-                    setState(() {
-                      _selectedDate = date;
-                    });
-                  },
-                ),
+              CalendarCard(
+                selectedDate: _selectedDate,
+                eventsByDate: eventsByDate,
+                onDateSelected: (date) {
+                  setState(() {
+                    _selectedDate = date;
+                  });
+                },
               ),
               const SizedBox(height: 24),
               Padding(

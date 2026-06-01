@@ -59,10 +59,7 @@ class AdminProfilePage extends ConsumerWidget {
                     children: [
                       Text(
                         'Profil Saya',
-                        style: textTheme.headlineSmall?.copyWith(
-                          color: colorScheme.onPrimary,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: textTheme.headlineLarge?.copyWith(color: colorScheme.onPrimary),
                       ),
                       const SizedBox(height: 12),
                       if (user != null)

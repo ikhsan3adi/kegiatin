@@ -4,8 +4,8 @@ import 'package:kegiatin/core/constants/api_constants.dart';
 import 'package:kegiatin/domain/entities/archive_item.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/entities/session.dart';
-import 'package:kegiatin/domain/enums/event_status.dart';
 import 'package:kegiatin/domain/enums/attendance_status.dart';
+import 'package:kegiatin/domain/enums/event_status.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
 import 'package:kegiatin/domain/enums/event_visibility.dart';
 import 'package:kegiatin/presentation/controllers/archive/delete_archive_controller.dart';
@@ -111,7 +111,7 @@ class AdminEventDetailBody extends ConsumerWidget {
                     const SizedBox(width: 12),
                     Text(
                       'Deskripsi Kegiatan',
-                      style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                      style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -131,7 +131,7 @@ class AdminEventDetailBody extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Detail', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                Text('Detail', style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 16),
                 _DetailRow(
                   label: 'Visibilitas',
@@ -192,7 +192,7 @@ class _MaterialSection extends ConsumerWidget {
               const SizedBox(width: 12),
               Text(
                 'Materi Kegiatan',
-                style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -391,7 +391,7 @@ class _AttendanceSummaryCard extends ConsumerWidget {
                   const SizedBox(width: 12),
                   Text(
                     'Daftar Hadir',
-                    style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                    style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -453,11 +453,7 @@ class _SessionSummaryRow extends ConsumerWidget {
       loading: () => const Padding(
         padding: EdgeInsets.symmetric(vertical: 8),
         child: Center(
-          child: SizedBox(
-            width: 16,
-            height: 16,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
+          child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
         ),
       ),
       error: (err, _) => Padding(
@@ -562,7 +558,7 @@ class _ParticipantsSummaryCard extends ConsumerWidget {
                   const SizedBox(width: 12),
                   Text(
                     'Peserta Terdaftar',
-                    style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                    style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                   ),
                 ],
               ),

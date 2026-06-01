@@ -115,7 +115,7 @@ class PesertaEventDetailBody extends ConsumerWidget {
                     const SizedBox(width: 12),
                     Text(
                       'Deskripsi Kegiatan',
-                      style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                      style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -135,7 +135,7 @@ class PesertaEventDetailBody extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Detail', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                Text('Detail', style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 16),
                 _DetailRow(
                   label: 'Visibilitas',
@@ -523,7 +523,7 @@ class _MateriKegiatanCard extends ConsumerWidget {
               const SizedBox(width: 12),
               Text(
                 'Materi Kegiatan',
-                style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
               ),
             ],
           ),

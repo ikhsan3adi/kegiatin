@@ -59,10 +59,7 @@ class AdminEventDetailHeader extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             event.title,
-            style: textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: colorScheme.onPrimary,
-            ),
+            style: textTheme.headlineLarge?.copyWith(color: colorScheme.onPrimary),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),

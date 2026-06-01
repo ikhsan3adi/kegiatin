@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 import 'package:kegiatin/core/theme/custom.dart';
-import 'package:kegiatin/presentation/widgets/kegiatin_app_bar.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/entities/rsvp.dart';
 import 'package:kegiatin/domain/entities/user.dart';
-
 import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
 import 'package:kegiatin/presentation/controllers/event/event_detail_controller.dart';
 import 'package:kegiatin/presentation/controllers/rsvp/my_rsvp_controller.dart';
+import 'package:kegiatin/presentation/widgets/kegiatin_app_bar.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class PesertaQrDisplayPage extends ConsumerWidget {
   const PesertaQrDisplayPage({super.key, required this.eventId});
@@ -82,14 +81,11 @@ class PesertaQrDisplayPage extends ConsumerWidget {
             children: [
               Text(
                 'QR Code Saya',
-                style: textTheme.titleLarge?.copyWith(
-                  color: KegiatinCustomTheme.onGradient,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: textTheme.headlineMedium?.copyWith(color: KegiatinCustomTheme.onGradient),
               ),
               Text(
                 'Tunjukkan QR ini kepada admin untuk presensi',
-                style: textTheme.bodySmall?.copyWith(
+                style: textTheme.bodyMedium?.copyWith(
                   color: KegiatinCustomTheme.onGradientSecondary,
                 ),
               ),
@@ -230,10 +226,7 @@ class PesertaQrDisplayPage extends ConsumerWidget {
           const SizedBox(height: 2),
           Text(
             'Kartu QR Presensi',
-            style: textTheme.titleMedium?.copyWith(
-              color: colorScheme.onPrimary,
-              fontWeight: FontWeight.bold,
-            ),
+            style: textTheme.titleLarge?.copyWith(color: colorScheme.onPrimary),
           ),
         ],
       ),
@@ -276,16 +269,13 @@ class PesertaQrDisplayPage extends ConsumerWidget {
 
   Widget _buildQrCode(Rsvp rsvp, ColorScheme colorScheme, TextTheme textTheme) {
     // Shorten qrToken for display: show last 12 chars prefixed with ellipsis
-    final displayCode = rsvp.qrToken.length > 16
-        ? '…${rsvp.qrToken.substring(rsvp.qrToken.length - 12)}'
-        : rsvp.qrToken;
+    // final displayCode = rsvp.qrToken.length > 16
+    //     ? '…${rsvp.qrToken.substring(rsvp.qrToken.length - 12)}'
+    //     : rsvp.qrToken;
     return Text(
-      displayCode,
-      style: textTheme.titleSmall?.copyWith(
-        color: colorScheme.primary,
-        fontWeight: FontWeight.bold,
-        letterSpacing: 1.4,
-      ),
+      rsvp.qrToken,
+      textAlign: TextAlign.center,
+      style: textTheme.bodySmall?.copyWith(color: colorScheme.primary),
     );
   }
 

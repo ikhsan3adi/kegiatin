@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -114,7 +115,7 @@ class _PesertaEventPageState extends ConsumerState<PesertaEventPage> {
             children: [
               Text(
                 'Kegiatan',
-                style: textTheme.headlineSmall?.copyWith(
+                style: textTheme.headlineLarge?.copyWith(
                   color: colorScheme.onPrimary,
                   fontWeight: FontWeight.bold,
                 ),
@@ -123,13 +124,13 @@ class _PesertaEventPageState extends ConsumerState<PesertaEventPage> {
               eventListState.maybeWhen(
                 data: (paginatedData) => Text(
                   '${paginatedData.data.length} Kegiatan Tersedia',
-                  style: textTheme.bodySmall?.copyWith(
+                  style: textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onPrimary.withValues(alpha: 0.85),
                   ),
                 ),
                 orElse: () => Text(
                   'Memuat kegiatan...',
-                  style: textTheme.bodySmall?.copyWith(
+                  style: textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onPrimary.withValues(alpha: 0.85),
                   ),
                 ),

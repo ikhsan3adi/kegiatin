@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kegiatin/domain/entities/activity_record.dart';
 import 'package:kegiatin/domain/usecases/get_history_usecase.dart';
 import 'package:kegiatin/presentation/pages/peserta/widget/peserta_activity_history_card.dart';
@@ -101,22 +101,19 @@ class _PesertaRiwayatPageState extends ConsumerState<PesertaRiwayatPage> {
                   ],
                   Text(
                     'Riwayat Kegiatan',
-                    style: textTheme.headlineSmall?.copyWith(
-                      color: colorScheme.onPrimary,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: textTheme.headlineLarge?.copyWith(color: colorScheme.onPrimary),
                   ),
                   const SizedBox(height: 4),
                   filteredHistoryAsync.maybeWhen(
                     data: (list) => Text(
                       '${list.length} Kegiatan Tersedia',
-                      style: textTheme.bodySmall?.copyWith(
+                      style: textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onPrimary.withValues(alpha: 0.85),
                       ),
                     ),
                     orElse: () => Text(
                       'Memuat riwayat...',
-                      style: textTheme.bodySmall?.copyWith(
+                      style: textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onPrimary.withValues(alpha: 0.85),
                       ),
                     ),

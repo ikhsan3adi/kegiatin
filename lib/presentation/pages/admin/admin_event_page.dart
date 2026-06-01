@@ -116,22 +116,19 @@ class _AdminEventPageState extends ConsumerState<AdminEventPage> {
             children: [
               Text(
                 'Kegiatan',
-                style: textTheme.headlineSmall?.copyWith(
-                  color: colorScheme.onPrimary,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: textTheme.headlineLarge?.copyWith(color: colorScheme.onPrimary),
               ),
               const SizedBox(height: 4),
               eventsState.maybeWhen(
                 data: (paginatedData) => Text(
                   '${paginatedData.data.length} Kegiatan Tersedia',
-                  style: textTheme.bodySmall?.copyWith(
+                  style: textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onPrimary.withValues(alpha: 0.85),
                   ),
                 ),
                 orElse: () => Text(
                   'Memuat kegiatan...',
-                  style: textTheme.bodySmall?.copyWith(
+                  style: textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onPrimary.withValues(alpha: 0.85),
                   ),
                 ),
