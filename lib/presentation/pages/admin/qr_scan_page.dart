@@ -178,7 +178,7 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
             child: TabBarView(
               controller: _tabController,
               children: [
-                QrScannerTab(onDetect: _onQrDetected),
+                QrScannerTab(onDetect: _onQrDetected, sessionSelected: _selectedSession != null),
                 ManualInputTab(eventId: _selectedEvent?.id, sessionId: _selectedSession?.id),
               ],
             ),

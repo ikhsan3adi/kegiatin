@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:kegiatin/core/constants/api_constants.dart';
 import 'package:kegiatin/core/theme/custom.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/entities/rsvp.dart';
@@ -170,6 +172,110 @@ class PesertaQrDisplayPage extends ConsumerWidget {
               children: [
                 if (user != null) _buildUserInfo(user, colorScheme, textTheme),
                 if (user != null) const SizedBox(height: 24),
+                if (event != null) ...[
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surfaceContainerLow,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.event_seat_rounded, color: colorScheme.primary, size: 18),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                event.title,
+                                style: textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: colorScheme.onSurface,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.location_on_outlined,
+                              color: colorScheme.onSurfaceVariant,
+                              size: 14,
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                event.location,
+                                style: textTheme.bodySmall?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (event.sessions.isNotEmpty) ...[
+                          const SizedBox(height: 12),
+                          const Divider(height: 1),
+                          const SizedBox(height: 8),
+                          Text(
+                            event.sessions.length == 1
+                                ? 'Jadwal Sesi:'
+                                : 'Jadwal Sesi (${event.sessions.length}):',
+                            style: textTheme.labelSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.primary,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          ...event.sessions.map((session) {
+                            final sessionTime =
+                                '${session.startTime.day.toString().padLeft(2, '0')}/${session.startTime.month.toString().padLeft(2, '0')} - '
+                                '${session.startTime.hour.toString().padLeft(2, '0')}:${session.startTime.minute.toString().padLeft(2, '0')}';
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 4),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Icon(
+                                    Icons.check_circle_outline_rounded,
+                                    color: colorScheme.secondary,
+                                    size: 12,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Expanded(
+                                    child: RichText(
+                                      text: TextSpan(
+                                        style: textTheme.bodySmall?.copyWith(
+                                          color: colorScheme.onSurface,
+                                        ),
+                                        children: [
+                                          TextSpan(
+                                            text: '${session.title}: ',
+                                            style: const TextStyle(fontWeight: FontWeight.bold),
+                                          ),
+                                          TextSpan(
+                                            text: sessionTime,
+                                            style: TextStyle(color: colorScheme.onSurfaceVariant),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
                 // QR code — centered, white background required for scanner
                 Center(
                   child: QrImageView(
@@ -237,16 +343,43 @@ class PesertaQrDisplayPage extends ConsumerWidget {
     final initials = _initials(user.displayName);
     return Row(
       children: [
-        CircleAvatar(
-          radius: 22,
-          backgroundColor: colorScheme.primary,
-          child: Text(
-            initials,
-            style: textTheme.titleSmall?.copyWith(
-              color: colorScheme.onPrimary,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+        Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(shape: BoxShape.circle, color: colorScheme.primary),
+          clipBehavior: Clip.antiAlias,
+          child: user.photoUrl != null && user.photoUrl!.isNotEmpty
+              ? CachedNetworkImage(
+                  imageUrl: ApiConstants.resolveImageUrl(user.photoUrl!),
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Center(
+                    child: Text(
+                      initials,
+                      style: textTheme.titleSmall?.copyWith(
+                        color: colorScheme.onPrimary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  errorWidget: (context, url, error) => Center(
+                    child: Text(
+                      initials,
+                      style: textTheme.titleSmall?.copyWith(
+                        color: colorScheme.onPrimary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                )
+              : Center(
+                  child: Text(
+                    initials,
+                    style: textTheme.titleSmall?.copyWith(
+                      color: colorScheme.onPrimary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
         ),
         const SizedBox(width: 12),
         Column(
@@ -285,23 +418,14 @@ class PesertaQrDisplayPage extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.access_time_rounded, size: 14, color: colorScheme.onSurfaceVariant),
-            const SizedBox(width: 4),
+            Icon(Icons.info_outline_rounded, size: 14, color: colorScheme.primary),
+            const SizedBox(width: 6),
             Text(
-              'Berlaku hingga ${_formatTime(rsvp.createdAt)}',
-              style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
-            ),
-          ],
-        ),
-        const SizedBox(height: 4),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.lock_outline_rounded, size: 14, color: colorScheme.primary),
-            const SizedBox(width: 4),
-            Text(
-              'QR terenkripsi & one-time use',
-              style: textTheme.bodySmall?.copyWith(color: colorScheme.primary),
+              'Tunjukkan QR ini ke panitia untuk presensi',
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.primary,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),
@@ -351,11 +475,5 @@ class PesertaQrDisplayPage extends ConsumerWidget {
       return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
     }
     return name.isNotEmpty ? name[0].toUpperCase() : '?';
-  }
-
-  String _formatTime(DateTime dt) {
-    final h = dt.hour.toString().padLeft(2, '0');
-    final m = dt.minute.toString().padLeft(2, '0');
-    return '$h.$m WIB';
   }
 }

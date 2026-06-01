@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kegiatin/core/theme/custom.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/enums/attendance_status.dart';
@@ -229,8 +230,11 @@ class EventListCard extends ConsumerWidget {
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         onTap: () {
-          // Akan diarahkan ke detail atau langsung pop up QR nanti
-          if (onTap != null) onTap!();
+          if (alreadyRsvp && !alreadyAttended) {
+            context.push('/peserta/qr/${event.id}');
+          } else {
+            if (onTap != null) onTap!();
+          }
         },
         borderRadius: BorderRadius.circular(12),
         child: Padding(

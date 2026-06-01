@@ -1,12 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/core/constants/api_constants.dart';
 import 'package:kegiatin/core/utils/string_utils.dart';
 import 'package:kegiatin/domain/entities/user_summary.dart';
 import 'package:kegiatin/domain/usecases/rsvp/invite_user_usecase.dart';
 import 'package:kegiatin/presentation/controllers/user/search_user_controller.dart';
+import 'package:kegiatin/presentation/controllers/rsvp/event_rsvp_list_controller.dart';
 import 'package:kegiatin/presentation/providers/providers.dart';
 
 class InviteMemberSheet extends ConsumerStatefulWidget {
@@ -21,7 +23,25 @@ class InviteMemberSheet extends ConsumerStatefulWidget {
 class _InviteMemberSheetState extends ConsumerState<InviteMemberSheet> {
   final _searchController = TextEditingController();
   Timer? _debounce;
-  bool _inviting = false;
+  final Set<String> _invitedUserIds = {};
+  final Set<String> _invitingUserIds = {};
+
+  @override
+  void initState() {
+    super.initState();
+    // Populate already invited users from existing RSVPs
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final rsvpsVal = ref.read(eventRsvpListControllerProvider(widget.eventId)).value;
+      if (rsvpsVal != null) {
+        setState(() {
+          for (final rsvp in rsvpsVal.data) {
+            _invitedUserIds.add(rsvp.user.id);
+          }
+        });
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -38,12 +58,14 @@ class _InviteMemberSheetState extends ConsumerState<InviteMemberSheet> {
   }
 
   Future<void> _invite(UserSummary user) async {
-    setState(() => _inviting = true);
+    if (_invitingUserIds.contains(user.id) || _invitedUserIds.contains(user.id)) return;
+    setState(() => _invitingUserIds.add(user.id));
     final useCase = ref.read(inviteUserUseCaseProvider);
     final result = await useCase(InviteUserParams(eventId: widget.eventId, userId: user.id));
-    setState(() => _inviting = false);
 
     if (!mounted) return;
+    setState(() => _invitingUserIds.remove(user.id));
+
     result.fold(
       (failure) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -54,10 +76,11 @@ class _InviteMemberSheetState extends ConsumerState<InviteMemberSheet> {
         );
       },
       (_) {
+        setState(() => _invitedUserIds.add(user.id));
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Anggota berhasil diundang')));
-        Navigator.of(context).pop();
+        ).showSnackBar(SnackBar(content: Text('${user.displayName} berhasil diundang')));
+        ref.invalidate(eventRsvpListControllerProvider(widget.eventId));
       },
     );
   }
@@ -144,9 +167,14 @@ class _InviteMemberSheetState extends ConsumerState<InviteMemberSheet> {
                           separatorBuilder: (_, _) => const SizedBox(height: 6),
                           itemBuilder: (context, i) {
                             final user = result.data[i];
+                            final isInvited = _invitedUserIds.contains(user.id);
+                            final isInviting = _invitingUserIds.contains(user.id);
+
                             return _UserCard(
                               user: user,
-                              onInvite: _inviting ? null : () => _invite(user),
+                              isInvited: isInvited,
+                              isInviting: isInviting,
+                              onInvite: isInvited || isInviting ? null : () => _invite(user),
                             );
                           },
                         );
@@ -166,9 +194,16 @@ class _InviteMemberSheetState extends ConsumerState<InviteMemberSheet> {
 
 class _UserCard extends StatelessWidget {
   final UserSummary user;
+  final bool isInvited;
+  final bool isInviting;
   final VoidCallback? onInvite;
 
-  const _UserCard({required this.user, required this.onInvite});
+  const _UserCard({
+    required this.user,
+    required this.isInvited,
+    required this.isInviting,
+    required this.onInvite,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -183,21 +218,43 @@ class _UserCard extends StatelessWidget {
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
-        leading: CircleAvatar(
-          radius: 20,
-          backgroundColor: colorScheme.primaryContainer,
-          backgroundImage: user.photoUrl != null && user.photoUrl!.isNotEmpty
-              ? NetworkImage(ApiConstants.resolveImageUrl(user.photoUrl!))
-              : null,
-          child: user.photoUrl == null || user.photoUrl!.isEmpty
-              ? Text(
-                  StringUtils.initials(user.displayName),
-                  style: textTheme.labelMedium?.copyWith(
-                    color: colorScheme.onPrimaryContainer,
-                    fontWeight: FontWeight.bold,
+        leading: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(shape: BoxShape.circle, color: colorScheme.primaryContainer),
+          clipBehavior: Clip.antiAlias,
+          child: user.photoUrl != null && user.photoUrl!.isNotEmpty
+              ? CachedNetworkImage(
+                  imageUrl: ApiConstants.resolveImageUrl(user.photoUrl!),
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Center(
+                    child: Text(
+                      StringUtils.initials(user.displayName),
+                      style: textTheme.labelMedium?.copyWith(
+                        color: colorScheme.onPrimaryContainer,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  errorWidget: (context, url, error) => Center(
+                    child: Text(
+                      StringUtils.initials(user.displayName),
+                      style: textTheme.labelMedium?.copyWith(
+                        color: colorScheme.onPrimaryContainer,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 )
-              : null,
+              : Center(
+                  child: Text(
+                    StringUtils.initials(user.displayName),
+                    style: textTheme.labelMedium?.copyWith(
+                      color: colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
         ),
         title: Text(
           user.displayName,
@@ -209,7 +266,29 @@ class _UserCard extends StatelessWidget {
                 style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
               )
             : null,
-        trailing: FilledButton.tonal(onPressed: onInvite, child: const Text('Undang')),
+        trailing: isInvited
+            ? OutlinedButton.icon(
+                onPressed: null,
+                icon: Icon(Icons.check, size: 16, color: colorScheme.primary),
+                label: Text(
+                  'Diundang',
+                  style: textTheme.labelMedium?.copyWith(
+                    color: colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: colorScheme.primary.withValues(alpha: 0.5)),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                ),
+              )
+            : isInviting
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2.5),
+              )
+            : FilledButton.tonal(onPressed: onInvite, child: const Text('Undang')),
       ),
     );
   }

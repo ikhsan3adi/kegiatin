@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/core/constants/api_constants.dart';
 import 'package:kegiatin/core/theme/custom.dart';
@@ -334,7 +335,7 @@ class _PesertaCard extends StatelessWidget {
             radius: 22,
             backgroundColor: colorScheme.primaryContainer,
             backgroundImage: photoUrl != null && photoUrl!.isNotEmpty
-                ? NetworkImage(ApiConstants.resolveImageUrl(photoUrl!))
+                ? CachedNetworkImageProvider(ApiConstants.resolveImageUrl(photoUrl!))
                 : null,
             child: photoUrl == null || photoUrl!.isEmpty
                 ? Text(

@@ -5,9 +5,10 @@ import 'package:kegiatin/core/theme/custom.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 class QrScannerTab extends StatefulWidget {
-  const QrScannerTab({super.key, this.onDetect});
+  const QrScannerTab({super.key, this.onDetect, this.sessionSelected = true});
 
   final void Function(String value)? onDetect;
+  final bool sessionSelected;
 
   @override
   State<QrScannerTab> createState() => _QrScannerTabState();
@@ -47,8 +48,8 @@ class _QrScannerTabState extends State<QrScannerTab> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              // Live camera preview
-              if (!isDesktop)
+              // Live camera preview - Only run if session is selected
+              if (!isDesktop && widget.sessionSelected)
                 MobileScanner(
                   controller: _controller,
                   onDetect: _handleDetection,
@@ -86,47 +87,78 @@ class _QrScannerTabState extends State<QrScannerTab> {
                 Container(
                   color: colorScheme.surfaceContainerHighest,
                   child: Center(
-                    child: Text(
-                      'QR Scanner tidak tersedia di platform ini',
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.qr_code_scanner_rounded,
+                            size: 64,
+                            color: colorScheme.primary.withValues(alpha: 0.5),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            !widget.sessionSelected
+                                ? 'Pilih Kegiatan & Sesi Terlebih Dahulu'
+                                : 'QR Scanner tidak tersedia di platform ini',
+                            textAlign: TextAlign.center,
+                            style: textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
+                          if (!widget.sessionSelected) ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              'Silakan tentukan Kegiatan dan Sesi di menu bagian atas untuk mengaktifkan kamera scanner.',
+                              textAlign: TextAlign.center,
+                              style: textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
                   ),
                 ),
 
               // Overlay viewfinder (blur luar + border sudut)
-              CustomPaint(painter: _OverlayPainter(borderColor: colorScheme.primary)),
+              if (widget.sessionSelected)
+                CustomPaint(painter: _OverlayPainter(borderColor: colorScheme.primary)),
 
               // Ikon QR di tengah area scan
-              const Center(
-                child: Icon(
-                  Icons.qr_code_2_rounded,
-                  size: 80,
-                  color: KegiatinCustomTheme.scannerGhost,
+              if (widget.sessionSelected)
+                const Center(
+                  child: Icon(
+                    Icons.qr_code_2_rounded,
+                    size: 80,
+                    color: KegiatinCustomTheme.scannerGhost,
+                  ),
                 ),
-              ),
 
               // Kontrol flash & flip — pojok kanan atas
-              Positioned(
-                top: 12,
-                right: 12,
-                child: Column(
-                  children: [
-                    _ControlButton(
-                      icon: Icons.flash_on_rounded,
-                      tooltip: 'Flash',
-                      onTap: () => _controller.toggleTorch(),
-                    ),
-                    const SizedBox(height: 8),
-                    _ControlButton(
-                      icon: Icons.flip_camera_ios_rounded,
-                      tooltip: 'Balik Kamera',
-                      onTap: () => _controller.switchCamera(),
-                    ),
-                  ],
+              if (widget.sessionSelected)
+                Positioned(
+                  top: 12,
+                  right: 12,
+                  child: Column(
+                    children: [
+                      _ControlButton(
+                        icon: Icons.flash_on_rounded,
+                        tooltip: 'Flash',
+                        onTap: () => _controller.toggleTorch(),
+                      ),
+                      const SizedBox(height: 8),
+                      _ControlButton(
+                        icon: Icons.flip_camera_ios_rounded,
+                        tooltip: 'Balik Kamera',
+                        onTap: () => _controller.switchCamera(),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
             ],
           ),
         ),

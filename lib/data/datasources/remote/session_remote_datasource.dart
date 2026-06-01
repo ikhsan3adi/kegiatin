@@ -40,8 +40,8 @@ class SessionRemoteDataSourceImpl implements SessionRemoteDataSource {
         ApiConstants.eventSessions(eventId),
         data: {
           'title': input.title,
-          'startTime': input.startTime.toIso8601String(),
-          'endTime': input.endTime.toIso8601String(),
+          'startTime': input.startTime.toUtc().toIso8601String(),
+          'endTime': input.endTime.toUtc().toIso8601String(),
           if (input.location != null) 'location': input.location,
           if (input.capacity != null) 'capacity': input.capacity,
         },
@@ -68,8 +68,8 @@ class SessionRemoteDataSourceImpl implements SessionRemoteDataSource {
     try {
       final data = <String, dynamic>{
         'title': ?title,
-        'startTime': ?startTime?.toIso8601String(),
-        'endTime': ?endTime?.toIso8601String(),
+        'startTime': ?startTime?.toUtc().toIso8601String(),
+        'endTime': ?endTime?.toUtc().toIso8601String(),
         'location': ?location,
         'capacity': ?capacity,
       };

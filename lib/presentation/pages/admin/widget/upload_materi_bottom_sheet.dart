@@ -1,17 +1,18 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/core/pcd/enhancement_options.dart';
+import 'package:kegiatin/core/utils/pdf_generator.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/entities/processed_image.dart';
 import 'package:kegiatin/domain/entities/session.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:kegiatin/domain/enums/archive_type.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
-import 'package:kegiatin/presentation/controllers/archive/upload_materi_controller.dart';
 import 'package:kegiatin/presentation/controllers/archive/session_archives_controller.dart';
+import 'package:kegiatin/presentation/controllers/archive/upload_materi_controller.dart';
 import 'package:kegiatin/presentation/widgets/smart_camera_launcher.dart';
 
 class UploadMateriBottomSheet extends ConsumerStatefulWidget {
@@ -29,6 +30,7 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
   final _titleController = TextEditingController();
   final _linkController = TextEditingController();
   ProcessedImage? _scannedFile;
+  final List<ProcessedImage> _capturedImages = [];
 
   @override
   void initState() {
@@ -60,7 +62,21 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
     try {
       final result = await FilePicker.pickFiles(
         type: FileType.custom,
-        allowedExtensions: ['jpg', 'jpeg', 'png', 'webp'],
+        allowedExtensions: [
+          'pdf',
+          'doc',
+          'docx',
+          'xls',
+          'xlsx',
+          'ppt',
+          'pptx',
+          'txt',
+          'jpg',
+          'jpeg',
+          'png',
+          'webp',
+          'zip',
+        ],
       );
 
       if (result != null && result.files.single.path != null && mounted) {
@@ -96,13 +112,105 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
       return;
     }
 
+    String? finalFilePath;
+
+    if (_selectedType == 'FILE') {
+      if (_scannedFile == null) {
+        unawaited(
+          showDialog(
+            context: context,
+            builder: (_) => const AlertDialog(
+              title: Text('Lengkapi Data'),
+              content: Text('Silakan pilih file atau scan dokumen terlebih dahulu.'),
+            ),
+          ),
+        );
+        return;
+      }
+      finalFilePath = _scannedFile!.filePath;
+    } else if (_selectedType == 'MULTI_IMAGE') {
+      if (_capturedImages.isEmpty) {
+        unawaited(
+          showDialog(
+            context: context,
+            builder: (_) => const AlertDialog(
+              title: Text('Lengkapi Data'),
+              content: Text(
+                'Silakan ambil minimal 1 foto menggunakan Smart Camera terlebih dahulu.',
+              ),
+            ),
+          ),
+        );
+        return;
+      }
+
+      // Tampilkan dialog progress pembuatan PDF agar sangat interaktif
+      if (mounted) {
+        unawaited(
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (_) => const Center(
+              child: Card(
+                child: Padding(
+                  padding: EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircularProgressIndicator(),
+                      SizedBox(height: 16),
+                      Text('Menyusun PDF dari foto...'),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+      try {
+        finalFilePath = await PdfGenerator.imagesToPdf(
+          _capturedImages.map((img) => img.filePath).toList(),
+        );
+      } catch (e) {
+        if (mounted) {
+          Navigator.pop(context); // Pop dialog progress
+          unawaited(
+            showDialog(
+              context: context,
+              builder: (_) => AlertDialog(
+                title: const Text('Gagal PDF'),
+                content: Text('Terjadi kesalahan menyusun PDF: $e'),
+              ),
+            ),
+          );
+        }
+        return;
+      }
+      if (mounted) Navigator.pop(context); // Pop dialog progress
+    } else if (_selectedType == 'LINK') {
+      if (_linkController.text.trim().isEmpty) {
+        unawaited(
+          showDialog(
+            context: context,
+            builder: (_) => const AlertDialog(
+              title: Text('Lengkapi Data'),
+              content: Text('Masukkan URL tautan materi.'),
+            ),
+          ),
+        );
+        return;
+      }
+    }
+
     final uploadCtrl = ref.read(uploadMateriControllerProvider.notifier);
     await uploadCtrl.upload(
       UploadMateriArgs(
         sessionId: _selectedSession!.id,
         title: _titleController.text.trim(),
         type: ArchiveType.material,
-        filePath: _scannedFile?.filePath,
+        filePath: finalFilePath,
         linkUrl: _selectedType == 'LINK' ? _linkController.text.trim() : null,
       ),
     );
@@ -192,7 +300,11 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
                       .map(
                         (s) => DropdownMenuItem<Session>(
                           value: s,
-                          child: Text(s.title, overflow: TextOverflow.ellipsis),
+                          child: Text(
+                            s.title,
+                            overflow: TextOverflow.ellipsis,
+                            style: textTheme.labelLarge,
+                          ),
                         ),
                       )
                       .toList(),
@@ -216,8 +328,13 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
               segments: const [
                 ButtonSegment(
                   value: 'FILE',
-                  label: Text('Dokumen'),
+                  label: Text('File'),
                   icon: Icon(Icons.file_copy_outlined),
+                ),
+                ButtonSegment(
+                  value: 'MULTI_IMAGE',
+                  label: Text('Gambar PDF'),
+                  icon: Icon(Icons.picture_as_pdf_outlined),
                 ),
                 ButtonSegment(value: 'LINK', label: Text('Tautan'), icon: Icon(Icons.link_rounded)),
               ],
@@ -229,23 +346,79 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
             const SizedBox(height: 16),
             if (_selectedType == 'FILE') ...[
               if (_scannedFile != null) ...[
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.file(File(_scannedFile!.filePath), height: 160, fit: BoxFit.cover),
+                Builder(
+                  builder: (context) {
+                    final path = _scannedFile!.filePath;
+                    final ext = path.split('.').last.toLowerCase();
+                    final isImage = ['jpg', 'jpeg', 'png', 'webp'].contains(ext);
+
+                    if (isImage) {
+                      return ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.file(File(path), height: 160, fit: BoxFit.cover),
+                      );
+                    } else {
+                      return Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: colorScheme.surfaceContainerLow,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.insert_drive_file_outlined,
+                              size: 36,
+                              color: colorScheme.primary,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    path.split('/').last,
+                                    style: textTheme.bodyMedium?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '${(_scannedFile!.fileSize / 1024).toStringAsFixed(1)} KB',
+                                    style: textTheme.bodySmall?.copyWith(
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                  },
                 ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
                     Expanded(
                       child: Text(
-                        'Mode: ${_scannedFile!.enhancementMode} · ${(_scannedFile!.fileSize / 1024).toStringAsFixed(1)} KB',
+                        'Ukuran: ${(_scannedFile!.fileSize / 1024).toStringAsFixed(1)} KB',
                         style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
                       ),
                     ),
                     TextButton.icon(
-                      onPressed: _handleScanDocument,
+                      onPressed: _scannedFile!.isDocumentScan
+                          ? _handleScanDocument
+                          : _handlePickFile,
                       icon: const Icon(Icons.refresh, size: 18),
-                      label: const Text('Scan Ulang'),
+                      label: Text(_scannedFile!.isDocumentScan ? 'Scan Ulang' : 'Pilih File Lain'),
                     ),
                   ],
                 ),
@@ -308,6 +481,102 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
                   ],
                 ),
               ],
+            ] else if (_selectedType == 'MULTI_IMAGE') ...[
+              if (_capturedImages.isNotEmpty) ...[
+                Text(
+                  'Daftar Foto (${_capturedImages.length}):',
+                  style: textTheme.labelMedium?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  height: 110,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: _capturedImages.length,
+                    separatorBuilder: (_, index) => const SizedBox(width: 8),
+                    itemBuilder: (context, index) {
+                      final img = _capturedImages[index];
+                      return Stack(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: colorScheme.outlineVariant),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(11),
+                              child: Image.file(
+                                File(img.filePath),
+                                width: 90,
+                                height: 90,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            top: 4,
+                            right: 4,
+                            child: Material(
+                              color: colorScheme.error.withValues(alpha: 0.9),
+                              shape: const CircleBorder(),
+                              elevation: 2,
+                              child: InkWell(
+                                onTap: () => setState(() => _capturedImages.removeAt(index)),
+                                borderRadius: BorderRadius.circular(12),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(4.0),
+                                  child: Icon(Icons.close, size: 14, color: colorScheme.onError),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
+              InkWell(
+                onTap: () async {
+                  final result = await launchSmartCamera(context, ref, mode: CameraMode.document);
+                  if (result != null && mounted) {
+                    setState(() => _capturedImages.add(result));
+                  }
+                },
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: colorScheme.primary.withValues(alpha: 0.4),
+                      style: BorderStyle.solid,
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Icon(Icons.add_a_photo_rounded, size: 38, color: colorScheme.primary),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Ambil Foto via Smart Camera',
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Ambil gambar materi secara berurutan untuk dijadikan PDF',
+                        style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ] else
               TextField(
                 controller: _linkController,

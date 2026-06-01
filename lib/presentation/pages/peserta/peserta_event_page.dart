@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/presentation/controllers/event/event_list_controller.dart';
 import 'package:kegiatin/presentation/widgets/event_list_card.dart';
 import 'package:kegiatin/presentation/widgets/kegiatin_app_bar.dart';
@@ -185,7 +186,25 @@ class _PesertaEventPageState extends ConsumerState<PesertaEventPage> {
                         const SizedBox(height: 54),
                         eventListState.when(
                           data: (paginatedData) {
-                            final events = paginatedData.data;
+                            final events = List<Event>.from(paginatedData.data);
+                            events.sort((a, b) {
+                              final dateA = a.sessions.isEmpty
+                                  ? a.createdAt
+                                  : a.sessions
+                                        .map((s) => s.startTime)
+                                        .reduce((x, y) => x.isBefore(y) ? x : y);
+                              final dateB = b.sessions.isEmpty
+                                  ? b.createdAt
+                                  : b.sessions
+                                        .map((s) => s.startTime)
+                                        .reduce((x, y) => x.isBefore(y) ? x : y);
+
+                              if (_selectedStatus == 'COMPLETED' ||
+                                  _selectedStatus == 'CANCELLED') {
+                                return dateB.compareTo(dateA); // Descending (newest first)
+                              }
+                              return dateA.compareTo(dateB); // Ascending (closest first)
+                            });
 
                             if (events.isEmpty) {
                               return Center(

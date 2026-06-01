@@ -144,6 +144,20 @@ class _PesertaDashboardPageState extends ConsumerState<PesertaDashboardPage> {
                         event.status == EventStatus.published;
                   }).toList();
 
+                  filteredEvents.sort((a, b) {
+                    final dateA = a.sessions.isEmpty
+                        ? a.createdAt
+                        : a.sessions
+                              .map((s) => s.startTime)
+                              .reduce((x, y) => x.isBefore(y) ? x : y);
+                    final dateB = b.sessions.isEmpty
+                        ? b.createdAt
+                        : b.sessions
+                              .map((s) => s.startTime)
+                              .reduce((x, y) => x.isBefore(y) ? x : y);
+                    return dateA.compareTo(dateB);
+                  });
+
                   if (filteredEvents.isEmpty) {
                     return Center(
                       child: Padding(

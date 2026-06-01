@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { eq } from 'drizzle-orm';
 import { uuidv7 } from 'uuidv7';
 import { DRIZZLE } from '../../../database/drizzle.provider';
@@ -13,9 +14,34 @@ import {
 
 @Injectable()
 export class DrizzleArchiveRepository implements IArchiveRepository {
-  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) {}
+  constructor(
+    @Inject(DRIZZLE) private readonly db: DrizzleDB,
+    private readonly config: ConfigService,
+  ) {}
+
+  private getAbsoluteUrl(fileUrl: string): string {
+    if (fileUrl.startsWith('http://') || fileUrl.startsWith('https://')) {
+      return fileUrl;
+    }
+    const envBaseUrl = this.config.get<string>('BASE_URL');
+    const baseUrl = envBaseUrl
+      ? envBaseUrl.replace(/\/$/, '')
+      : `http://localhost:${this.config.get<number>('PORT', 3000)}`;
+    
+    const relativePath = fileUrl.startsWith('/') ? fileUrl : `/${fileUrl}`;
+    return `${baseUrl}${relativePath}`;
+  }
+
+  private getRelativePath(fileUrl: string): string {
+    const uploadsIndex = fileUrl.indexOf('/uploads/');
+    if (uploadsIndex !== -1) {
+      return fileUrl.substring(uploadsIndex);
+    }
+    return fileUrl;
+  }
 
   async create(data: ICreateArchiveData): Promise<IArchive> {
+    const relativePath = this.getRelativePath(data.fileUrl);
     const [row] = await this.db
       .insert(archives)
       .values({
@@ -23,7 +49,7 @@ export class DrizzleArchiveRepository implements IArchiveRepository {
         sessionId: data.sessionId,
         title: data.title,
         type: data.type,
-        fileUrl: data.fileUrl,
+        fileUrl: relativePath,
       })
       .returning();
 
@@ -60,7 +86,7 @@ export class DrizzleArchiveRepository implements IArchiveRepository {
       sessionId: row.sessionId,
       title: row.title,
       type: row.type as ArchiveType,
-      fileUrl: row.fileUrl,
+      fileUrl: this.getAbsoluteUrl(row.fileUrl),
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
     };

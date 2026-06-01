@@ -7,7 +7,6 @@ import 'package:kegiatin/core/pcd/enhancement_options.dart';
 import 'package:kegiatin/domain/entities/processed_image.dart';
 import 'package:kegiatin/domain/repositories/pcd_repository.dart';
 import 'package:kegiatin/presentation/providers/pcd_providers.dart';
-import 'package:kegiatin/presentation/widgets/enhancement_preview.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -95,16 +94,7 @@ Future<ProcessedImage?> launchSmartCamera(
   final finalResult = captureResult;
   if (finalResult == null || !context.mounted) return null;
 
-  final defaultMode = mode == CameraMode.document
-      ? EnhancementMode.original
-      : EnhancementMode.enhanced;
-  final selectedMode = await EnhancementPreview.show(
-    context,
-    imageBytes: finalResult.imageBytes,
-    defaultMode: defaultMode,
-  );
-
-  if (selectedMode == null || !context.mounted) return null;
+  const selectedMode = EnhancementMode.original;
 
   final result = await repository.enhanceAndSave(
     imageBytes: finalResult.imageBytes,

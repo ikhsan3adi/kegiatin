@@ -289,7 +289,11 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: colorScheme.primaryContainer,
-                border: Border.all(color: colorScheme.primary.withValues(alpha: 0.3), width: 3),
+                border: Border.all(
+                  color: colorScheme.primary.withValues(alpha: 0.3),
+                  width: 3,
+                  strokeAlign: BorderSide.strokeAlignOutside,
+                ),
                 boxShadow: [
                   BoxShadow(
                     color: colorScheme.shadow.withValues(alpha: 0.1),
