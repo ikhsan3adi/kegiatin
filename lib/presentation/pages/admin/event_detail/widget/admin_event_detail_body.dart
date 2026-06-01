@@ -71,17 +71,24 @@ class AdminEventDetailBody extends ConsumerWidget {
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: Colors.black54,
+                              color: colorScheme.scrim.withValues(alpha: 0.54),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Row(
+                            child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.fullscreen, color: Colors.white, size: 16),
-                                SizedBox(width: 4),
+                                Icon(
+                                  Icons.fullscreen,
+                                  color: colorScheme.onInverseSurface,
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 4),
                                 Text(
                                   'Perbesar',
-                                  style: TextStyle(color: Colors.white, fontSize: 10),
+                                  style: TextStyle(
+                                    color: colorScheme.onInverseSurface,
+                                    fontSize: 10,
+                                  ),
                                 ),
                               ],
                             ),
@@ -152,7 +159,9 @@ class AdminEventDetailBody extends ConsumerWidget {
             const SizedBox(height: 16),
             _ParticipantsSummaryCard(eventId: event.id),
             const SizedBox(height: 16),
-          ] else if (event.status == EventStatus.draft || event.status == EventStatus.published || event.status == EventStatus.cancelled) ...[
+          ] else if (event.status == EventStatus.draft ||
+              event.status == EventStatus.published ||
+              event.status == EventStatus.cancelled) ...[
             _ParticipantsSummaryCard(eventId: event.id),
             const SizedBox(height: 16),
           ],
@@ -359,49 +368,62 @@ class _AttendanceSummaryCard extends ConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final rsvpsAsync = ref.watch(eventRsvpListControllerProvider(eventId));
-    final totalRsvp = rsvpsAsync.asData?.value.total ?? 0;
 
-    return _SurfaceCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return rsvpsAsync.when(
+      loading: () => const _SurfaceCard(child: Center(child: CircularProgressIndicator())),
+      error: (err, _) => _SurfaceCard(
+        child: Center(
+          child: Text(
+            'Gagal memuat daftar hadir: $err',
+            style: TextStyle(color: colorScheme.error),
+          ),
+        ),
+      ),
+      data: (rsvpList) {
+        final totalRsvp = rsvpList.total;
+        return _SurfaceCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.fact_check_outlined, size: 20, color: colorScheme.onSurfaceVariant),
-              const SizedBox(width: 12),
-              Text(
-                'Daftar Hadir',
-                style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              Row(
+                children: [
+                  Icon(Icons.fact_check_outlined, size: 20, color: colorScheme.onSurfaceVariant),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Daftar Hadir',
+                    style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              if (sessions.isEmpty)
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Text(
+                      'Belum ada sesi',
+                      style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+                    ),
+                  ),
+                )
+              else
+                ...sessions.map((s) => _SessionSummaryRow(session: s, totalRsvp: totalRsvp)),
+              const SizedBox(height: 16),
+              Center(
+                child: FilledButton.icon(
+                  onPressed: () => _openAttendancePage(context),
+                  icon: const Icon(Icons.fact_check_outlined),
+                  label: const Text('Kelola Kehadiran'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: colorScheme.primaryContainer,
+                    foregroundColor: colorScheme.onPrimaryContainer,
+                  ),
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          if (sessions.isEmpty)
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Text(
-                  'Belum ada sesi',
-                  style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
-                ),
-              ),
-            )
-          else
-            ...sessions.map((s) => _SessionSummaryRow(session: s, totalRsvp: totalRsvp)),
-          const SizedBox(height: 16),
-          Center(
-            child: FilledButton.icon(
-              onPressed: () => _openAttendancePage(context),
-              icon: const Icon(Icons.fact_check_outlined),
-              label: const Text('Kelola Kehadiran'),
-              style: FilledButton.styleFrom(
-                backgroundColor: colorScheme.primaryContainer,
-                foregroundColor: colorScheme.onPrimaryContainer,
-              ),
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -427,63 +449,83 @@ class _SessionSummaryRow extends ConsumerWidget {
     final textTheme = Theme.of(context).textTheme;
     final attendanceAsync = ref.watch(attendanceListControllerProvider(session.id));
 
-    final list = attendanceAsync.asData?.value ?? [];
-    final hadir = list.where((a) => a.status == AttendanceStatus.present).length;
-    final terlambat = list.where((a) => a.status == AttendanceStatus.late).length;
-    final totalHadir = hadir + terlambat;
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  session.title,
-                  style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                '$totalHadir / $totalRsvp',
-                style: textTheme.labelMedium?.copyWith(
-                  color: colorScheme.primary,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
+    return attendanceAsync.when(
+      loading: () => const Padding(
+        padding: EdgeInsets.symmetric(vertical: 8),
+        child: Center(
+          child: SizedBox(
+            width: 16,
+            height: 16,
+            child: CircularProgressIndicator(strokeWidth: 2),
           ),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              Text(
-                '$hadir hadir',
-                style: textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant),
-              ),
-              if (terlambat > 0) ...[
-                const SizedBox(width: 8),
-                Container(
-                  width: 4,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: colorScheme.outlineVariant,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Icon(Icons.access_time, size: 10, color: colorScheme.tertiary),
-                const SizedBox(width: 2),
-                Text(
-                  '$terlambat terlambat',
-                  style: textTheme.labelSmall?.copyWith(color: colorScheme.tertiary),
-                ),
-              ],
-            ],
-          ),
-        ],
+        ),
       ),
+      error: (err, _) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Text(
+          'Gagal memuat kehadiran: $err',
+          style: textTheme.labelSmall?.copyWith(color: colorScheme.error),
+        ),
+      ),
+      data: (list) {
+        final hadir = list.where((a) => a.status == AttendanceStatus.present).length;
+        final terlambat = list.where((a) => a.status == AttendanceStatus.late).length;
+        final totalHadir = hadir + terlambat;
+
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      session.title,
+                      style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '$totalHadir / $totalRsvp',
+                    style: textTheme.labelMedium?.copyWith(
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Text(
+                    '$hadir hadir',
+                    style: textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant),
+                  ),
+                  if (terlambat > 0) ...[
+                    const SizedBox(width: 8),
+                    Container(
+                      width: 4,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: colorScheme.outlineVariant,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Icon(Icons.access_time, size: 10, color: colorScheme.tertiary),
+                    const SizedBox(width: 2),
+                    Text(
+                      '$terlambat terlambat',
+                      style: textTheme.labelSmall?.copyWith(color: colorScheme.tertiary),
+                    ),
+                  ],
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -498,109 +540,118 @@ class _ParticipantsSummaryCard extends ConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final rsvpsAsync = ref.watch(eventRsvpListControllerProvider(eventId));
-    final total = rsvpsAsync.asData?.value.total ?? 0;
-    final list = rsvpsAsync.asData?.value.data ?? [];
 
-    return _SurfaceCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return rsvpsAsync.when(
+      loading: () => const _SurfaceCard(child: Center(child: CircularProgressIndicator())),
+      error: (err, _) => _SurfaceCard(
+        child: Center(
+          child: Text('Gagal memuat peserta: $err', style: TextStyle(color: colorScheme.error)),
+        ),
+      ),
+      data: (rsvpList) {
+        final total = rsvpList.total;
+        final list = rsvpList.data;
+
+        return _SurfaceCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.people_alt_outlined, size: 20, color: colorScheme.onSurfaceVariant),
-              const SizedBox(width: 12),
-              Text(
-                'Peserta Terdaftar',
-                style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          if (list.isEmpty)
-            Text(
-              'Belum ada peserta terdaftar',
-              style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
-            )
-          else ...[
-            Row(
-              children: [
-                SizedBox(
-                  height: 32,
-                  width: (list.take(5).length * 20.0) + 12.0,
-                  child: Stack(
-                    children: List.generate(
-                      list.take(5).length,
-                      (index) {
-                        final user = list[index].user;
-                        return Positioned(
-                          left: index * 20.0,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(color: colorScheme.surface, width: 2),
-                            ),
-                            child: CircleAvatar(
-                              radius: 14,
-                              backgroundColor: colorScheme.primaryContainer,
-                              backgroundImage: user.photoUrl != null && user.photoUrl!.isNotEmpty
-                                  ? NetworkImage(ApiConstants.resolveImageUrl(user.photoUrl!))
-                                  : null,
-                              child: user.photoUrl == null || user.photoUrl!.isEmpty
-                                  ? Text(
-                                      (user.displayName.isNotEmpty ? user.displayName[0] : '?').toUpperCase(),
-                                      style: textTheme.labelSmall?.copyWith(
-                                        color: colorScheme.onPrimaryContainer,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 9,
-                                      ),
-                                    )
-                                  : null,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+              Row(
+                children: [
+                  Icon(Icons.people_alt_outlined, size: 20, color: colorScheme.onSurfaceVariant),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Peserta Terdaftar',
+                    style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    list.length > 5
-                        ? '${list.take(3).map((e) => e.user.displayName.split(' ').first).join(', ')}, dan ${total - 3} lainnya'
-                        : list.map((e) => e.user.displayName.split(' ').first).join(', '),
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                      fontWeight: FontWeight.w500,
+                ],
+              ),
+              const SizedBox(height: 16),
+              if (list.isEmpty)
+                Text(
+                  'Belum ada peserta terdaftar',
+                  style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+                )
+              else ...[
+                Row(
+                  children: [
+                    SizedBox(
+                      height: 32,
+                      width: (list.take(5).length * 20.0) + 12.0,
+                      child: Stack(
+                        children: List.generate(list.take(5).length, (index) {
+                          final user = list[index].user;
+                          return Positioned(
+                            left: index * 20.0,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(color: colorScheme.surface, width: 2),
+                              ),
+                              child: CircleAvatar(
+                                radius: 14,
+                                backgroundColor: colorScheme.primaryContainer,
+                                backgroundImage: user.photoUrl != null && user.photoUrl!.isNotEmpty
+                                    ? NetworkImage(ApiConstants.resolveImageUrl(user.photoUrl!))
+                                    : null,
+                                child: user.photoUrl == null || user.photoUrl!.isEmpty
+                                    ? Text(
+                                        (user.displayName.isNotEmpty ? user.displayName[0] : '?')
+                                            .toUpperCase(),
+                                        style: textTheme.labelSmall?.copyWith(
+                                          color: colorScheme.onPrimaryContainer,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 9,
+                                        ),
+                                      )
+                                    : null,
+                              ),
+                            ),
+                          );
+                        }),
+                      ),
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        list.length > 5
+                            ? '${list.take(3).map((e) => e.user.displayName.split(' ').first).join(', ')}, dan ${total - 3} lainnya'
+                            : list.map((e) => e.user.displayName.split(' ').first).join(', '),
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  '$total peserta terdaftar',
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.primary,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              '$total peserta terdaftar',
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.primary,
-                fontWeight: FontWeight.bold,
+              const SizedBox(height: 16),
+              Center(
+                child: FilledButton.icon(
+                  onPressed: () => _openParticipantsPage(context),
+                  icon: const Icon(Icons.people_outline),
+                  label: const Text('Kelola Peserta'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: colorScheme.primaryContainer,
+                    foregroundColor: colorScheme.onPrimaryContainer,
+                  ),
+                ),
               ),
-            ),
-          ],
-          const SizedBox(height: 16),
-          Center(
-            child: FilledButton.icon(
-              onPressed: () => _openParticipantsPage(context),
-              icon: const Icon(Icons.people_outline),
-              label: const Text('Kelola Peserta'),
-              style: FilledButton.styleFrom(
-                backgroundColor: colorScheme.primaryContainer,
-                foregroundColor: colorScheme.onPrimaryContainer,
-              ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 

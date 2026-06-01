@@ -8,11 +8,12 @@ class FullscreenImagePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: colorScheme.scrim,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: colorScheme.scrim,
+        iconTheme: IconThemeData(color: colorScheme.onInverseSurface),
         elevation: 0,
       ),
       body: Center(
@@ -24,7 +25,7 @@ class FullscreenImagePage extends StatelessWidget {
             ApiConstants.resolveImageUrl(imageUrl),
             fit: BoxFit.contain,
             errorBuilder: (context, error, stackTrace) =>
-                const Icon(Icons.broken_image, color: Colors.white, size: 64),
+                Icon(Icons.broken_image, color: colorScheme.onInverseSurface, size: 64),
           ),
         ),
       ),

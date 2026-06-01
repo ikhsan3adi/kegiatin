@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kegiatin/domain/entities/activity_record.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kegiatin/core/constants/api_constants.dart';
@@ -15,6 +16,7 @@ import 'package:kegiatin/presentation/controllers/archive/session_archives_contr
 import 'package:kegiatin/presentation/controllers/rsvp/create_rsvp_controller.dart';
 import 'package:kegiatin/presentation/controllers/rsvp/my_rsvp_controller.dart';
 import 'package:kegiatin/presentation/pages/fullscreen_image_page.dart';
+import 'package:kegiatin/presentation/pages/peserta/peserta_riwayat_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Konten scrollable halaman detail event peserta.
@@ -73,17 +75,24 @@ class PesertaEventDetailBody extends ConsumerWidget {
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: Colors.black54,
+                              color: colorScheme.scrim.withValues(alpha: 0.54),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Row(
+                            child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.fullscreen, color: Colors.white, size: 16),
-                                SizedBox(width: 4),
+                                Icon(
+                                  Icons.fullscreen,
+                                  color: colorScheme.onInverseSurface,
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 4),
                                 Text(
                                   'Perbesar',
-                                  style: TextStyle(color: Colors.white, fontSize: 10),
+                                  style: TextStyle(
+                                    color: colorScheme.onInverseSurface,
+                                    fontSize: 10,
+                                  ),
                                 ),
                               ],
                             ),
@@ -233,14 +242,105 @@ class _PesertaActionButton extends ConsumerWidget {
     final createState = ref.watch(createRsvpControllerProvider);
     final myAttendanceAsync = ref.watch(myAttendanceControllerProvider);
 
+    ref.listen<AsyncValue<dynamic>>(myRsvpControllerProvider, (_, next) {
+      next.whenOrNull(
+        error: (err, _) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Gagal memuat status pendaftaran: $err'),
+              backgroundColor: colorScheme.error,
+            ),
+          );
+        },
+      );
+    });
+
+    ref.listen<AsyncValue<dynamic>>(myAttendanceControllerProvider, (_, next) {
+      next.whenOrNull(
+        error: (err, _) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Gagal memuat status kehadiran: $err'),
+              backgroundColor: colorScheme.error,
+            ),
+          );
+        },
+      );
+    });
+
+    ref.listen<AsyncValue<dynamic>>(historyControllerProvider, (_, next) {
+      next.whenOrNull(
+        error: (err, _) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Gagal memuat riwayat kegiatan: $err'),
+              backgroundColor: colorScheme.error,
+            ),
+          );
+        },
+      );
+    });
+
     final isCreating = createState.isLoading;
+
+    if (isCreating) {
+      return _ActionChip(
+        icon: Icons.hourglass_top,
+        label: 'Mendaftar...',
+        backgroundColor: colorScheme.primaryContainer,
+        foregroundColor: colorScheme.onPrimaryContainer,
+        onTap: null,
+      );
+    }
+
+    if (myRsvpAsync.isLoading ||
+        myAttendanceAsync.isLoading ||
+        ref.watch(historyControllerProvider).isLoading) {
+      return _ActionChip(
+        icon: Icons.hourglass_top,
+        label: 'Memuat status...',
+        backgroundColor: colorScheme.surfaceContainerHighest,
+        foregroundColor: colorScheme.onSurfaceVariant,
+        onTap: null,
+      );
+    }
+
+    if (myRsvpAsync.hasError ||
+        myAttendanceAsync.hasError ||
+        ref.watch(historyControllerProvider).hasError) {
+      return _ActionChip(
+        icon: Icons.error_outline,
+        label: 'Gagal memuat status',
+        backgroundColor: colorScheme.errorContainer,
+        foregroundColor: colorScheme.onErrorContainer,
+        onTap: () {
+          ref.invalidate(myRsvpControllerProvider);
+          ref.invalidate(myAttendanceControllerProvider);
+          ref.invalidate(historyControllerProvider);
+        },
+      );
+    }
+
     final alreadyRsvp = myRsvpAsync.value?.any((r) => r.eventId == event.id) ?? false;
-    final alreadyAttended =
-        myAttendanceAsync.value?.any((att) {
-          return event.sessions.any((session) => att.sessionId == session.id) &&
-              (att.status == AttendanceStatus.present || att.status == AttendanceStatus.late);
-        }) ??
+
+    final historyList = ref.watch(historyControllerProvider).value ?? [];
+    final historyRecord = historyList.cast<ActivityRecord?>().firstWhere(
+      (r) => r?.event.id == event.id,
+      orElse: () => null,
+    );
+    final historyAttended =
+        historyRecord?.attendancePerSession.any(
+          (sa) => sa.status == AttendanceStatus.present || sa.status == AttendanceStatus.late,
+        ) ??
         false;
+
+    final alreadyAttended =
+        (myAttendanceAsync.value?.any((att) {
+              return event.sessions.any((session) => att.sessionId == session.id) &&
+                  (att.status == AttendanceStatus.present || att.status == AttendanceStatus.late);
+            }) ??
+            false) ||
+        historyAttended;
 
     if (alreadyRsvp) {
       if (alreadyAttended) {
@@ -457,15 +557,27 @@ class _PesertaSessionArchiveSection extends ConsumerWidget {
     final textTheme = Theme.of(context).textTheme;
 
     final myAttendanceList = ref.watch(myAttendanceControllerProvider).value ?? [];
-    final attendanceRecord = myAttendanceList.cast<Attendance?>().firstWhere(
+    final localAttendance = myAttendanceList.cast<Attendance?>().firstWhere(
       (a) => a?.sessionId == session.id,
       orElse: () => null,
     );
 
+    final historyList = ref.watch(historyControllerProvider).value ?? [];
+    final historyRecord = historyList.cast<ActivityRecord?>().firstWhere(
+      (r) => r?.event.id == session.eventId,
+      orElse: () => null,
+    );
+    final historySessionAttendance = historyRecord?.attendancePerSession
+        .cast<SessionAttendance?>()
+        .firstWhere((sa) => sa?.session.id == session.id, orElse: () => null);
+
     final isPresentOrLate =
-        attendanceRecord != null &&
-        (attendanceRecord.status == AttendanceStatus.present ||
-            attendanceRecord.status == AttendanceStatus.late);
+        (localAttendance != null &&
+            (localAttendance.status == AttendanceStatus.present ||
+                localAttendance.status == AttendanceStatus.late)) ||
+        (historySessionAttendance != null &&
+            (historySessionAttendance.status == AttendanceStatus.present ||
+                historySessionAttendance.status == AttendanceStatus.late));
 
     if (!isPresentOrLate) {
       return Padding(
@@ -508,16 +620,23 @@ class _PesertaSessionArchiveSection extends ConsumerWidget {
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
             ),
-            error: (e, _) => Row(
-              children: [
-                Icon(Icons.error_outline, size: 16, color: colorScheme.error),
-                const SizedBox(width: 6),
-                Text(
-                  'Gagal memuat',
-                  style: textTheme.bodySmall?.copyWith(color: colorScheme.error),
-                ),
-              ],
-            ),
+            error: (e, _) {
+              final errorStr = e.toString();
+              final isForbidden =
+                  errorStr.contains('403') ||
+                  errorStr.contains('ForbiddenException') ||
+                  errorStr.contains('Akses materi');
+              return Row(
+                children: [
+                  Icon(Icons.error_outline, size: 16, color: colorScheme.error),
+                  const SizedBox(width: 6),
+                  Text(
+                    isForbidden ? 'Akses ditolak (Kehadiran belum terverifikasi)' : 'Gagal memuat',
+                    style: textTheme.bodySmall?.copyWith(color: colorScheme.error),
+                  ),
+                ],
+              );
+            },
             data: (list) {
               if (list.isEmpty) {
                 return Text(

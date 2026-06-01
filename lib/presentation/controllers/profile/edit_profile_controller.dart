@@ -16,8 +16,7 @@ class EditProfileController extends _$EditProfileController {
   /// Mengembalikan `null` jika berhasil, atau pesan error jika gagal.
   Future<String?> updateProfile(UpdateProfileInput input) async {
     state = const AsyncLoading();
-    final result =
-        await ref.read(updateProfileUseCaseProvider).call(input);
+    final result = await ref.read(updateProfileUseCaseProvider).call(input);
     return result.fold(
       (failure) {
         state = AsyncError(failure, StackTrace.current);
@@ -36,8 +35,7 @@ class EditProfileController extends _$EditProfileController {
   /// Mengembalikan URL string jika berhasil, atau `null` jika gagal.
   Future<String?> uploadPhoto(String filePath) async {
     try {
-      final url =
-          await ref.read(uploadsRemoteDataSourceProvider).uploadImage(filePath);
+      final url = await ref.read(uploadsRemoteDataSourceProvider).uploadImage(filePath);
       return url;
     } on Exception {
       return null;

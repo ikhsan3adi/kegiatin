@@ -29,13 +29,15 @@ abstract class AttendanceModel with _$AttendanceModel implements Attendance {
   factory AttendanceModel.fromJson(Map<String, dynamic> json) => _$AttendanceModelFromJson(json);
 
   @override
-  UserSummary? get user => userSnippet != null ? UserSummary(
-    id: userId,
-    displayName: userSnippet!.displayName,
-    npa: userSnippet!.npa,
-    cabang: userSnippet!.cabang,
-    photoUrl: userSnippet!.photoUrl,
-  ) : null;
+  UserSummary? get user => userSnippet != null
+      ? UserSummary(
+          id: userId,
+          displayName: userSnippet!.displayName,
+          npa: userSnippet!.npa,
+          cabang: userSnippet!.cabang,
+          photoUrl: userSnippet!.photoUrl,
+        )
+      : null;
 }
 
 extension AttendanceModelX on AttendanceModel {

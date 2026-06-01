@@ -43,8 +43,10 @@ class PesertaQrDisplayPage extends ConsumerWidget {
                 final user = asyncUser.whenOrNull(data: (u) => u);
                 return asyncEvent.when(
                   loading: () => const Center(child: CircularProgressIndicator()),
-                  error: (_, _) => _buildQrContent(context, rsvp, null, user, colorScheme, textTheme),
-                  data: (event) => _buildQrContent(context, rsvp, event, user, colorScheme, textTheme),
+                  error: (_, _) =>
+                      _buildQrContent(context, rsvp, null, user, colorScheme, textTheme),
+                  data: (event) =>
+                      _buildQrContent(context, rsvp, event, user, colorScheme, textTheme),
                 );
               },
             ),
@@ -367,4 +369,3 @@ class PesertaQrDisplayPage extends ConsumerWidget {
     return '$h.$m WIB';
   }
 }
-

@@ -7,7 +7,9 @@ import 'package:kegiatin/core/pcd/enhancement_options.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/entities/processed_image.dart';
 import 'package:kegiatin/domain/entities/session.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:kegiatin/domain/enums/archive_type.dart';
+import 'package:kegiatin/domain/enums/event_type.dart';
 import 'package:kegiatin/presentation/controllers/archive/upload_materi_controller.dart';
 import 'package:kegiatin/presentation/controllers/archive/session_archives_controller.dart';
 import 'package:kegiatin/presentation/widgets/smart_camera_launcher.dart';
@@ -31,8 +33,10 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
   @override
   void initState() {
     super.initState();
-    if (widget.event.sessions.length == 1) {
-      _selectedSession = widget.event.sessions.first;
+    if (widget.event.type == EventType.single) {
+      if (widget.event.sessions.isNotEmpty) {
+        _selectedSession = widget.event.sessions.first;
+      }
     }
   }
 
@@ -53,9 +57,28 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
   }
 
   Future<void> _handlePickFile() async {
-    final result = await launchSmartCamera(context, ref, mode: CameraMode.gallery);
-    if (result != null && mounted) {
-      setState(() => _scannedFile = result);
+    try {
+      final result = await FilePicker.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['jpg', 'jpeg', 'png', 'webp'],
+      );
+
+      if (result != null && result.files.single.path != null && mounted) {
+        final path = result.files.single.path!;
+        final file = File(path);
+        final size = await file.length();
+
+        setState(() {
+          _scannedFile = ProcessedImage(
+            filePath: path,
+            enhancementMode: 'original',
+            fileSize: size,
+            isDocumentScan: false,
+          );
+        });
+      }
+    } catch (e) {
+      debugPrint('Error picking file: $e');
     }
   }
 
@@ -150,7 +173,7 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
               ],
             ),
             const SizedBox(height: 24),
-            if (_availableSessions.length > 1) ...[
+            if (widget.event.type == EventType.series) ...[
               InputDecorator(
                 decoration: InputDecoration(
                   labelText: 'Pilih Sesi',
@@ -305,10 +328,12 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               child: uploadState.isLoading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                  ? const Center(
+                      child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
                     )
                   : const Text(
                       'Unggah Materi',

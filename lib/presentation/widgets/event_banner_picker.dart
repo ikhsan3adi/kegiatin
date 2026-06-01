@@ -46,14 +46,14 @@ class EventBannerPicker extends ConsumerWidget {
                   top: 8,
                   right: 8,
                   child: Material(
-                    color: Colors.black54,
+                    color: colorScheme.scrim.withValues(alpha: 0.54),
                     borderRadius: BorderRadius.circular(20),
                     child: InkWell(
                       borderRadius: BorderRadius.circular(20),
                       onTap: onRemove,
-                      child: const Padding(
-                        padding: EdgeInsets.all(6),
-                        child: Icon(Icons.close, color: Colors.white, size: 18),
+                      child: Padding(
+                        padding: const EdgeInsets.all(6),
+                        child: Icon(Icons.close, color: colorScheme.onInverseSurface, size: 18),
                       ),
                     ),
                   ),
@@ -62,19 +62,22 @@ class EventBannerPicker extends ConsumerWidget {
                   bottom: 8,
                   right: 8,
                   child: Material(
-                    color: Colors.black54,
+                    color: colorScheme.scrim.withValues(alpha: 0.54),
                     borderRadius: BorderRadius.circular(20),
                     child: InkWell(
                       borderRadius: BorderRadius.circular(20),
                       onTap: () => _pickBanner(context, ref),
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.edit, color: Colors.white, size: 14),
-                            SizedBox(width: 4),
-                            Text('Ganti Foto', style: TextStyle(color: Colors.white, fontSize: 12)),
+                            Icon(Icons.edit, color: colorScheme.onInverseSurface, size: 14),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Ganti Foto',
+                              style: TextStyle(color: colorScheme.onInverseSurface, fontSize: 12),
+                            ),
                           ],
                         ),
                       ),

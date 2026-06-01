@@ -69,9 +69,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
               const SizedBox(height: 16),
               Text(
                 'Pilih Sumber Foto',
-                style: Theme.of(ctx).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(ctx).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               ListTile(
@@ -185,25 +183,18 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     );
 
     // Tidak ada perubahan.
-    if (input.displayName == null &&
-        input.cabang == null &&
-        input.photoUrl == null) {
+    if (input.displayName == null && input.cabang == null && input.photoUrl == null) {
       if (mounted) context.pop();
       return;
     }
 
-    final error = await ref
-        .read(editProfileControllerProvider.notifier)
-        .updateProfile(input);
+    final error = await ref.read(editProfileControllerProvider.notifier).updateProfile(input);
 
     if (!mounted) return;
 
     if (error != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(error),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
+        SnackBar(content: Text(error), backgroundColor: Theme.of(context).colorScheme.error),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -298,10 +289,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: colorScheme.primaryContainer,
-                border: Border.all(
-                  color: colorScheme.primary.withValues(alpha: 0.3),
-                  width: 3,
-                ),
+                border: Border.all(color: colorScheme.primary.withValues(alpha: 0.3), width: 3),
                 boxShadow: [
                   BoxShadow(
                     color: colorScheme.shadow.withValues(alpha: 0.1),
@@ -314,13 +302,12 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
               child: _pickedImage != null
                   ? Image.file(_pickedImage!, fit: BoxFit.cover)
                   : hasNetworkPhoto
-                      ? Image.network(
-                          ApiConstants.resolveImageUrl(user.photoUrl!),
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) =>
-                              _InitialsAvatar(initials: initials),
-                        )
-                      : _InitialsAvatar(initials: initials),
+                  ? Image.network(
+                      ApiConstants.resolveImageUrl(user.photoUrl!),
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) => _InitialsAvatar(initials: initials),
+                    )
+                  : _InitialsAvatar(initials: initials),
             ),
             Positioned(
               bottom: 0,
@@ -332,11 +319,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                   shape: BoxShape.circle,
                   border: Border.all(color: colorScheme.surface, width: 2),
                 ),
-                child: Icon(
-                  Icons.camera_alt_rounded,
-                  size: 18,
-                  color: colorScheme.onPrimary,
-                ),
+                child: Icon(Icons.camera_alt_rounded, size: 18, color: colorScheme.onPrimary),
               ),
             ),
           ],
@@ -345,19 +328,13 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     );
   }
 
-  Widget _buildEditableSection(
-    User user,
-    ColorScheme colorScheme,
-    TextTheme textTheme,
-  ) {
+  Widget _buildEditableSection(User user, ColorScheme colorScheme, TextTheme textTheme) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.5),
-        ),
+        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
         boxShadow: [
           BoxShadow(
             color: colorScheme.shadow.withValues(alpha: 0.04),
@@ -389,9 +366,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
             decoration: InputDecoration(
               labelText: 'Nama Tampilan',
               prefixIcon: const Icon(Icons.person_outline_rounded),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             ),
             validator: (v) {
               if (v == null || v.trim().isEmpty) return 'Nama wajib diisi';
@@ -406,9 +381,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
             decoration: InputDecoration(
               labelText: 'Cabang',
               prefixIcon: const Icon(Icons.location_on_outlined),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               helperText: 'Opsional',
             ),
           ),
@@ -417,19 +390,13 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     );
   }
 
-  Widget _buildReadOnlySection(
-    User user,
-    ColorScheme colorScheme,
-    TextTheme textTheme,
-  ) {
+  Widget _buildReadOnlySection(User user, ColorScheme colorScheme, TextTheme textTheme) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.5),
-        ),
+        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
         boxShadow: [
           BoxShadow(
             color: colorScheme.shadow.withValues(alpha: 0.04),
@@ -455,18 +422,10 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
             ],
           ),
           const SizedBox(height: 16),
-          _ReadOnlyField(
-            icon: Icons.email_outlined,
-            label: 'Email',
-            value: user.email,
-          ),
+          _ReadOnlyField(icon: Icons.email_outlined, label: 'Email', value: user.email),
           if (user.npa != null) ...[
             const SizedBox(height: 12),
-            _ReadOnlyField(
-              icon: Icons.badge_outlined,
-              label: 'NPA',
-              value: user.npa!,
-            ),
+            _ReadOnlyField(icon: Icons.badge_outlined, label: 'NPA', value: user.npa!),
           ],
           const SizedBox(height: 12),
           _ReadOnlyField(
@@ -487,10 +446,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
           ? SizedBox(
               width: 20,
               height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: colorScheme.onPrimary,
-              ),
+              child: CircularProgressIndicator(strokeWidth: 2, color: colorScheme.onPrimary),
             )
           : const Icon(Icons.check_rounded),
       label: Text(isSaving ? 'Menyimpan...' : 'Simpan Perubahan'),
@@ -531,11 +487,7 @@ class _InitialsAvatar extends StatelessWidget {
 }
 
 class _ReadOnlyField extends StatelessWidget {
-  const _ReadOnlyField({
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
+  const _ReadOnlyField({required this.icon, required this.label, required this.value});
 
   final IconData icon;
   final String label;
@@ -564,9 +516,7 @@ class _ReadOnlyField extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: textTheme.labelSmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
+                style: textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant),
               ),
               const SizedBox(height: 1),
               Text(

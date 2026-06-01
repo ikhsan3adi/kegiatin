@@ -51,6 +51,7 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
 
   void _onQrDetected(String value) {
     if (_selectedSession == null) {
+      final colorScheme = Theme.of(context).colorScheme;
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -61,7 +62,7 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
               Expanded(child: Text('Pilih kegiatan dan sesi terlebih dahulu', maxLines: 1)),
             ],
           ),
-          backgroundColor: Colors.orange,
+          backgroundColor: colorScheme.tertiary,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -84,13 +85,7 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
       if (next is AsyncError) {
         ScaffoldMessenger.of(context).clearSnackBars();
         final error = next.error;
-        String message = 'Terjadi kesalahan';
-        if (error is Failure) {
-          message = error.message;
-        } else {
-          message = error.toString();
-        }
-        message = message.replaceAll(RegExp(r'^[a-zA-Z]+Failure:\s*'), '').trim();
+        final message = error?.cleanMessage ?? 'Terjadi kesalahan';
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(

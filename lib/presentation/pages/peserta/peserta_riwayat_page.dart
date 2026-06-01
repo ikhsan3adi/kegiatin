@@ -127,7 +127,9 @@ class _PesertaRiwayatPageState extends ConsumerState<PesertaRiwayatPage> {
                     style: textTheme.bodyMedium,
                     decoration: InputDecoration(
                       hintText: 'Cari Kegiatan...',
-                      hintStyle: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+                      hintStyle: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
                       prefixIcon: const Icon(Icons.search),
                       filled: true,
                       fillColor: colorScheme.surface,

@@ -22,3 +22,13 @@ class NetworkFailure extends Failure {
 class AuthFailure extends Failure {
   const AuthFailure(super.message);
 }
+
+extension FailureMessageExtension on Object {
+  String get cleanMessage {
+    String msg = toString();
+    if (this is Failure) {
+      msg = (this as Failure).message;
+    }
+    return msg.replaceAll(RegExp(r'^[a-zA-Z]+Failure:\s*'), '').trim();
+  }
+}

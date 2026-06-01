@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/core/utils/date_formatter.dart';
 import 'package:kegiatin/domain/entities/activity_record.dart';
+import 'package:kegiatin/domain/entities/session.dart';
 import 'package:kegiatin/domain/enums/attendance_status.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
+import 'package:kegiatin/presentation/controllers/archive/session_archives_controller.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class PesertaActivityHistoryCard extends StatefulWidget {
+class PesertaActivityHistoryCard extends ConsumerStatefulWidget {
   const PesertaActivityHistoryCard({super.key, required this.record});
 
   final ActivityRecord record;
 
   @override
-  State<PesertaActivityHistoryCard> createState() => _PesertaActivityHistoryCardState();
+  ConsumerState<PesertaActivityHistoryCard> createState() => _PesertaActivityHistoryCardState();
 }
 
-class _PesertaActivityHistoryCardState extends State<PesertaActivityHistoryCard> {
+class _PesertaActivityHistoryCardState extends ConsumerState<PesertaActivityHistoryCard> {
   bool _isExpanded = false;
 
   String _formatDateRange(List<SessionAttendance> sessions) {
@@ -49,6 +53,14 @@ class _PesertaActivityHistoryCardState extends State<PesertaActivityHistoryCard>
     final attendedCount = widget.record.attendancePerSession
         .where((a) => a.status == AttendanceStatus.present || a.status == AttendanceStatus.late)
         .length;
+
+    final firstSessionAtt = widget.record.attendancePerSession.isNotEmpty
+        ? widget.record.attendancePerSession.first
+        : null;
+    final isSinglePresentOrLate =
+        firstSessionAtt != null &&
+        (firstSessionAtt.status == AttendanceStatus.present ||
+            firstSessionAtt.status == AttendanceStatus.late);
 
     final progress = totalSessions > 0 ? (attendedCount / totalSessions) : 0.0;
     final percentText = '${(progress * 100).toInt()}%';
@@ -236,7 +248,7 @@ class _PesertaActivityHistoryCardState extends State<PesertaActivityHistoryCard>
                       statusLabel = timeStr != null ? 'Hadir ($timeStr)' : 'Hadir';
                       break;
                     case AttendanceStatus.late:
-                      statusColor = Colors.orange;
+                      statusColor = colorScheme.tertiary;
                       statusLabel = timeStr != null ? 'Terlambat ($timeStr)' : 'Terlambat';
                       break;
                     case AttendanceStatus.absent:
@@ -292,6 +304,29 @@ class _PesertaActivityHistoryCardState extends State<PesertaActivityHistoryCard>
                             ),
                           ),
                         ),
+                        if (status == AttendanceStatus.present ||
+                            status == AttendanceStatus.late) ...[
+                          const SizedBox(width: 8),
+                          IconButton(
+                            icon: Icon(
+                              Icons.folder_open_outlined,
+                              color: colorScheme.primary,
+                              size: 20,
+                            ),
+                            constraints: const BoxConstraints(),
+                            padding: EdgeInsets.zero,
+                            onPressed: () {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                                ),
+                                builder: (_) => _MateriBottomSheet(session: sessAtt.session),
+                              );
+                            },
+                          ),
+                        ],
                       ],
                     ),
                   );
@@ -299,6 +334,146 @@ class _PesertaActivityHistoryCardState extends State<PesertaActivityHistoryCard>
               ),
             ),
           ],
+          if (widget.record.event.type == EventType.single && isSinglePresentOrLate) ...[
+            InkWell(
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                  ),
+                  builder: (_) => _MateriBottomSheet(session: firstSessionAtt.session),
+                );
+              },
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(20),
+                bottomRight: Radius.circular(20),
+              ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                decoration: BoxDecoration(
+                  border: Border(
+                    top: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.folder_open_outlined, size: 18, color: colorScheme.primary),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Lihat Materi Kegiatan',
+                      style: textTheme.labelMedium?.copyWith(
+                        color: colorScheme.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _MateriBottomSheet extends ConsumerWidget {
+  const _MateriBottomSheet({required this.session});
+
+  final Session session;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final archiveAsync = ref.watch(sessionArchivesControllerProvider(session.id));
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 20),
+              decoration: BoxDecoration(
+                color: colorScheme.outlineVariant,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  'Materi: ${session.title}',
+                  style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.close),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          archiveAsync.when(
+            loading: () => const Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 24),
+                child: CircularProgressIndicator(),
+              ),
+            ),
+            error: (e, _) => Row(
+              children: [
+                Icon(Icons.error_outline, size: 16, color: colorScheme.error),
+                const SizedBox(width: 6),
+                Text(
+                  'Gagal memuat materi',
+                  style: textTheme.bodySmall?.copyWith(color: colorScheme.error),
+                ),
+              ],
+            ),
+            data: (list) {
+              if (list.isEmpty) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24),
+                  child: Text(
+                    'Belum ada materi untuk sesi ini',
+                    style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+                    textAlign: TextAlign.center,
+                  ),
+                );
+              }
+              return Column(
+                children: list.map((a) {
+                  return ListTile(
+                    leading: Icon(Icons.description_outlined, color: colorScheme.primary),
+                    title: Text(a.title, maxLines: 1, overflow: TextOverflow.ellipsis),
+                    trailing: Icon(Icons.open_in_new, size: 16, color: colorScheme.primary),
+                    contentPadding: EdgeInsets.zero,
+                    onTap: () async {
+                      final uri = Uri.parse(a.fileUrl);
+                      if (await canLaunchUrl(uri)) {
+                        await launchUrl(uri, mode: LaunchMode.externalApplication);
+                      }
+                    },
+                  );
+                }).toList(),
+              );
+            },
+          ),
         ],
       ),
     );

@@ -110,7 +110,8 @@ class _ParticipantRow extends StatelessWidget {
                 : null,
             child: rsvp.user.photoUrl == null || rsvp.user.photoUrl!.isEmpty
                 ? Text(
-                    (rsvp.user.displayName.isNotEmpty ? rsvp.user.displayName[0] : '?').toUpperCase(),
+                    (rsvp.user.displayName.isNotEmpty ? rsvp.user.displayName[0] : '?')
+                        .toUpperCase(),
                     style: textTheme.bodyMedium?.copyWith(color: colorScheme.onPrimaryContainer),
                   )
                 : null,

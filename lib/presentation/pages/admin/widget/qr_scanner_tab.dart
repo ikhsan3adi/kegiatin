@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:kegiatin/core/theme/custom.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -37,6 +39,8 @@ class _QrScannerTabState extends State<QrScannerTab> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
+    final bool isDesktop = Platform.isWindows || Platform.isMacOS || Platform.isLinux;
+
     return Column(
       children: [
         Expanded(
@@ -44,7 +48,52 @@ class _QrScannerTabState extends State<QrScannerTab> {
             fit: StackFit.expand,
             children: [
               // Live camera preview
-              MobileScanner(controller: _controller, onDetect: _handleDetection),
+              if (!isDesktop)
+                MobileScanner(
+                  controller: _controller,
+                  onDetect: _handleDetection,
+                  errorBuilder: (context, error) {
+                    final colorScheme = Theme.of(context).colorScheme;
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.videocam_off_rounded, color: colorScheme.error, size: 48),
+                            const SizedBox(height: 12),
+                            Text(
+                              'Kamera tidak dapat diakses',
+                              style: Theme.of(
+                                context,
+                              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              error.errorDetails?.message ?? error.toString(),
+                              textAlign: TextAlign.center,
+                              style: Theme.of(
+                                context,
+                              ).textTheme.bodyMedium?.copyWith(color: colorScheme.error),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                )
+              else
+                Container(
+                  color: colorScheme.surfaceContainerHighest,
+                  child: Center(
+                    child: Text(
+                      'QR Scanner tidak tersedia di platform ini',
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                ),
 
               // Overlay viewfinder (blur luar + border sudut)
               CustomPaint(painter: _OverlayPainter(borderColor: colorScheme.primary)),
