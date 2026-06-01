@@ -97,100 +97,108 @@ abstract final class SnackBarHelper {
               child: Material(
                 color: Colors.transparent,
                 child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+                  margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
                   decoration: BoxDecoration(
                     color: colorScheme.surface,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: typeColor.withValues(alpha: 0.2),
+                      width: 1.5,
+                    ),
                     boxShadow: [
                       BoxShadow(
-                        color: colorScheme.shadow.withValues(alpha: 0.15),
-                        blurRadius: 30,
-                        offset: const Offset(0, 10),
+                        color: typeColor.withValues(alpha: 0.15),
+                        blurRadius: 40,
+                        offset: const Offset(0, 12),
                       ),
                     ],
                   ),
                   clipBehavior: Clip.antiAlias,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
+                  child: Stack(
                     children: [
-                      // Colored top border
-                      Container(
-                        height: 4,
-                        width: double.infinity,
-                        color: typeColor,
+                      // Tombol Close (X)
+                      Positioned(
+                        top: 12,
+                        right: 12,
+                        child: IconButton(
+                          icon: Icon(Icons.close, size: 22, color: colorScheme.onSurfaceVariant),
+                          style: IconButton.styleFrom(
+                            backgroundColor: colorScheme.onSurface.withValues(alpha: 0.05),
+                            hoverColor: colorScheme.onSurface.withValues(alpha: 0.1),
+                          ),
+                          onPressed: dismiss,
+                        ),
                       ),
-                      Stack(
-                        children: [
-                          // Close button
-                          Positioned(
-                            top: 8,
-                            right: 8,
-                            child: IconButton(
-                              icon: Icon(Icons.close, size: 20, color: colorScheme.onSurfaceVariant),
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                              onPressed: dismiss,
-                            ),
-                          ),
-                          // Content
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                // Circular Icon
-                                Container(
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(color: typeColor, width: 2),
+                      // Konten Utama
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(24, 40, 24, 28),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Ikon dengan efek menyala (Glow)
+                            Container(
+                              padding: const EdgeInsets.all(18),
+                              decoration: BoxDecoration(
+                                color: typeColor.withValues(alpha: 0.1),
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: typeColor.withValues(alpha: 0.2),
+                                    blurRadius: 24,
+                                    spreadRadius: 4,
                                   ),
-                                  child: Icon(icon, color: typeColor, size: 28),
+                                ],
+                              ),
+                              child: Icon(icon, color: typeColor, size: 42),
+                            ),
+                            const SizedBox(height: 24),
+                            // Judul (Bold)
+                            Text(
+                              title,
+                              textAlign: TextAlign.center,
+                              style: textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: -0.5,
+                                color: colorScheme.onSurface,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            // Pesan / Deskripsi
+                            Text(
+                              message,
+                              textAlign: TextAlign.center,
+                              style: textTheme.bodyLarge?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                                height: 1.5,
+                              ),
+                            ),
+                            const SizedBox(height: 32),
+                            // Tombol Aksi Utama
+                            SizedBox(
+                              width: double.infinity,
+                              child: FilledButton(
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: typeColor,
+                                  foregroundColor: KegiatinCustomTheme.onGradient,
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  elevation: 0,
                                 ),
-                                const SizedBox(height: 20),
-                                // Title
-                                Text(
-                                  title,
-                                  textAlign: TextAlign.center,
-                                  style: textTheme.titleMedium?.copyWith(
+                                onPressed: dismiss,
+                                child: const Text(
+                                  'Mengerti',
+                                  style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    color: colorScheme.onSurface,
+                                    fontSize: 16,
+                                    letterSpacing: 0.2,
                                   ),
                                 ),
-                                const SizedBox(height: 8),
-                                // Message
-                                Text(
-                                  message,
-                                  textAlign: TextAlign.center,
-                                  style: textTheme.bodyMedium?.copyWith(
-                                    color: colorScheme.onSurfaceVariant,
-                                    height: 1.5,
-                                  ),
-                                ),
-                                const SizedBox(height: 24),
-                                // Action Button
-                                SizedBox(
-                                  width: double.infinity,
-                                  child: FilledButton(
-                                    style: FilledButton.styleFrom(
-                                      backgroundColor: colorScheme.onSurface,
-                                      foregroundColor: colorScheme.surface,
-                                      padding: const EdgeInsets.symmetric(vertical: 12),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                    onPressed: dismiss,
-                                    child: const Text(
-                                      'Tutup',
-                                      style: TextStyle(fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ),
