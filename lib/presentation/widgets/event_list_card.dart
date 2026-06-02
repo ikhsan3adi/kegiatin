@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kegiatin/core/theme/custom.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/enums/attendance_status.dart';
@@ -23,9 +24,8 @@ class EventListCard extends ConsumerWidget {
 
     // Ambil sesi pertama untuk info waktu
     final firstSession = event.sessions.isNotEmpty ? event.sessions.first : null;
-    final startTime = firstSession?.startTime;
+    final startTime = firstSession?.startTime.toLocal();
 
-    // Format tanggal sederhana: YYYY-MM-DD . HH:mm
     final dateStr = startTime != null
         ? "${startTime.year}-${startTime.month.toString().padLeft(2, '0')}-${startTime.day.toString().padLeft(2, '0')} . ${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}"
         : 'Waktu belum ditentukan';
@@ -229,8 +229,11 @@ class EventListCard extends ConsumerWidget {
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         onTap: () {
-          // Akan diarahkan ke detail atau langsung pop up QR nanti
-          if (onTap != null) onTap!();
+          if (alreadyRsvp && !alreadyAttended) {
+            context.push('/peserta/qr/${event.id}');
+          } else {
+            if (onTap != null) onTap!();
+          }
         },
         borderRadius: BorderRadius.circular(12),
         child: Padding(

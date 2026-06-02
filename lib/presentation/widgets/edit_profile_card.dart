@@ -20,9 +20,7 @@ class SettingsCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.5),
-        ),
+        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
         boxShadow: [
           BoxShadow(
             color: colorScheme.shadow.withValues(alpha: 0.04),
@@ -118,9 +116,7 @@ class _SettingsRow extends StatelessWidget {
                       const SizedBox(height: 1),
                       Text(
                         item.subtitle!,
-                        style: textTheme.labelSmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
+                        style: textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant),
                       ),
                     ],
                   ],

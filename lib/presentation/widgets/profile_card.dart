@@ -60,9 +60,10 @@ class ProfileCard extends StatelessWidget {
 
   /// Format [DateTime] ke string `dd-MM-yyyy`.
   String _formatDate(DateTime date) {
-    final day = date.day.toString().padLeft(2, '0');
-    final month = date.month.toString().padLeft(2, '0');
-    return '$day-$month-${date.year}';
+    final local = date.toLocal();
+    final day = local.day.toString().padLeft(2, '0');
+    final month = local.month.toString().padLeft(2, '0');
+    return '$day-$month-${local.year}';
   }
 }
 

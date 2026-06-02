@@ -11,7 +11,7 @@ class CaptureResult {
 }
 
 abstract class PcdRepository {
-  Future<CaptureResult?> captureDocument({int pageLimit = 1});
+  Future<List<CaptureResult>?> captureDocument({int pageLimit = 1});
   Future<CaptureResult?> capturePhoto();
   Future<Either<Failure, ProcessedImage>> enhanceAndSave({
     required Uint8List imageBytes,

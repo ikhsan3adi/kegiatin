@@ -26,7 +26,9 @@ abstract class EventModel with _$EventModel implements Event {
     int? maxParticipants,
     @JsonKey(fromJson: JsonUtils.stringFromJson) required String createdBy,
     @Default([]) List<SessionModel> sessions,
+    @JsonKey(fromJson: JsonUtils.dateTimeFromJson, toJson: JsonUtils.dateTimeToJson)
     required DateTime createdAt,
+    @JsonKey(fromJson: JsonUtils.dateTimeFromJson, toJson: JsonUtils.dateTimeToJson)
     required DateTime updatedAt,
   }) = _EventModel;
 

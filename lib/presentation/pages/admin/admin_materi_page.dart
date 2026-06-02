@@ -19,7 +19,7 @@ class AdminMateriPage extends StatelessWidget {
             children: [
               Text(
                 'Materi',
-                style: textTheme.headlineSmall?.copyWith(
+                style: textTheme.headlineLarge?.copyWith(
                   color: colorScheme.onPrimary,
                   fontWeight: FontWeight.bold,
                 ),
@@ -27,7 +27,7 @@ class AdminMateriPage extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 'Kelola materi kegiatan',
-                style: textTheme.bodySmall?.copyWith(
+                style: textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onPrimary.withValues(alpha: 0.85),
                 ),
               ),
@@ -50,8 +50,8 @@ class AdminMateriPage extends StatelessWidget {
                 const SizedBox(height: 16),
                 Text(
                   'Belum ada materi',
-                  style: textTheme.titleMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
+                  style: textTheme.titleLarge?.copyWith(
+                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -59,7 +59,7 @@ class AdminMateriPage extends StatelessWidget {
                 Text(
                   'Materi kegiatan dapat dikelola\ndi dalam halaman detail kegiatan.',
                   textAlign: TextAlign.center,
-                  style: textTheme.bodySmall?.copyWith(
+                  style: textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                   ),
                 ),

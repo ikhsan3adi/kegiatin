@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:kegiatin/core/utils/json_utils.dart';
 import 'package:kegiatin/data/models/event_model.dart';
 import 'package:kegiatin/data/models/session_model.dart';
 import 'package:kegiatin/domain/entities/activity_record.dart';
@@ -23,6 +24,7 @@ abstract class SessionAttendanceModel with _$SessionAttendanceModel implements S
   const factory SessionAttendanceModel({
     required SessionModel session,
     required AttendanceStatus? status,
+    @JsonKey(fromJson: JsonUtils.nullableDateTimeFromJson, toJson: JsonUtils.nullableDateTimeToJson)
     DateTime? checkedInAt,
   }) = _SessionAttendanceModel;
 

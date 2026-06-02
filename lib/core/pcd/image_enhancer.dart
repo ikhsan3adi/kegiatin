@@ -6,10 +6,7 @@ import 'package:kegiatin/core/pcd/enhancement_options.dart';
 
 /// Provides image enhancement algorithms for photo improvement.
 class ImageEnhancer {
-  static Future<Uint8List> enhance(
-    Uint8List imageBytes,
-    EnhancementMode mode,
-  ) async {
+  static Future<Uint8List> enhance(Uint8List imageBytes, EnhancementMode mode) async {
     if (mode == EnhancementMode.original) {
       return imageBytes;
     }
@@ -82,8 +79,7 @@ class ImageEnhancer {
         final r = pixel.r.toInt();
         final g = pixel.g.toInt();
         final b = pixel.b.toInt();
-        final luminance =
-            (0.299 * r + 0.587 * g + 0.114 * b).round().clamp(0, 255);
+        final luminance = (0.299 * r + 0.587 * g + 0.114 * b).round().clamp(0, 255);
 
         final newLuminance = lut[luminance];
 
@@ -110,11 +106,7 @@ class ImageEnhancer {
   // ---------------------------------------------------------------------------
 
   /// Blends two images: factor 0.0 = all original, 1.0 = all enhanced.
-  static img.Image _blend(
-    img.Image original,
-    img.Image enhanced,
-    double factor,
-  ) {
+  static img.Image _blend(img.Image original, img.Image enhanced, double factor) {
     final width = original.width;
     final height = original.height;
     final result = img.Image(width: width, height: height);
@@ -125,12 +117,9 @@ class ImageEnhancer {
         final origPx = original.getPixel(x, y);
         final enhPx = enhanced.getPixel(x, y);
 
-        final r =
-            (origPx.r * invFactor + enhPx.r * factor).round().clamp(0, 255);
-        final g =
-            (origPx.g * invFactor + enhPx.g * factor).round().clamp(0, 255);
-        final b =
-            (origPx.b * invFactor + enhPx.b * factor).round().clamp(0, 255);
+        final r = (origPx.r * invFactor + enhPx.r * factor).round().clamp(0, 255);
+        final g = (origPx.g * invFactor + enhPx.g * factor).round().clamp(0, 255);
+        final b = (origPx.b * invFactor + enhPx.b * factor).round().clamp(0, 255);
 
         result.setPixelRgba(x, y, r, g, b, origPx.a.toInt());
       }

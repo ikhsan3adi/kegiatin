@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/core/constants/api_constants.dart';
+import 'package:kegiatin/core/utils/string_utils.dart';
 import 'package:kegiatin/domain/entities/rsvp_with_user.dart';
 import 'package:kegiatin/domain/enums/rsvp_status.dart';
 import 'package:kegiatin/domain/enums/event_visibility.dart';
@@ -19,7 +21,10 @@ class AdminParticipantsPage extends ConsumerWidget {
     final textTheme = Theme.of(context).textTheme;
     final rsvpsAsync = ref.watch(eventRsvpListControllerProvider(eventId));
     final eventAsync = ref.watch(eventDetailControllerProvider(eventId));
-    final isInviteOnly = eventAsync.asData?.value.visibility == EventVisibility.inviteOnly;
+    final isInviteOnly = eventAsync.maybeWhen(
+      data: (event) => event.visibility == EventVisibility.inviteOnly,
+      orElse: () => false,
+    );
 
     return Scaffold(
       backgroundColor: colorScheme.surfaceContainer,
@@ -106,12 +111,15 @@ class _ParticipantRow extends StatelessWidget {
             radius: 20,
             backgroundColor: colorScheme.primaryContainer,
             backgroundImage: rsvp.user.photoUrl != null && rsvp.user.photoUrl!.isNotEmpty
-                ? NetworkImage(ApiConstants.resolveImageUrl(rsvp.user.photoUrl!))
+                ? CachedNetworkImageProvider(ApiConstants.resolveImageUrl(rsvp.user.photoUrl!))
                 : null,
             child: rsvp.user.photoUrl == null || rsvp.user.photoUrl!.isEmpty
                 ? Text(
-                    (rsvp.user.displayName.isNotEmpty ? rsvp.user.displayName[0] : '?').toUpperCase(),
-                    style: textTheme.bodyMedium?.copyWith(color: colorScheme.onPrimaryContainer),
+                    StringUtils.initials(rsvp.user.displayName),
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.bold,
+                    ),
                   )
                 : null,
           ),

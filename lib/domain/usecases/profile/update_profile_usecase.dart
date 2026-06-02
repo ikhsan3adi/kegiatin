@@ -11,6 +11,5 @@ class UpdateProfileUseCase extends UseCase<User, UpdateProfileInput> {
   UpdateProfileUseCase(this.repository);
 
   @override
-  Future<Either<Failure, User>> call(UpdateProfileInput input) =>
-      repository.updateProfile(input);
+  Future<Either<Failure, User>> call(UpdateProfileInput input) => repository.updateProfile(input);
 }

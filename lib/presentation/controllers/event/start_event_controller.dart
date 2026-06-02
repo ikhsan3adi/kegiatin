@@ -1,6 +1,7 @@
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/presentation/providers/providers.dart';
 import 'package:kegiatin/presentation/controllers/event/event_list_controller.dart';
+import 'package:kegiatin/presentation/controllers/event/event_detail_controller.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'start_event_controller.g.dart';
@@ -25,6 +26,7 @@ class StartEventController extends _$StartEventController {
       (event) {
         state = AsyncValue.data(event);
         ref.invalidate(eventListControllerProvider);
+        ref.invalidate(eventDetailControllerProvider(eventId));
       },
     );
   }

@@ -37,10 +37,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
       if (input.cabang != null) data['cabang'] = input.cabang;
       if (input.photoUrl != null) data['photoUrl'] = input.photoUrl;
 
-      final response = await dio.patch(
-        ApiConstants.profileMe,
-        data: data,
-      );
+      final response = await dio.patch(ApiConstants.profileMe, data: data);
       final responseData = response.data as Map<String, dynamic>;
       final payload = responseData['data'] as Map<String, dynamic>;
       return UserModel.fromJson(payload);

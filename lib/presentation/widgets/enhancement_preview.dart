@@ -13,7 +13,7 @@ class EnhancementPreview extends StatefulWidget {
   static Future<EnhancementMode?> show(
     BuildContext context, {
     required Uint8List imageBytes,
-    EnhancementMode defaultMode = EnhancementMode.auto,
+    EnhancementMode defaultMode = EnhancementMode.original,
   }) {
     return showModalBottomSheet<EnhancementMode>(
       context: context,
@@ -34,7 +34,7 @@ class _EnhancementPreviewState extends State<EnhancementPreview> {
   @override
   void initState() {
     super.initState();
-    _selectedMode = widget.defaultMode ?? EnhancementMode.auto;
+    _selectedMode = widget.defaultMode ?? EnhancementMode.original;
     _generatePreview();
   }
 

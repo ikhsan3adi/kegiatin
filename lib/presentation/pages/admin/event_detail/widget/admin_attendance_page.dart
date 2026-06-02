@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/core/constants/api_constants.dart';
+import 'package:kegiatin/core/utils/string_utils.dart';
 import 'package:kegiatin/domain/entities/attendance.dart';
 import 'package:kegiatin/domain/entities/session.dart';
 import 'package:kegiatin/domain/enums/attendance_status.dart';
 import 'package:kegiatin/domain/enums/session_status.dart';
 import 'package:kegiatin/presentation/controllers/attendance/attendance_list_controller.dart';
+import 'package:kegiatin/domain/enums/event_visibility.dart';
+import 'package:kegiatin/presentation/controllers/event/event_detail_controller.dart';
+import 'package:kegiatin/presentation/pages/admin/widget/invite_member_sheet.dart';
 
 class AdminAttendancePage extends ConsumerStatefulWidget {
   const AdminAttendancePage({super.key, required this.sessions, required this.eventId});
@@ -65,11 +70,35 @@ class _AdminAttendancePageState extends ConsumerState<AdminAttendancePage> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
+    final eventAsync = ref.watch(eventDetailControllerProvider(widget.eventId));
+    final isInviteOnly = eventAsync.maybeWhen(
+      data: (event) => event.visibility == EventVisibility.inviteOnly,
+      orElse: () => false,
+    );
+
     return Scaffold(
       backgroundColor: colorScheme.surfaceContainer,
       appBar: AppBar(
         title: const Text('Kelola Kehadiran'),
         backgroundColor: colorScheme.surfaceContainer,
+        actions: [
+          if (isInviteOnly)
+            IconButton(
+              icon: const Icon(Icons.person_add_alt_rounded),
+              tooltip: 'Undang Anggota',
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  useSafeArea: true,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                  ),
+                  builder: (_) => InviteMemberSheet(eventId: widget.eventId),
+                );
+              },
+            ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(20),
@@ -258,8 +287,9 @@ class _AttendanceRow extends StatelessWidget {
       AttendanceStatus.absent => ('Absen', colorScheme.error),
     };
 
+    final checkedInLocal = attendance.checkedInAt.toLocal();
     final checkInTime =
-        '${attendance.checkedInAt.hour.toString().padLeft(2, '0')}:${attendance.checkedInAt.minute.toString().padLeft(2, '0')}';
+        '${checkedInLocal.hour.toString().padLeft(2, '0')}:${checkedInLocal.minute.toString().padLeft(2, '0')}';
 
     final hasUser = attendance.user != null;
     final displayName = hasUser ? attendance.user!.displayName : 'User ID: ${attendance.userId}';
@@ -274,11 +304,11 @@ class _AttendanceRow extends StatelessWidget {
             radius: 18,
             backgroundColor: colorScheme.primaryContainer,
             backgroundImage: photoUrl != null && photoUrl.isNotEmpty
-                ? NetworkImage(ApiConstants.resolveImageUrl(photoUrl))
+                ? CachedNetworkImageProvider(ApiConstants.resolveImageUrl(photoUrl))
                 : null,
             child: photoUrl == null || photoUrl.isEmpty
                 ? Text(
-                    (displayName.isNotEmpty ? displayName[0] : '?').toUpperCase(),
+                    StringUtils.initials(displayName),
                     style: textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onPrimaryContainer,
                       fontWeight: FontWeight.bold,

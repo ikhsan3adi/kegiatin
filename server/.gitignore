@@ -63,4 +63,5 @@ public/uploads/*.jpg
 public/uploads/*.jpeg
 public/uploads/*.png
 public/uploads/*.webp
+public/uploads/*.pdf
 !public/uploads/.gitkeep

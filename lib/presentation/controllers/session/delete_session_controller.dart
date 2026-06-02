@@ -9,12 +9,17 @@ class DeleteSessionController extends _$DeleteSessionController {
   AsyncValue<void> build() => const AsyncValue.data(null);
 
   Future<void> deleteSession(String sessionId) async {
-    state = const AsyncValue.loading();
-    final useCase = ref.read(deleteSessionUseCaseProvider);
-    final result = await useCase(sessionId);
-    result.fold(
-      (failure) => state = AsyncValue.error(failure.message, StackTrace.current),
-      (_) => state = const AsyncValue.data(null),
-    );
+    final keepAliveLink = ref.keepAlive();
+    try {
+      state = const AsyncValue.loading();
+      final useCase = ref.read(deleteSessionUseCaseProvider);
+      final result = await useCase(sessionId);
+      result.fold(
+        (failure) => state = AsyncValue.error(failure.message, StackTrace.current),
+        (_) => state = const AsyncValue.data(null),
+      );
+    } finally {
+      keepAliveLink.close();
+    }
   }
 }

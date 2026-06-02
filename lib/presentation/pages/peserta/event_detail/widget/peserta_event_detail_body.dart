@@ -1,21 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kegiatin/core/constants/api_constants.dart';
 import 'package:kegiatin/core/utils/snackbar_helper.dart';
-import 'package:kegiatin/domain/entities/event.dart';
-import 'package:kegiatin/domain/entities/session.dart';
+import 'package:kegiatin/domain/entities/activity_record.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:kegiatin/domain/entities/archive_item.dart';
 import 'package:kegiatin/domain/entities/attendance.dart';
+import 'package:kegiatin/domain/entities/event.dart';
+import 'package:kegiatin/domain/entities/session.dart';
 import 'package:kegiatin/domain/enums/attendance_status.dart';
 import 'package:kegiatin/domain/enums/event_status.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
 import 'package:kegiatin/domain/enums/event_visibility.dart';
-import 'package:kegiatin/presentation/controllers/attendance/my_attendance_controller.dart';
 import 'package:kegiatin/presentation/controllers/archive/session_archives_controller.dart';
+import 'package:kegiatin/presentation/controllers/attendance/my_attendance_controller.dart';
 import 'package:kegiatin/presentation/controllers/rsvp/create_rsvp_controller.dart';
 import 'package:kegiatin/presentation/controllers/rsvp/my_rsvp_controller.dart';
 import 'package:kegiatin/presentation/pages/fullscreen_image_page.dart';
+import 'package:kegiatin/presentation/pages/peserta/peserta_riwayat_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Konten scrollable halaman detail event peserta.
@@ -41,56 +45,107 @@ class PesertaEventDetailBody extends ConsumerWidget {
           if (hasBanner) ...[
             Padding(
               padding: const EdgeInsets.only(bottom: 16),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => FullscreenImagePage(imageUrl: event.imageUrl!),
-                        ),
-                      );
-                    },
-                    child: Stack(
-                      alignment: Alignment.bottomRight,
-                      children: [
-                        Image.network(
-                          ApiConstants.resolveImageUrl(event.imageUrl!),
-                          width: double.infinity,
-                          height: 160,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Container(
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: colorScheme.outlineVariant.withValues(alpha: 0.8),
+                    width: 1,
+                  ),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(15),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => FullscreenImagePage(imageUrl: event.imageUrl!),
+                          ),
+                        );
+                      },
+                      child: Stack(
+                        alignment: Alignment.bottomRight,
+                        children: [
+                          CachedNetworkImage(
+                            imageUrl: ApiConstants.resolveImageUrl(event.imageUrl!),
+                            width: double.infinity,
                             height: 160,
-                            color: colorScheme.surfaceContainerHighest,
-                            child: const Center(child: Icon(Icons.broken_image_outlined, size: 40)),
-                          ),
-                        ),
-                        Positioned(
-                          right: 8,
-                          bottom: 8,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.black54,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.fullscreen, color: Colors.white, size: 16),
-                                SizedBox(width: 4),
-                                Text(
-                                  'Perbesar',
-                                  style: TextStyle(color: Colors.white, fontSize: 10),
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => Shimmer.fromColors(
+                              baseColor: colorScheme.surfaceContainerHighest,
+                              highlightColor: colorScheme.surfaceContainerHighest.withValues(
+                                alpha: 0.5,
+                              ),
+                              child: Container(
+                                height: 160,
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: colorScheme.surfaceContainerHighest,
+                                  border: Border.all(
+                                    color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                                    width: 1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(15),
                                 ),
-                              ],
+                                child: Center(
+                                  child: Icon(
+                                    Icons.image_outlined,
+                                    size: 40,
+                                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            errorWidget: (context, url, error) => Container(
+                              height: 160,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: colorScheme.surfaceContainerHighest,
+                                border: Border.all(
+                                  color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              child: const Center(
+                                child: Icon(Icons.broken_image_outlined, size: 40),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                          Positioned(
+                            right: 8,
+                            bottom: 8,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: colorScheme.scrim.withValues(alpha: 0.54),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.fullscreen,
+                                    color: colorScheme.onInverseSurface,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    'Perbesar',
+                                    style: TextStyle(
+                                      color: colorScheme.onInverseSurface,
+                                      fontSize: 10,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -107,7 +162,7 @@ class PesertaEventDetailBody extends ConsumerWidget {
                     const SizedBox(width: 12),
                     Text(
                       'Deskripsi Kegiatan',
-                      style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                      style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -127,7 +182,7 @@ class PesertaEventDetailBody extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Detail', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                Text('Detail', style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 16),
                 _DetailRow(
                   label: 'Visibilitas',
@@ -234,14 +289,105 @@ class _PesertaActionButton extends ConsumerWidget {
     final createState = ref.watch(createRsvpControllerProvider);
     final myAttendanceAsync = ref.watch(myAttendanceControllerProvider);
 
+    ref.listen<AsyncValue<dynamic>>(myRsvpControllerProvider, (_, next) {
+      next.whenOrNull(
+        error: (err, _) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Gagal memuat status pendaftaran: $err'),
+              backgroundColor: colorScheme.error,
+            ),
+          );
+        },
+      );
+    });
+
+    ref.listen<AsyncValue<dynamic>>(myAttendanceControllerProvider, (_, next) {
+      next.whenOrNull(
+        error: (err, _) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Gagal memuat status kehadiran: $err'),
+              backgroundColor: colorScheme.error,
+            ),
+          );
+        },
+      );
+    });
+
+    ref.listen<AsyncValue<dynamic>>(historyControllerProvider, (_, next) {
+      next.whenOrNull(
+        error: (err, _) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Gagal memuat riwayat kegiatan: $err'),
+              backgroundColor: colorScheme.error,
+            ),
+          );
+        },
+      );
+    });
+
     final isCreating = createState.isLoading;
+
+    if (isCreating) {
+      return _ActionChip(
+        icon: Icons.hourglass_top,
+        label: 'Mendaftar...',
+        backgroundColor: colorScheme.primaryContainer,
+        foregroundColor: colorScheme.onPrimaryContainer,
+        onTap: null,
+      );
+    }
+
+    if (myRsvpAsync.isLoading ||
+        myAttendanceAsync.isLoading ||
+        ref.watch(historyControllerProvider).isLoading) {
+      return _ActionChip(
+        icon: Icons.hourglass_top,
+        label: 'Memuat status...',
+        backgroundColor: colorScheme.surfaceContainerHighest,
+        foregroundColor: colorScheme.onSurfaceVariant,
+        onTap: null,
+      );
+    }
+
+    if (myRsvpAsync.hasError ||
+        myAttendanceAsync.hasError ||
+        ref.watch(historyControllerProvider).hasError) {
+      return _ActionChip(
+        icon: Icons.error_outline,
+        label: 'Gagal memuat status',
+        backgroundColor: colorScheme.errorContainer,
+        foregroundColor: colorScheme.onErrorContainer,
+        onTap: () {
+          ref.invalidate(myRsvpControllerProvider);
+          ref.invalidate(myAttendanceControllerProvider);
+          ref.invalidate(historyControllerProvider);
+        },
+      );
+    }
+
     final alreadyRsvp = myRsvpAsync.value?.any((r) => r.eventId == event.id) ?? false;
-    final alreadyAttended =
-        myAttendanceAsync.value?.any((att) {
-          return event.sessions.any((session) => att.sessionId == session.id) &&
-              (att.status == AttendanceStatus.present || att.status == AttendanceStatus.late);
-        }) ??
+
+    final historyList = ref.watch(historyControllerProvider).value ?? [];
+    final historyRecord = historyList.cast<ActivityRecord?>().firstWhere(
+      (r) => r?.event.id == event.id,
+      orElse: () => null,
+    );
+    final historyAttended =
+        historyRecord?.attendancePerSession.any(
+          (sa) => sa.status == AttendanceStatus.present || sa.status == AttendanceStatus.late,
+        ) ??
         false;
+
+    final alreadyAttended =
+        (myAttendanceAsync.value?.any((att) {
+              return event.sessions.any((session) => att.sessionId == session.id) &&
+                  (att.status == AttendanceStatus.present || att.status == AttendanceStatus.late);
+            }) ??
+            false) ||
+        historyAttended;
 
     if (alreadyRsvp) {
       if (alreadyAttended) {
@@ -424,7 +570,7 @@ class _MateriKegiatanCard extends ConsumerWidget {
               const SizedBox(width: 12),
               Text(
                 'Materi Kegiatan',
-                style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -458,15 +604,27 @@ class _PesertaSessionArchiveSection extends ConsumerWidget {
     final textTheme = Theme.of(context).textTheme;
 
     final myAttendanceList = ref.watch(myAttendanceControllerProvider).value ?? [];
-    final attendanceRecord = myAttendanceList.cast<Attendance?>().firstWhere(
+    final localAttendance = myAttendanceList.cast<Attendance?>().firstWhere(
       (a) => a?.sessionId == session.id,
       orElse: () => null,
     );
 
+    final historyList = ref.watch(historyControllerProvider).value ?? [];
+    final historyRecord = historyList.cast<ActivityRecord?>().firstWhere(
+      (r) => r?.event.id == session.eventId,
+      orElse: () => null,
+    );
+    final historySessionAttendance = historyRecord?.attendancePerSession
+        .cast<SessionAttendance?>()
+        .firstWhere((sa) => sa?.session.id == session.id, orElse: () => null);
+
     final isPresentOrLate =
-        attendanceRecord != null &&
-        (attendanceRecord.status == AttendanceStatus.present ||
-            attendanceRecord.status == AttendanceStatus.late);
+        (localAttendance != null &&
+            (localAttendance.status == AttendanceStatus.present ||
+                localAttendance.status == AttendanceStatus.late)) ||
+        (historySessionAttendance != null &&
+            (historySessionAttendance.status == AttendanceStatus.present ||
+                historySessionAttendance.status == AttendanceStatus.late));
 
     if (!isPresentOrLate) {
       return Padding(
@@ -509,16 +667,23 @@ class _PesertaSessionArchiveSection extends ConsumerWidget {
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
             ),
-            error: (e, _) => Row(
-              children: [
-                Icon(Icons.error_outline, size: 16, color: colorScheme.error),
-                const SizedBox(width: 6),
-                Text(
-                  'Gagal memuat',
-                  style: textTheme.bodySmall?.copyWith(color: colorScheme.error),
-                ),
-              ],
-            ),
+            error: (e, _) {
+              final errorStr = e.toString();
+              final isForbidden =
+                  errorStr.contains('403') ||
+                  errorStr.contains('ForbiddenException') ||
+                  errorStr.contains('Akses materi');
+              return Row(
+                children: [
+                  Icon(Icons.error_outline, size: 16, color: colorScheme.error),
+                  const SizedBox(width: 6),
+                  Text(
+                    isForbidden ? 'Akses ditolak (Kehadiran belum terverifikasi)' : 'Gagal memuat',
+                    style: textTheme.bodySmall?.copyWith(color: colorScheme.error),
+                  ),
+                ],
+              );
+            },
             data: (list) {
               if (list.isEmpty) {
                 return Text(
@@ -549,6 +714,7 @@ class _PesertaArchiveRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final isImg = _isImageFile(archive.fileUrl);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -561,23 +727,41 @@ class _PesertaArchiveRow extends StatelessWidget {
             );
             return;
           }
-          final uri = Uri.parse(archive.fileUrl);
-          if (await canLaunchUrl(uri)) {
-            await launchUrl(uri, mode: LaunchMode.externalApplication);
+          if (isImg) {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => FullscreenImagePage(imageUrl: archive.fileUrl)),
+            );
+          } else {
+            final uri = Uri.parse(archive.fileUrl);
+            if (await canLaunchUrl(uri)) {
+              await launchUrl(uri, mode: LaunchMode.inAppWebView);
+            }
           }
         },
         borderRadius: BorderRadius.circular(8),
         child: Opacity(
           opacity: isAccessible ? 1.0 : 0.45,
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
             child: Row(
               children: [
-                Icon(
-                  isAccessible ? Icons.description_outlined : Icons.lock_outline_rounded,
-                  size: 18,
-                  color: isAccessible ? colorScheme.primary : colorScheme.onSurfaceVariant,
-                ),
+                if (isAccessible)
+                  _buildMaterialThumbnail(context, archive.fileUrl)
+                else
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      Icons.lock_outline_rounded,
+                      color: colorScheme.onSurfaceVariant,
+                      size: 20,
+                    ),
+                  ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -590,7 +774,12 @@ class _PesertaArchiveRow extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                if (isAccessible) Icon(Icons.open_in_new, size: 14, color: colorScheme.primary),
+                if (isAccessible)
+                  Icon(
+                    isImg ? Icons.photo_outlined : Icons.open_in_new,
+                    size: 14,
+                    color: colorScheme.primary,
+                  ),
               ],
             ),
           ),
@@ -598,4 +787,88 @@ class _PesertaArchiveRow extends StatelessWidget {
       ),
     );
   }
+}
+
+String _getFileExtension(String url) {
+  try {
+    final path = Uri.parse(url).path;
+    final dotIndex = path.lastIndexOf('.');
+    if (dotIndex != -1) {
+      return path.substring(dotIndex + 1).toLowerCase();
+    }
+  } catch (_) {}
+  return '';
+}
+
+bool _isImageFile(String url) {
+  final ext = _getFileExtension(url);
+  return ext == 'jpg' ||
+      ext == 'jpeg' ||
+      ext == 'png' ||
+      ext == 'gif' ||
+      ext == 'webp' ||
+      ext == 'bmp';
+}
+
+Widget _buildMaterialThumbnail(BuildContext context, String fileUrl) {
+  final colorScheme = Theme.of(context).colorScheme;
+  if (_isImageFile(fileUrl)) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: CachedNetworkImage(
+        imageUrl: ApiConstants.resolveImageUrl(fileUrl),
+        width: 40,
+        height: 40,
+        fit: BoxFit.cover,
+        placeholder: (context, url) => Container(
+          width: 40,
+          height: 40,
+          color: colorScheme.surfaceContainerHighest,
+          child: const Center(
+            child: SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          ),
+        ),
+        errorWidget: (context, url, error) => Container(
+          width: 40,
+          height: 40,
+          color: colorScheme.errorContainer,
+          child: Icon(Icons.broken_image, size: 20, color: colorScheme.error),
+        ),
+      ),
+    );
+  }
+
+  final ext = _getFileExtension(fileUrl);
+  IconData iconData = Icons.description_outlined;
+  Color iconColor = colorScheme.primary;
+  Color bgColor = colorScheme.primaryContainer.withValues(alpha: 0.3);
+
+  if (ext == 'pdf') {
+    iconData = Icons.picture_as_pdf_outlined;
+    iconColor = colorScheme.error;
+    bgColor = colorScheme.errorContainer.withValues(alpha: 0.3);
+  } else if (ext == 'xlsx' || ext == 'xls' || ext == 'csv') {
+    iconData = Icons.table_chart_outlined;
+    iconColor = Colors.green;
+    bgColor = Colors.green.withValues(alpha: 0.15);
+  } else if (ext == 'docx' || ext == 'doc' || ext == 'txt') {
+    iconData = Icons.article_outlined;
+    iconColor = colorScheme.primary;
+    bgColor = colorScheme.primaryContainer.withValues(alpha: 0.3);
+  } else if (fileUrl.startsWith('http') && !fileUrl.contains('.')) {
+    iconData = Icons.link;
+    iconColor = colorScheme.secondary;
+    bgColor = colorScheme.secondaryContainer.withValues(alpha: 0.3);
+  }
+
+  return Container(
+    width: 40,
+    height: 40,
+    decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(8)),
+    child: Icon(iconData, color: iconColor, size: 20),
+  );
 }

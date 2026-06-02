@@ -59,10 +59,7 @@ class PesertaProfilePage extends ConsumerWidget {
                     children: [
                       Text(
                         'Profil Saya',
-                        style: textTheme.headlineSmall?.copyWith(
-                          color: colorScheme.onPrimary,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: textTheme.headlineLarge?.copyWith(color: colorScheme.onPrimary),
                       ),
                       const SizedBox(height: 12),
                       if (user != null)
@@ -81,7 +78,7 @@ class PesertaProfilePage extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      if (user != null) ProfileCard(email: user.email, joinedAt: user.createdAt),
+                      if (user != null) ProfileCard(email: user.email, joinedAt: user.createdAt.toLocal()),
                       const SizedBox(height: 16),
                       SettingsCard(
                         items: [

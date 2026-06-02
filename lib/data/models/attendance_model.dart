@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:kegiatin/core/utils/json_utils.dart';
 import 'package:kegiatin/data/models/attendance_user_brief_model.dart';
 import 'package:kegiatin/domain/entities/attendance.dart';
 import 'package:kegiatin/domain/entities/user_summary.dart';
@@ -20,8 +21,11 @@ abstract class AttendanceModel with _$AttendanceModel implements Attendance {
     required AttendanceStatus status,
     required SyncStatus syncStatus,
     String? qrToken,
+    @JsonKey(fromJson: JsonUtils.dateTimeFromJson, toJson: JsonUtils.dateTimeToJson)
     required DateTime checkedInAt,
+    @JsonKey(fromJson: JsonUtils.nullableDateTimeFromJson, toJson: JsonUtils.nullableDateTimeToJson)
     DateTime? syncedAt,
+    @JsonKey(fromJson: JsonUtils.dateTimeFromJson, toJson: JsonUtils.dateTimeToJson)
     required DateTime createdAt,
     @JsonKey(name: 'user') AttendanceUserBriefModel? userSnippet,
   }) = _AttendanceModel;
@@ -29,13 +33,15 @@ abstract class AttendanceModel with _$AttendanceModel implements Attendance {
   factory AttendanceModel.fromJson(Map<String, dynamic> json) => _$AttendanceModelFromJson(json);
 
   @override
-  UserSummary? get user => userSnippet != null ? UserSummary(
-    id: userId,
-    displayName: userSnippet!.displayName,
-    npa: userSnippet!.npa,
-    cabang: userSnippet!.cabang,
-    photoUrl: userSnippet!.photoUrl,
-  ) : null;
+  UserSummary? get user => userSnippet != null
+      ? UserSummary(
+          id: userId,
+          displayName: userSnippet!.displayName,
+          npa: userSnippet!.npa,
+          cabang: userSnippet!.cabang,
+          photoUrl: userSnippet!.photoUrl,
+        )
+      : null;
 }
 
 extension AttendanceModelX on AttendanceModel {

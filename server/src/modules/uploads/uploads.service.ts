@@ -23,10 +23,24 @@ export class UploadsService {
   }
 
   saveImage(file: Express.Multer.File): { url: string } {
-    const allowedMimes = ['image/jpeg', 'image/png', 'image/webp'];
+    const allowedMimes = [
+      'image/jpeg',
+      'image/png',
+      'image/webp',
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-powerpoint',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'text/plain',
+      'application/zip',
+      'application/x-zip-compressed',
+    ];
     if (!allowedMimes.includes(file.mimetype)) {
       throw new BadRequestException(
-        'Format file tidak didukung. Gunakan JPEG, PNG, atau WEBP.',
+        'Format file tidak didukung.',
       );
     }
 
