@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/core/constants/api_constants.dart';
-import 'package:kegiatin/core/theme/custom.dart';
+import 'package:kegiatin/core/utils/snackbar_helper.dart';
 import 'package:kegiatin/core/utils/string_utils.dart';
 import 'package:kegiatin/domain/entities/attendance.dart';
 import 'package:kegiatin/presentation/controllers/attendance/attendance_list_controller.dart';
@@ -45,41 +45,9 @@ class _ManualInputTabState extends ConsumerState<ManualInputTab> {
     // Listen status presensi manual dari ScanAttendanceController
     ref.listen<AsyncValue<Attendance?>>(scanAttendanceControllerProvider, (prev, next) {
       if (next is AsyncError) {
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.error_outline, color: KegiatinCustomTheme.onGradient, size: 20),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(next.error.toString(), maxLines: 2, overflow: TextOverflow.ellipsis),
-                ),
-              ],
-            ),
-            backgroundColor: colorScheme.error,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-          ),
-        );
+        SnackBarHelper.showError(context, next.error.toString());
       } else if (next is AsyncData && next.value != null) {
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Row(
-              children: [
-                Icon(Icons.check_circle, color: KegiatinCustomTheme.onGradient, size: 20),
-                SizedBox(width: 10),
-                Expanded(child: Text('Presensi berhasil dicatat secara manual!', maxLines: 1)),
-              ],
-            ),
-            backgroundColor: KegiatinCustomTheme.snackbarSuccess,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-          ),
-        );
+        SnackBarHelper.showSuccess(context, 'Presensi berhasil dicatat secara manual!');
         ref.invalidate(attendanceListControllerProvider(widget.sessionId!));
       }
     });

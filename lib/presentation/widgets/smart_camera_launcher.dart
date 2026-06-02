@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kegiatin/core/pcd/enhancement_options.dart';
+import 'package:kegiatin/core/utils/snackbar_helper.dart';
 import 'package:kegiatin/domain/entities/processed_image.dart';
 import 'package:kegiatin/domain/repositories/pcd_repository.dart';
 import 'package:kegiatin/presentation/providers/pcd_providers.dart';
@@ -20,9 +21,7 @@ Future<ProcessedImage?> launchSmartCamera(
     final status = await Permission.camera.request();
     if (!status.isGranted) {
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Izin kamera diperlukan untuk mode foto')));
+        SnackBarHelper.showError(context, 'Izin kamera diperlukan untuk mode foto');
       }
       return null;
     }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/core/constants/api_constants.dart';
 import 'package:kegiatin/core/pcd/enhancement_options.dart';
-import 'package:kegiatin/core/theme/custom.dart';
+import 'package:kegiatin/core/utils/snackbar_helper.dart';
 import 'package:kegiatin/presentation/providers/providers.dart';
 import 'package:kegiatin/presentation/widgets/smart_camera_launcher.dart';
 
@@ -176,18 +176,10 @@ class EventBannerPicker extends ConsumerWidget {
       final result = await launchSmartCamera(context, ref, mode: selectedMode, cropImage: true);
       if (result == null || !context.mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Row(
-            children: [
-              Icon(Icons.cloud_upload_outlined, color: KegiatinCustomTheme.onGradient, size: 18),
-              SizedBox(width: 8),
-              Text('Mengupload banner...'),
-            ],
-          ),
-          behavior: SnackBarBehavior.floating,
-          duration: Duration(seconds: 1),
-        ),
+      SnackBarHelper.showInfo(
+        context,
+        'Mengupload banner...',
+        duration: const Duration(seconds: 1),
       );
 
       final uploadRepo = ref.read(uploadsRemoteDataSourceProvider);
@@ -195,12 +187,7 @@ class EventBannerPicker extends ConsumerWidget {
       if (context.mounted) onImagePicked(url);
     } catch (e) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Gagal mengupload banner: $e'),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
-      );
+      SnackBarHelper.showError(context, 'Gagal mengupload banner: $e');
     }
   }
 }

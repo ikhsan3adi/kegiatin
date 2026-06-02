@@ -139,14 +139,9 @@ class _EnhancementPreviewState extends State<EnhancementPreview> {
                   icon: Icon(Icons.image_outlined),
                 ),
                 ButtonSegment(
-                  value: EnhancementMode.enhanced,
-                  label: Text('Ditingkatkan'),
+                  value: EnhancementMode.auto,
+                  label: Text('Otomatis'),
                   icon: Icon(Icons.auto_awesome_outlined),
-                ),
-                ButtonSegment(
-                  value: EnhancementMode.grayscaleEnhanced,
-                  label: Text('Grayscale'),
-                  icon: Icon(Icons.filter_b_and_w_outlined),
                 ),
               ],
               selected: {_selectedMode},

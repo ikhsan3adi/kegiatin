@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kegiatin/core/utils/snackbar_helper.dart';
 import 'package:kegiatin/domain/entities/update_event_input.dart';
 import 'package:kegiatin/domain/enums/event_visibility.dart';
 import 'package:kegiatin/presentation/controllers/event/event_detail_controller.dart';
@@ -113,19 +114,13 @@ class _EditEventPageState extends ConsumerState<EditEventPage> {
     if (errorMsg != null) {
       _showError(errorMsg);
     } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Kegiatan berhasil diperbarui')));
-      context.pop(); // Go back
+      SnackBarHelper.showSuccess(context, 'Kegiatan berhasil diperbarui');
+      context.pop();
     }
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(content: Text(message), backgroundColor: Theme.of(context).colorScheme.error),
-      );
+    SnackBarHelper.showError(context, message);
   }
 
   @override

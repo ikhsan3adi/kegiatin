@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/core/pcd/enhancement_options.dart';
+import 'package:kegiatin/core/utils/snackbar_helper.dart';
 import 'package:kegiatin/core/utils/pdf_generator.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/entities/processed_image.dart';
@@ -233,9 +234,7 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
           ref.invalidate(sessionArchivesControllerProvider(_selectedSession!.id));
         }
         Navigator.pop(context);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Materi berhasil diunggah')));
+        SnackBarHelper.showSuccess(context, 'Materi berhasil diunggah');
       },
     );
   }
