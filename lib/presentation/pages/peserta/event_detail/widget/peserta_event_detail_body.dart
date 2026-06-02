@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kegiatin/core/constants/api_constants.dart';
+import 'package:kegiatin/core/utils/snackbar_helper.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/entities/session.dart';
 import 'package:kegiatin/domain/entities/archive_item.dart';
@@ -554,13 +555,9 @@ class _PesertaArchiveRow extends StatelessWidget {
       child: InkWell(
         onTap: () async {
           if (!isAccessible) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                  'Akses materi hanya untuk peserta yang hadir/terlambat pada sesi ini',
-                ),
-                behavior: SnackBarBehavior.floating,
-              ),
+            SnackBarHelper.showWarning(
+              context,
+              'Akses materi hanya untuk peserta yang hadir/terlambat pada sesi ini',
             );
             return;
           }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kegiatin/core/theme/custom.dart';
+import 'package:kegiatin/core/utils/snackbar_helper.dart';
 import 'package:kegiatin/domain/entities/register_input.dart';
 import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
 
@@ -51,16 +52,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     if (!mounted) return;
 
     if (error != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(error), backgroundColor: Theme.of(context).colorScheme.error),
-      );
+      SnackBarHelper.showError(context, error);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Registrasi berhasil. Silakan masuk.'),
-          backgroundColor: Theme.of(context).colorScheme.primary,
-        ),
-      );
+      SnackBarHelper.showSuccess(context, 'Registrasi berhasil. Silakan masuk.');
       context.go('/login');
     }
   }

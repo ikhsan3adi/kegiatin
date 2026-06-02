@@ -7,6 +7,7 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kegiatin/core/constants/api_constants.dart';
 import 'package:kegiatin/core/theme/custom.dart';
+import 'package:kegiatin/core/utils/snackbar_helper.dart';
 import 'package:kegiatin/domain/entities/update_profile_input.dart';
 import 'package:kegiatin/domain/entities/user.dart';
 import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
@@ -162,12 +163,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
       if (!mounted) return;
       if (photoUrl == null) {
         setState(() => _isUploading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Gagal mengunggah foto'),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
+        SnackBarHelper.showError(context, 'Gagal mengunggah foto');
         return;
       }
       _uploadedPhotoUrl = photoUrl;
@@ -199,19 +195,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     if (!mounted) return;
 
     if (error != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(error),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
-      );
+      SnackBarHelper.showError(context, error);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Profil berhasil diperbarui'),
-          backgroundColor: KegiatinCustomTheme.snackbarSuccess,
-        ),
-      );
+      SnackBarHelper.showSuccess(context, 'Profil berhasil diperbarui');
       context.pop();
     }
   }

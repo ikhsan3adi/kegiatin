@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kegiatin/core/utils/snackbar_helper.dart';
 import 'package:kegiatin/presentation/controllers/rsvp/create_rsvp_controller.dart';
 
 /// Side-effect listener untuk aksi RSVP peserta.
@@ -16,21 +17,11 @@ class PesertaEventDetailListeners extends ConsumerWidget {
     ref.listen(createRsvpControllerProvider, (_, next) {
       next.whenOrNull(
         error: (err, _) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Gagal mendaftar: $err'),
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
-          );
+          SnackBarHelper.showError(context, 'Gagal mendaftar: $err');
         },
         data: (rsvp) {
           if (rsvp != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Berhasil mendaftar ke kegiatan!'),
-                backgroundColor: Theme.of(context).colorScheme.primary,
-              ),
-            );
+            SnackBarHelper.showSuccess(context, 'Berhasil mendaftar ke kegiatan!');
           }
         },
       );

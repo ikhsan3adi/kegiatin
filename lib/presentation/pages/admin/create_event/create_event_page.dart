@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kegiatin/core/utils/date_formatter.dart';
+import 'package:kegiatin/core/utils/snackbar_helper.dart';
 import 'package:kegiatin/domain/entities/create_event_input.dart';
 import 'package:kegiatin/domain/entities/session_input.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
@@ -247,19 +248,13 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
       _showError(errorMsg);
     } else {
       ref.read(createEventControllerProvider.notifier).reset();
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Kegiatan berhasil dibuat')));
+      SnackBarHelper.showSuccess(context, 'Kegiatan berhasil dibuat');
       context.pop();
     }
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(content: Text(message), backgroundColor: Theme.of(context).colorScheme.error),
-      );
+    SnackBarHelper.showError(context, message);
   }
 
   // Build
