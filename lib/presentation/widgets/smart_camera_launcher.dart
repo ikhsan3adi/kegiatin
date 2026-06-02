@@ -96,7 +96,7 @@ Future<ProcessedImage?> launchSmartCamera(
 
   final defaultMode = mode == CameraMode.document
       ? EnhancementMode.original
-      : EnhancementMode.enhanced;
+      : EnhancementMode.auto;
   final selectedMode = await EnhancementPreview.show(
     context,
     imageBytes: finalResult.imageBytes,
