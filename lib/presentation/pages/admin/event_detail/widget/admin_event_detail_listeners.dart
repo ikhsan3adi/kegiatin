@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kegiatin/core/utils/snackbar_helper.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/presentation/controllers/event/cancel_event_controller.dart';
 import 'package:kegiatin/presentation/controllers/event/complete_event_controller.dart';
@@ -22,7 +23,7 @@ class AdminEventDetailListeners extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     void onSuccess(String message) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+      SnackBarHelper.showSuccess(context, message);
       // Invalidate list agar halaman daftar menampilkan status terbaru.
       ref.invalidate(eventListControllerProvider);
       // Invalidate detail provider agar data tidak stale jika provider
@@ -32,12 +33,7 @@ class AdminEventDetailListeners extends ConsumerWidget {
     }
 
     void onError(Object error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Gagal: $error'),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
-      );
+      SnackBarHelper.showError(context, 'Gagal: $error');
     }
 
     ref.listen(publishEventControllerProvider, (previous, next) {
