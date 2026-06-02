@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/core/errors/failures.dart';
 import 'package:kegiatin/core/theme/custom.dart';
+import 'package:kegiatin/core/utils/snackbar_helper.dart';
 import 'package:kegiatin/domain/entities/attendance.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/entities/session.dart';
@@ -51,22 +52,7 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
 
   void _onQrDetected(String value) {
     if (_selectedSession == null) {
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Row(
-            children: [
-              Icon(Icons.warning_rounded, color: KegiatinCustomTheme.onGradient, size: 20),
-              SizedBox(width: 10),
-              Expanded(child: Text('Pilih kegiatan dan sesi terlebih dahulu', maxLines: 1)),
-            ],
-          ),
-          backgroundColor: Colors.orange,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-        ),
-      );
+      SnackBarHelper.showWarning(context, 'Pilih kegiatan dan sesi terlebih dahulu');
       return;
     }
     setState(() => _totalScanned++);
@@ -82,7 +68,6 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
 
     ref.listen<AsyncValue<Attendance?>>(scanAttendanceControllerProvider, (prev, next) {
       if (next is AsyncError) {
-        ScaffoldMessenger.of(context).clearSnackBars();
         final error = next.error;
         String message = 'Terjadi kesalahan';
         if (error is Failure) {
@@ -91,38 +76,9 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
           message = error.toString();
         }
         message = message.replaceAll(RegExp(r'^[a-zA-Z]+Failure:\s*'), '').trim();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.error_outline, color: KegiatinCustomTheme.onGradient, size: 20),
-                const SizedBox(width: 10),
-                Expanded(child: Text(message, maxLines: 2, overflow: TextOverflow.ellipsis)),
-              ],
-            ),
-            backgroundColor: colorScheme.error,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-          ),
-        );
+        SnackBarHelper.showError(context, message);
       } else if (next is AsyncData && next.value != null && _selectedSession != null) {
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Row(
-              children: [
-                Icon(Icons.check_circle, color: KegiatinCustomTheme.onGradient, size: 20),
-                SizedBox(width: 10),
-                Expanded(child: Text('Presensi berhasil dicatat!', maxLines: 1)),
-              ],
-            ),
-            backgroundColor: KegiatinCustomTheme.snackbarSuccess,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-          ),
-        );
+        SnackBarHelper.showSuccess(context, 'Presensi berhasil dicatat!');
         ref.invalidate(attendanceListControllerProvider(_selectedSession!.id));
       }
     });

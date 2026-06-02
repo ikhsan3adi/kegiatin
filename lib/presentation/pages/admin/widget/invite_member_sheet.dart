@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/core/constants/api_constants.dart';
+import 'package:kegiatin/core/utils/snackbar_helper.dart';
 import 'package:kegiatin/core/utils/string_utils.dart';
 import 'package:kegiatin/domain/entities/user_summary.dart';
 import 'package:kegiatin/domain/usecases/rsvp/invite_user_usecase.dart';
@@ -46,17 +47,10 @@ class _InviteMemberSheetState extends ConsumerState<InviteMemberSheet> {
     if (!mounted) return;
     result.fold(
       (failure) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(failure.message),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
+        SnackBarHelper.showError(context, failure.message);
       },
       (_) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Anggota berhasil diundang')));
+        SnackBarHelper.showSuccess(context, 'Anggota berhasil diundang');
         Navigator.of(context).pop();
       },
     );
