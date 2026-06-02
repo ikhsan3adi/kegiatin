@@ -103,14 +103,15 @@ class _Avatar extends StatelessWidget {
         color: KegiatinCustomTheme.glassElement,
         border: Border.all(color: KegiatinCustomTheme.glassElementBorder, width: 1.5),
       ),
-      clipBehavior: Clip.antiAlias,
-      child: photoUrl != null && photoUrl!.isNotEmpty
-          ? Image.network(
-              ApiConstants.resolveImageUrl(photoUrl!),
-              fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => _InitialsFallback(_initials),
-            )
-          : _InitialsFallback(_initials),
+      child: ClipOval(
+        child: photoUrl != null && photoUrl!.isNotEmpty
+            ? Image.network(
+                ApiConstants.resolveImageUrl(photoUrl!),
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => _InitialsFallback(_initials),
+              )
+            : _InitialsFallback(_initials),
+      ),
     );
   }
 }
