@@ -1,7 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:kegiatin/core/constants/api_constants.dart';
 import 'package:kegiatin/core/theme/custom.dart';
 import 'package:kegiatin/domain/entities/event.dart';
@@ -239,13 +239,9 @@ class PesertaQrDisplayPage extends ConsumerWidget {
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 4),
                               child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Icon(
-                                    Icons.check_circle_outline_rounded,
-                                    color: colorScheme.secondary,
-                                    size: 12,
-                                  ),
+                                  Icon(Icons.access_time, color: colorScheme.primary, size: 12),
                                   const SizedBox(width: 6),
                                   Expanded(
                                     child: RichText(

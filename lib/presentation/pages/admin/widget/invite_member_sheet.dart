@@ -1,15 +1,15 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kegiatin/core/constants/api_constants.dart';
 import 'package:kegiatin/core/utils/snackbar_helper.dart';
 import 'package:kegiatin/core/utils/string_utils.dart';
 import 'package:kegiatin/domain/entities/user_summary.dart';
 import 'package:kegiatin/domain/usecases/rsvp/invite_user_usecase.dart';
-import 'package:kegiatin/presentation/controllers/user/search_user_controller.dart';
 import 'package:kegiatin/presentation/controllers/rsvp/event_rsvp_list_controller.dart';
+import 'package:kegiatin/presentation/controllers/user/search_user_controller.dart';
 import 'package:kegiatin/presentation/providers/providers.dart';
 
 class InviteMemberSheet extends ConsumerStatefulWidget {
@@ -73,9 +73,7 @@ class _InviteMemberSheetState extends ConsumerState<InviteMemberSheet> {
       },
       (_) {
         setState(() => _invitedUserIds.add(user.id));
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('${user.displayName} berhasil diundang')));
+        SnackBarHelper.showSuccess(context, '${user.displayName} berhasil diundang');
         ref.invalidate(eventRsvpListControllerProvider(widget.eventId));
       },
     );

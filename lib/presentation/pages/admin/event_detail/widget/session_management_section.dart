@@ -6,10 +6,10 @@ import 'package:kegiatin/domain/entities/session_input.dart';
 import 'package:kegiatin/domain/enums/event_status.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
 import 'package:kegiatin/domain/usecases/session/update_session_usecase.dart';
+import 'package:kegiatin/presentation/controllers/event/event_detail_controller.dart';
 import 'package:kegiatin/presentation/controllers/session/add_session_controller.dart';
 import 'package:kegiatin/presentation/controllers/session/delete_session_controller.dart';
 import 'package:kegiatin/presentation/controllers/session/update_session_controller.dart';
-import 'package:kegiatin/presentation/controllers/event/event_detail_controller.dart';
 
 class SessionManagementSection extends ConsumerWidget {
   const SessionManagementSection({super.key, required this.event});
@@ -44,7 +44,7 @@ class SessionManagementSection extends ConsumerWidget {
             children: [
               Icon(Icons.event_note_outlined, size: 20, color: colorScheme.onSurfaceVariant),
               const SizedBox(width: 12),
-              Text('Sesi', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+              Text('Sesi', style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
               const Spacer(),
               if (_canManage && event.type == EventType.series)
                 TextButton.icon(
@@ -92,10 +92,7 @@ class SessionManagementSection extends ConsumerWidget {
           return AlertDialog(
             title: const Text('Tambah Sesi'),
             content: isSaving
-                ? const SizedBox(
-                    height: 100,
-                    child: Center(child: CircularProgressIndicator()),
-                  )
+                ? const SizedBox(height: 100, child: Center(child: CircularProgressIndicator()))
                 : SingleChildScrollView(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -182,9 +179,9 @@ class SessionManagementSection extends ConsumerWidget {
                           if (state.hasError) {
                             setDialogState(() => isSaving = false);
                             if (ctx.mounted) {
-                              ScaffoldMessenger.of(ctx).showSnackBar(
-                                SnackBar(content: Text('Gagal: ${state.error}')),
-                              );
+                              ScaffoldMessenger.of(
+                                ctx,
+                              ).showSnackBar(SnackBar(content: Text('Gagal: ${state.error}')));
                             }
                           } else {
                             container.invalidate(eventDetailControllerProvider(event.id));
@@ -193,9 +190,9 @@ class SessionManagementSection extends ConsumerWidget {
                         } catch (e) {
                           setDialogState(() => isSaving = false);
                           if (ctx.mounted) {
-                            ScaffoldMessenger.of(ctx).showSnackBar(
-                              SnackBar(content: Text('Gagal: $e')),
-                            );
+                            ScaffoldMessenger.of(
+                              ctx,
+                            ).showSnackBar(SnackBar(content: Text('Gagal: $e')));
                           }
                         }
                       },
@@ -225,10 +222,7 @@ class SessionManagementSection extends ConsumerWidget {
         builder: (ctx, setDialogState) => AlertDialog(
           title: const Text('Edit Sesi'),
           content: isSaving
-              ? const SizedBox(
-                  height: 100,
-                  child: Center(child: CircularProgressIndicator()),
-                )
+              ? const SizedBox(height: 100, child: Center(child: CircularProgressIndicator()))
               : SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -277,7 +271,7 @@ class SessionManagementSection extends ConsumerWidget {
                     onPressed: () async {
                       if (titleController.text.isEmpty) return;
                       setDialogState(() => isSaving = true);
-                      
+
                       final start = DateTime(
                         startDate.year,
                         startDate.month,
@@ -292,7 +286,7 @@ class SessionManagementSection extends ConsumerWidget {
                         endTime.hour,
                         endTime.minute,
                       );
-                      
+
                       try {
                         await container
                             .read(updateSessionControllerProvider.notifier)
@@ -312,9 +306,9 @@ class SessionManagementSection extends ConsumerWidget {
                         if (state.hasError) {
                           setDialogState(() => isSaving = false);
                           if (ctx.mounted) {
-                            ScaffoldMessenger.of(ctx).showSnackBar(
-                              SnackBar(content: Text('Gagal: ${state.error}')),
-                            );
+                            ScaffoldMessenger.of(
+                              ctx,
+                            ).showSnackBar(SnackBar(content: Text('Gagal: ${state.error}')));
                           }
                         } else {
                           container.invalidate(eventDetailControllerProvider(event.id));
@@ -323,9 +317,9 @@ class SessionManagementSection extends ConsumerWidget {
                       } catch (e) {
                         setDialogState(() => isSaving = false);
                         if (ctx.mounted) {
-                          ScaffoldMessenger.of(ctx).showSnackBar(
-                            SnackBar(content: Text('Gagal: $e')),
-                          );
+                          ScaffoldMessenger.of(
+                            ctx,
+                          ).showSnackBar(SnackBar(content: Text('Gagal: $e')));
                         }
                       }
                     },
@@ -347,10 +341,7 @@ class SessionManagementSection extends ConsumerWidget {
         builder: (ctx, setDialogState) => AlertDialog(
           title: const Text('Hapus Sesi'),
           content: isDeleting
-              ? const SizedBox(
-                  height: 100,
-                  child: Center(child: CircularProgressIndicator()),
-                )
+              ? const SizedBox(height: 100, child: Center(child: CircularProgressIndicator()))
               : Text('Hapus "${session.title}"?'),
           actions: isDeleting
               ? []
@@ -360,14 +351,16 @@ class SessionManagementSection extends ConsumerWidget {
                     onPressed: () async {
                       setDialogState(() => isDeleting = true);
                       try {
-                        await container.read(deleteSessionControllerProvider.notifier).deleteSession(session.id);
+                        await container
+                            .read(deleteSessionControllerProvider.notifier)
+                            .deleteSession(session.id);
                         final state = container.read(deleteSessionControllerProvider);
                         if (state.hasError) {
                           setDialogState(() => isDeleting = false);
                           if (ctx.mounted) {
-                            ScaffoldMessenger.of(ctx).showSnackBar(
-                              SnackBar(content: Text('Gagal: ${state.error}')),
-                            );
+                            ScaffoldMessenger.of(
+                              ctx,
+                            ).showSnackBar(SnackBar(content: Text('Gagal: ${state.error}')));
                           }
                         } else {
                           container.invalidate(eventDetailControllerProvider(event.id));
@@ -376,13 +369,15 @@ class SessionManagementSection extends ConsumerWidget {
                       } catch (e) {
                         setDialogState(() => isDeleting = false);
                         if (ctx.mounted) {
-                          ScaffoldMessenger.of(ctx).showSnackBar(
-                            SnackBar(content: Text('Gagal: $e')),
-                          );
+                          ScaffoldMessenger.of(
+                            ctx,
+                          ).showSnackBar(SnackBar(content: Text('Gagal: $e')));
                         }
                       }
                     },
-                    style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.error),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.error,
+                    ),
                     child: const Text('Hapus'),
                   ),
                 ],

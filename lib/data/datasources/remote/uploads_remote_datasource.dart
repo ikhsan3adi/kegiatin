@@ -30,7 +30,10 @@ class UploadsRemoteDataSourceImpl implements UploadsRemoteDataSource {
       case '.doc':
         return MediaType('application', 'msword');
       case '.docx':
-        return MediaType('application', 'vnd.openxmlformats-officedocument.wordprocessingml.document');
+        return MediaType(
+          'application',
+          'vnd.openxmlformats-officedocument.wordprocessingml.document',
+        );
       case '.xls':
         return MediaType('application', 'vnd.ms-excel');
       case '.xlsx':
@@ -38,7 +41,10 @@ class UploadsRemoteDataSourceImpl implements UploadsRemoteDataSource {
       case '.ppt':
         return MediaType('application', 'vnd.ms-powerpoint');
       case '.pptx':
-        return MediaType('application', 'vnd.openxmlformats-officedocument.presentationml.presentation');
+        return MediaType(
+          'application',
+          'vnd.openxmlformats-officedocument.presentationml.presentation',
+        );
       case '.zip':
         return MediaType('application', 'zip');
       default:
@@ -50,10 +56,7 @@ class UploadsRemoteDataSourceImpl implements UploadsRemoteDataSource {
   Future<String> uploadImage(String filePath) async {
     try {
       final mediaType = _getMediaType(filePath);
-      final file = await MultipartFile.fromFile(
-        filePath,
-        contentType: mediaType,
-      );
+      final file = await MultipartFile.fromFile(filePath, contentType: mediaType);
       final formData = FormData.fromMap({'file': file});
       final response = await dio.post(
         ApiConstants.uploadImage,

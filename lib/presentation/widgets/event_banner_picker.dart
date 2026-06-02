@@ -173,7 +173,8 @@ class EventBannerPicker extends ConsumerWidget {
     if (selectedMode == null || !context.mounted) return;
 
     try {
-      final result = await launchSmartCamera(context, ref, mode: selectedMode, cropImage: true);
+      final resultList = await launchSmartCamera(context, ref, mode: selectedMode, cropImage: true);
+      final result = resultList.firstOrNull;
       if (result == null || !context.mounted) return;
 
       SnackBarHelper.showInfo(

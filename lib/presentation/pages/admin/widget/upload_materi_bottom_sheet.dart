@@ -4,9 +4,10 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:kegiatin/core/pcd/enhancement_options.dart';
-import 'package:kegiatin/core/utils/snackbar_helper.dart';
 import 'package:kegiatin/core/utils/pdf_generator.dart';
+import 'package:kegiatin/core/utils/snackbar_helper.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/entities/processed_image.dart';
 import 'package:kegiatin/domain/entities/session.dart';
@@ -14,6 +15,7 @@ import 'package:kegiatin/domain/enums/archive_type.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
 import 'package:kegiatin/presentation/controllers/archive/session_archives_controller.dart';
 import 'package:kegiatin/presentation/controllers/archive/upload_materi_controller.dart';
+import 'package:kegiatin/presentation/providers/pcd_providers.dart';
 import 'package:kegiatin/presentation/widgets/smart_camera_launcher.dart';
 
 class UploadMateriBottomSheet extends ConsumerStatefulWidget {
@@ -53,7 +55,8 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
   List<Session> get _availableSessions => widget.event.sessions;
 
   Future<void> _handleScanDocument() async {
-    final result = await launchSmartCamera(context, ref, mode: CameraMode.document);
+    final resultList = await launchSmartCamera(context, ref, mode: CameraMode.document);
+    final result = resultList.firstOrNull;
     if (result != null && mounted) {
       setState(() => _scannedFile = result);
     }
@@ -96,6 +99,66 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
       }
     } catch (e) {
       debugPrint('Error picking file: $e');
+    }
+  }
+
+  Future<void> _handlePickMultiImage() async {
+    try {
+      final picker = ImagePicker();
+      final List<XFile> pickedFiles = await picker.pickMultiImage(imageQuality: 90);
+
+      if (pickedFiles.isEmpty || !mounted) return;
+
+      // Tampilkan progress dialog pemrosesan gambar
+      unawaited(
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => const Center(
+            child: Card(
+              child: Padding(
+                padding: EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text('Memproses gambar...'),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      final pcdRepo = ref.read(pcdRepositoryProvider);
+      final List<ProcessedImage> processedList = [];
+
+      for (final pickedFile in pickedFiles) {
+        try {
+          final bytes = await File(pickedFile.path).readAsBytes();
+          final result = await pcdRepo.enhanceAndSave(
+            imageBytes: bytes,
+            mode: EnhancementMode.original,
+            isDocumentScan: false,
+          );
+          result.fold((_) => null, (processed) => processedList.add(processed));
+        } catch (e) {
+          debugPrint('Error processing picked image: $e');
+        }
+      }
+
+      if (mounted) {
+        Navigator.pop(context); // Pop progress dialog
+        if (processedList.isNotEmpty) {
+          setState(() {
+            _capturedImages.addAll(processedList);
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint('Error picking multi image: $e');
     }
   }
 
@@ -291,7 +354,7 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
                   value: _selectedSession,
                   isExpanded: true,
                   underline: const SizedBox.shrink(),
-                  hint: const Text('Pilih sesi'),
+                  hint: Text('Pilih sesi', style: textTheme.labelLarge),
                   onChanged: (_availableSessions.isEmpty)
                       ? null
                       : (val) => setState(() => _selectedSession = val),
@@ -332,7 +395,7 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
                 ),
                 ButtonSegment(
                   value: 'MULTI_IMAGE',
-                  label: Text('Gambar PDF'),
+                  label: Text('Buat PDF'),
                   icon: Icon(Icons.picture_as_pdf_outlined),
                 ),
                 ButtonSegment(value: 'LINK', label: Text('Tautan'), icon: Icon(Icons.link_rounded)),
@@ -536,44 +599,87 @@ class _UploadMateriBottomSheetState extends ConsumerState<UploadMateriBottomShee
                 ),
                 const SizedBox(height: 16),
               ],
-              InkWell(
-                onTap: () async {
-                  final result = await launchSmartCamera(context, ref, mode: CameraMode.document);
-                  if (result != null && mounted) {
-                    setState(() => _capturedImages.add(result));
-                  }
-                },
-                borderRadius: BorderRadius.circular(12),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primaryContainer.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: colorScheme.primary.withValues(alpha: 0.4),
-                      style: BorderStyle.solid,
-                      width: 1.5,
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      Icon(Icons.add_a_photo_rounded, size: 38, color: colorScheme.primary),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Ambil Foto via Smart Camera',
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.primary,
-                          fontWeight: FontWeight.bold,
+              Row(
+                children: [
+                  Expanded(
+                    child: InkWell(
+                      onTap: () async {
+                        final results = await launchSmartCamera(
+                          context,
+                          ref,
+                          mode: CameraMode.document,
+                          pageLimit: 20,
+                        );
+                        if (results.isNotEmpty && mounted) {
+                          setState(() => _capturedImages.addAll(results));
+                        }
+                      },
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: colorScheme.primaryContainer.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: colorScheme.primary.withValues(alpha: 0.3)),
+                        ),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.document_scanner_rounded,
+                              size: 32,
+                              color: colorScheme.primary,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Scan Dokumen\n(Multi Page)',
+                              textAlign: TextAlign.center,
+                              style: textTheme.bodyMedium?.copyWith(
+                                color: colorScheme.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Ambil gambar materi secara berurutan untuk dijadikan PDF',
-                        style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
+                    ),
                   ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: InkWell(
+                      onTap: _handlePickMultiImage,
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: colorScheme.primaryContainer.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: colorScheme.primary.withValues(alpha: 0.3)),
+                        ),
+                        child: Column(
+                          children: [
+                            Icon(Icons.photo_library_rounded, size: 32, color: colorScheme.primary),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Galeri\n(Multi Page)',
+                              textAlign: TextAlign.center,
+                              style: textTheme.bodyMedium?.copyWith(
+                                color: colorScheme.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Center(
+                child: Text(
+                  'Ambil foto atau pilih gambar dari galeri berurutan untuk dijadikan PDF',
+                  style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
+                  textAlign: TextAlign.center,
                 ),
               ),
             ] else
