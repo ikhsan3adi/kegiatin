@@ -19,7 +19,7 @@ class PesertaEventDetailHeader extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     final firstSession = event.sessions.isNotEmpty ? event.sessions.first : null;
-    final startTime = firstSession?.startTime;
+    final startTime = firstSession?.startTime.toLocal();
     final dateStr = startTime != null
         ? '${startTime.year}-${startTime.month.toString().padLeft(2, '0')}-'
               '${startTime.day.toString().padLeft(2, '0')} . '

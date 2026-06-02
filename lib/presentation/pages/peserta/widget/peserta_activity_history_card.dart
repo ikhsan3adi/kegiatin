@@ -26,11 +26,11 @@ class _PesertaActivityHistoryCardState extends ConsumerState<PesertaActivityHist
 
   String _formatDateRange(List<SessionAttendance> sessions) {
     if (sessions.isEmpty) return 'Waktu belum ditentukan';
-    final first = sessions.first.session.startTime;
-    final last = sessions.last.session.startTime;
+    final first = sessions.first.session.startTime.toLocal();
+    final last = sessions.last.session.startTime.toLocal();
 
     if (sessions.length == 1) {
-      final end = sessions.first.session.endTime;
+      final end = sessions.first.session.endTime.toLocal();
       return '${first.day} ${DateFormatter.abbreviatedMonths[first.month - 1]} ${first.year}, '
           '${first.hour.toString().padLeft(2, '0')}:${first.minute.toString().padLeft(2, '0')} - '
           '${end.hour.toString().padLeft(2, '0')}:${end.minute.toString().padLeft(2, '0')}';
@@ -41,7 +41,8 @@ class _PesertaActivityHistoryCardState extends ConsumerState<PesertaActivityHist
   }
 
   String _formatTime(DateTime dt) {
-    return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+    final local = dt.toLocal();
+    return '${local.hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')}';
   }
 
   String _formatDate(DateTime dt) {

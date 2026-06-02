@@ -234,8 +234,8 @@ class PesertaQrDisplayPage extends ConsumerWidget {
                           const SizedBox(height: 6),
                           ...event.sessions.map((session) {
                             final sessionTime =
-                                '${session.startTime.day.toString().padLeft(2, '0')}/${session.startTime.month.toString().padLeft(2, '0')} - '
-                                '${session.startTime.hour.toString().padLeft(2, '0')}:${session.startTime.minute.toString().padLeft(2, '0')}';
+                                '${session.startTime.toLocal().day.toString().padLeft(2, '0')}/${session.startTime.toLocal().month.toString().padLeft(2, '0')} - '
+                                '${session.startTime.toLocal().hour.toString().padLeft(2, '0')}:${session.startTime.toLocal().minute.toString().padLeft(2, '0')}';
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 4),
                               child: Row(
@@ -430,10 +430,11 @@ class PesertaQrDisplayPage extends ConsumerWidget {
   }
 
   Widget _buildCardFooter(Rsvp rsvp, ColorScheme colorScheme, TextTheme textTheme) {
+    final createdAtLocal = rsvp.createdAt.toLocal();
     final dateStr =
-        '${rsvp.createdAt.day.toString().padLeft(2, '0')}.'
-        '${rsvp.createdAt.month.toString().padLeft(2, '0')}.'
-        '${rsvp.createdAt.year.toString().substring(2)}';
+        '${createdAtLocal.day.toString().padLeft(2, '0')}.'
+        '${createdAtLocal.month.toString().padLeft(2, '0')}.'
+        '${createdAtLocal.year.toString().substring(2)}';
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),

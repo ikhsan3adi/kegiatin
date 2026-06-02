@@ -24,9 +24,8 @@ class EventListCard extends ConsumerWidget {
 
     // Ambil sesi pertama untuk info waktu
     final firstSession = event.sessions.isNotEmpty ? event.sessions.first : null;
-    final startTime = firstSession?.startTime;
+    final startTime = firstSession?.startTime.toLocal();
 
-    // Format tanggal sederhana: YYYY-MM-DD . HH:mm
     final dateStr = startTime != null
         ? "${startTime.year}-${startTime.month.toString().padLeft(2, '0')}-${startTime.day.toString().padLeft(2, '0')} . ${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}"
         : 'Waktu belum ditentukan';

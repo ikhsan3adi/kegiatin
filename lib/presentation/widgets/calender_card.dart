@@ -230,7 +230,7 @@ class _CalendarCardState extends State<CalendarCard> {
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    DateFormat('HH:mm').format(event.sessions.first.startTime),
+                                    DateFormat('HH:mm').format(event.sessions.first.startTime.toLocal()),
                                     style: textTheme.bodySmall?.copyWith(
                                       color: colorScheme.onSurfaceVariant,
                                     ),

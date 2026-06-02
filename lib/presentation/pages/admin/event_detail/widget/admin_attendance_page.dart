@@ -287,8 +287,9 @@ class _AttendanceRow extends StatelessWidget {
       AttendanceStatus.absent => ('Absen', colorScheme.error),
     };
 
+    final checkedInLocal = attendance.checkedInAt.toLocal();
     final checkInTime =
-        '${attendance.checkedInAt.hour.toString().padLeft(2, '0')}:${attendance.checkedInAt.minute.toString().padLeft(2, '0')}';
+        '${checkedInLocal.hour.toString().padLeft(2, '0')}:${checkedInLocal.minute.toString().padLeft(2, '0')}';
 
     final hasUser = attendance.user != null;
     final displayName = hasUser ? attendance.user!.displayName : 'User ID: ${attendance.userId}';
