@@ -99,14 +99,7 @@ deploy-env:
         create secret generic "${DEPLOYMENT_NAME}-${STAGE}" \
         --from-env-file="${ENV}" \
         --dry-run=client -o yaml | \
-      kubectl --kubeconfig="$(pwd)/kubeconfig" replace -f -
-    - |
-      kubectl --kubeconfig="$(pwd)/kubeconfig" run migration-${CI_COMMIT_SHORT_SHA} \
-        --image="${IMAGE_TAG}-migration" \
-        --restart=Never \
-        --env-from=secret/${DEPLOYMENT_NAME}-${STAGE} \
-        --attach \
-        --rm
+      kubectl --kubeconfig="$(pwd)/kubeconfig" apply -f -
 
 deploy:
   stage: deploy
