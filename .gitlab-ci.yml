@@ -126,7 +126,8 @@ migration:
     - build-migration
     - deploy-env
   script:
-    - kubectl --kubeconfig=$(pwd)/kubeconfig apply -f ${MIGRATION_JOB}
+    - cat ${MIGRATION_JOB} > migration-job.yaml
+    - kubectl --kubeconfig=$(pwd)/kubeconfig apply -f migration-job.yaml
     - |
       kubectl --kubeconfig=$(pwd)/kubeconfig wait \
         --for=condition=complete \
@@ -139,5 +140,5 @@ migration:
   - |
     kubectl --kubeconfig=$(pwd)/kubeconfig delete \
       job/${DEPLOYMENT_NAME}-${STAGE}-migrate-${CI_PIPELINE_ID}
-  - rm -r {MIGRATION_JOB}
+  - rm -r migration-job.yaml
   - rm -r kubeconfig
