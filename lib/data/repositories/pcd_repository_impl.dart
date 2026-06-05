@@ -16,7 +16,7 @@ class PcdRepositoryImpl implements PcdRepository {
   Future<List<CaptureResult>?> captureDocument({int pageLimit = 1}) async {
     final options = DocumentScannerOptions(
       documentFormats: const {DocumentFormat.jpeg},
-      mode: ScannerMode.filter,
+      mode: ScannerMode.base,
       pageLimit: pageLimit,
       isGalleryImport: true,
     );
