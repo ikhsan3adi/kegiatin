@@ -10,7 +10,6 @@ export class CreateArchiveDto {
   type: ArchiveType;
 
   @IsString()
-  @IsUrl()
   @MaxLength(1024)
   fileUrl: string;
 }

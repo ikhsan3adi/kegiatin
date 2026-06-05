@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:kegiatin/core/constants/api_constants.dart';
 
+import 'package:cached_network_image/cached_network_image.dart';
+
 class FullscreenImagePage extends StatelessWidget {
   const FullscreenImagePage({super.key, required this.imageUrl});
 
@@ -8,11 +10,12 @@ class FullscreenImagePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: colorScheme.scrim,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: colorScheme.scrim,
+        iconTheme: IconThemeData(color: colorScheme.onInverseSurface),
         elevation: 0,
       ),
       body: Center(
@@ -20,11 +23,12 @@ class FullscreenImagePage extends StatelessWidget {
           panEnabled: true,
           minScale: 0.5,
           maxScale: 4.0,
-          child: Image.network(
-            ApiConstants.resolveImageUrl(imageUrl),
+          child: CachedNetworkImage(
+            imageUrl: ApiConstants.resolveImageUrl(imageUrl),
             fit: BoxFit.contain,
-            errorBuilder: (context, error, stackTrace) =>
-                const Icon(Icons.broken_image, color: Colors.white, size: 64),
+            placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+            errorWidget: (context, url, error) =>
+                Icon(Icons.broken_image, color: colorScheme.onInverseSurface, size: 64),
           ),
         ),
       ),

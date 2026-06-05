@@ -26,10 +26,10 @@ ProfileRepository profileRepository(Ref ref) => ProfileRepositoryImpl(
   networkInfo: ref.watch(networkInfoProvider),
 );
 
-@riverpod
+@Riverpod(keepAlive: true)
 GetHistoryUseCase getHistoryUseCase(Ref ref) =>
     GetHistoryUseCase(ref.watch(profileRepositoryProvider));
 
-@riverpod
+@Riverpod(keepAlive: true)
 UpdateProfileUseCase updateProfileUseCase(Ref ref) =>
     UpdateProfileUseCase(ref.watch(profileRepositoryProvider));

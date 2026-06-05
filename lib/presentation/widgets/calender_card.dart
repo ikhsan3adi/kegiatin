@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/enums/event_status.dart';
+import 'package:kegiatin/domain/enums/event_type.dart';
 
 /// Shared calendar card widget for event activity display.
 /// Shows a calendar month with date selection and event highlight capability.
@@ -91,24 +93,40 @@ class _CalendarCardState extends State<CalendarCard> {
   void _showEventBottomSheet(BuildContext context, DateTime date, List<Event> events) {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
+    final pagePath = GoRouterState.of(context).uri.path;
 
     showModalBottomSheet(
       context: context,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(20),
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (sheetContext) => Container(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Center(
+              child: Container(
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   DateFormat('EEEE, dd MMMM yyyy', 'id_ID').format(date),
-                  style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                  style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 IconButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => Navigator.pop(sheetContext),
                   icon: Icon(Icons.close, color: colorScheme.onSurface),
                 ),
               ],
@@ -118,44 +136,124 @@ class _CalendarCardState extends State<CalendarCard> {
               child: ListView.builder(
                 shrinkWrap: true,
                 itemCount: events.length,
-                itemBuilder: (context, index) {
+                itemBuilder: (itemContext, index) {
                   final event = events[index];
-                  return Container(
+
+                  // Determine routing path based on pre-captured path
+                  final isAdmin = pagePath.contains('/admin');
+                  final detailPath = isAdmin
+                      ? '/admin/event-detail/${event.id}'
+                      : '/peserta/event-detail/${event.id}';
+
+                  return Card(
+                    elevation: 0,
                     margin: const EdgeInsets.only(bottom: 12),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: colorScheme.surfaceContainerHigh,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      side: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          event.title,
-                          style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          '📍 ${event.location}',
-                          style: textTheme.labelSmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        if (event.sessions.isNotEmpty) ...[
-                          const SizedBox(height: 4),
-                          Text(
-                            '🕐 ${DateFormat('HH:mm').format(event.sessions.first.startTime)}',
-                            style: textTheme.labelSmall?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
+                    color: colorScheme.surfaceContainerLow,
+                    clipBehavior: Clip.antiAlias,
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pop(sheetContext); // Close bottomsheet
+                        context.push(detailPath); // Navigate using outer page context
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                _buildBadge(
+                                  context: sheetContext,
+                                  text: _getStatusText(event.status),
+                                  backgroundColor: _getEventColor(
+                                    colorScheme,
+                                    event.status,
+                                  ).withValues(alpha: 0.15),
+                                  textColor: _getEventColor(colorScheme, event.status),
+                                ),
+                                const SizedBox(width: 8),
+                                _buildBadge(
+                                  context: sheetContext,
+                                  text: event.type == EventType.series ? 'Rutin' : 'Tunggal',
+                                  backgroundColor: event.type == EventType.series
+                                      ? colorScheme.tertiaryContainer
+                                      : colorScheme.secondaryContainer,
+                                  textColor: event.type == EventType.series
+                                      ? colorScheme.onTertiaryContainer
+                                      : colorScheme.onSecondaryContainer,
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
-                      ],
+                            const SizedBox(height: 12),
+                            Text(
+                              event.title,
+                              style: textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: colorScheme.onSurface,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.location_on_outlined,
+                                  size: 16,
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    event.location,
+                                    style: textTheme.bodySmall?.copyWith(
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            if (event.sessions.isNotEmpty) ...[
+                              const SizedBox(height: 6),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.access_time_outlined,
+                                    size: 16,
+                                    color: colorScheme.onSurfaceVariant,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    DateFormat('HH:mm').format(event.sessions.first.startTime.toLocal()),
+                                    style: textTheme.bodySmall?.copyWith(
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Icon(
+                                    Icons.format_list_bulleted_rounded,
+                                    size: 16,
+                                    color: colorScheme.onSurfaceVariant,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    '${event.sessions.length} Sesi',
+                                    style: textTheme.bodySmall?.copyWith(
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
                     ),
                   );
                 },
@@ -165,6 +263,39 @@ class _CalendarCardState extends State<CalendarCard> {
         ),
       ),
     );
+  }
+
+  Widget _buildBadge({
+    required BuildContext context,
+    required String text,
+    required Color backgroundColor,
+    required Color textColor,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(8)),
+      child: Text(
+        text,
+        style: Theme.of(
+          context,
+        ).textTheme.labelSmall?.copyWith(color: textColor, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  String _getStatusText(EventStatus status) {
+    switch (status) {
+      case EventStatus.draft:
+        return 'Draft';
+      case EventStatus.published:
+        return 'Segera';
+      case EventStatus.ongoing:
+        return 'Berlangsung';
+      case EventStatus.completed:
+        return 'Selesai';
+      case EventStatus.cancelled:
+        return 'Batal';
+    }
   }
 
   @override
@@ -202,10 +333,7 @@ class _CalendarCardState extends State<CalendarCard> {
             children: [
               Text(
                 DateFormat('MMMM yyyy').format(_currentMonth),
-                style: textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: colorScheme.onSurface,
-                ),
+                style: textTheme.titleLarge?.copyWith(color: colorScheme.onSurface),
               ),
               Row(
                 children: [
@@ -243,7 +371,6 @@ class _CalendarCardState extends State<CalendarCard> {
                 )
                 .toList(),
           ),
-          const SizedBox(height: 8),
 
           // Calendar grid
           GridView.builder(

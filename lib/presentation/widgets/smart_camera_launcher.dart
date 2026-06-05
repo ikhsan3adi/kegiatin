@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,15 +9,15 @@ import 'package:kegiatin/core/utils/snackbar_helper.dart';
 import 'package:kegiatin/domain/entities/processed_image.dart';
 import 'package:kegiatin/domain/repositories/pcd_repository.dart';
 import 'package:kegiatin/presentation/providers/pcd_providers.dart';
-import 'package:kegiatin/presentation/widgets/enhancement_preview.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-Future<ProcessedImage?> launchSmartCamera(
+Future<List<ProcessedImage>> launchSmartCamera(
   BuildContext context,
   WidgetRef ref, {
   CameraMode mode = CameraMode.document,
   bool cropImage = false,
+  int pageLimit = 1,
 }) async {
   if (mode == CameraMode.photo) {
     final status = await Permission.camera.request();
@@ -24,31 +25,33 @@ Future<ProcessedImage?> launchSmartCamera(
       if (context.mounted) {
         SnackBarHelper.showError(context, 'Izin kamera diperlukan untuk mode foto');
       }
-      return null;
+      return [];
     }
   }
 
   final repository = ref.read(pcdRepositoryProvider);
 
-  CaptureResult? captureResult;
+  List<CaptureResult>? captureResults;
   if (mode == CameraMode.document) {
-    captureResult = await repository.captureDocument();
+    captureResults = await repository.captureDocument(pageLimit: pageLimit);
   } else if (mode == CameraMode.photo) {
-    captureResult = await repository.capturePhoto();
+    final photoResult = await repository.capturePhoto();
+    if (photoResult != null) {
+      captureResults = [photoResult];
+    }
   } else {
     final picker = ImagePicker();
     final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 90);
-    if (picked == null) {
-      captureResult = null;
-    } else {
+    if (picked != null) {
       final bytes = await File(picked.path).readAsBytes();
-      captureResult = CaptureResult(imageBytes: bytes);
+      captureResults = [CaptureResult(imageBytes: bytes)];
     }
   }
 
-  if (captureResult == null || !context.mounted) return null;
+  if (captureResults == null || captureResults.isEmpty || !context.mounted) return [];
 
-  if (cropImage) {
+  if (cropImage && captureResults.isNotEmpty) {
+    final captureResult = captureResults.first;
     final colorScheme = Theme.of(context).colorScheme;
     try {
       final tempDir = await getTemporaryDirectory();
@@ -81,35 +84,59 @@ Future<ProcessedImage?> launchSmartCamera(
       }
 
       if (croppedFile == null) {
-        return null;
+        return [];
       }
 
       final croppedBytes = await croppedFile.readAsBytes();
-      captureResult = CaptureResult(imageBytes: croppedBytes);
+      captureResults = [CaptureResult(imageBytes: croppedBytes)];
     } catch (e) {
       debugPrint('Error cropping image: $e');
     }
   }
 
-  final finalResult = captureResult;
-  if (finalResult == null || !context.mounted) return null;
+  if (captureResults == null || captureResults.isEmpty || !context.mounted) return [];
 
-  final defaultMode = mode == CameraMode.document
-      ? EnhancementMode.original
-      : EnhancementMode.auto;
-  final selectedMode = await EnhancementPreview.show(
-    context,
-    imageBytes: finalResult.imageBytes,
-    defaultMode: defaultMode,
-  );
+  const selectedMode = EnhancementMode.original;
+  final List<ProcessedImage> processedImages = [];
 
-  if (selectedMode == null || !context.mounted) return null;
+  if (captureResults.length > 1 && context.mounted) {
+    unawaited(
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => const Center(
+          child: Card(
+            child: Padding(
+              padding: EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Memproses gambar...'),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
-  final result = await repository.enhanceAndSave(
-    imageBytes: finalResult.imageBytes,
-    mode: selectedMode,
-    isDocumentScan: mode == CameraMode.document,
-  );
+  try {
+    for (final captureResult in captureResults) {
+      final result = await repository.enhanceAndSave(
+        imageBytes: captureResult.imageBytes,
+        mode: selectedMode,
+        isDocumentScan: mode == CameraMode.document,
+      );
+      result.fold((_) => null, (processed) => processedImages.add(processed));
+    }
+  } finally {
+    if (captureResults.length > 1 && context.mounted) {
+      Navigator.pop(context);
+    }
+  }
 
-  return result.fold((_) => null, (processed) => processed);
+  return processedImages;
 }

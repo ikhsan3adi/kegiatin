@@ -65,20 +65,16 @@ class ProfileRepositoryImpl implements ProfileRepository {
     bool forceRefresh = false,
   }) async {
     final cacheKey = 'p${page}_l${limit}_${search ?? ''}';
-    if (await networkInfo.isConnected) {
-      if (forceRefresh) {
-        try {
-          final models = await historyRemoteDataSource.getHistory(
-            page: page,
-            limit: limit,
-            search: search,
-          );
-          await historyLocalDataSource.cacheHistory(cacheKey, models);
-          return Right(_mapModelsToRecords(models));
-        } on Exception catch (e) {
-          return Left(ServerFailure(e.toString()));
-        }
+
+    // Cek cache lokal terlebih dahulu jika tidak dipaksa memuat ulang dari jaringan (caching & offline).
+    if (!forceRefresh) {
+      final cached = await historyLocalDataSource.getCachedHistory(cacheKey);
+      if (cached.isNotEmpty) {
+        return Right(_mapModelsToRecords(cached));
       }
+    }
+
+    if (await networkInfo.isConnected) {
       try {
         final models = await historyRemoteDataSource.getHistory(
           page: page,
@@ -95,6 +91,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
         return Left(ServerFailure(e.toString()));
       }
     }
+
     final cached = await historyLocalDataSource.getCachedHistory(cacheKey);
     if (cached.isNotEmpty) {
       return Right(_mapModelsToRecords(cached));

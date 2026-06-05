@@ -91,7 +91,7 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
             selectedEvent: _selectedEvent,
             selectedSession: _selectedSession,
             totalScanned: _totalScanned,
-            pendingSyncCount: pendingCountAsync.asData?.value ?? 0,
+            pendingSyncCount: pendingCountAsync.maybeWhen(data: (val) => val, orElse: () => 0),
             onEventChanged: (event) {
               setState(() {
                 _selectedEvent = event;
@@ -139,7 +139,7 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with SingleTickerProvid
             child: TabBarView(
               controller: _tabController,
               children: [
-                QrScannerTab(onDetect: _onQrDetected),
+                QrScannerTab(onDetect: _onQrDetected, sessionSelected: _selectedSession != null),
                 ManualInputTab(eventId: _selectedEvent?.id, sessionId: _selectedSession?.id),
               ],
             ),
@@ -210,16 +210,15 @@ class _ScanHeader extends ConsumerWidget {
                       children: [
                         Text(
                           'Pindai QR Presensi',
-                          style: textTheme.titleMedium?.copyWith(
+                          style: textTheme.headlineSmall?.copyWith(
                             color: KegiatinCustomTheme.onGradient,
-                            fontWeight: FontWeight.w700,
                           ),
                         ),
                         Row(
                           children: [
                             Text(
                               '$totalScanned sudah dipindai',
-                              style: textTheme.bodySmall?.copyWith(
+                              style: textTheme.bodyMedium?.copyWith(
                                 color: KegiatinCustomTheme.onGradientDim,
                               ),
                             ),

@@ -14,7 +14,9 @@ abstract class SessionModel with _$SessionModel implements Session {
     required String id,
     @JsonKey(fromJson: JsonUtils.stringFromJson) required String eventId,
     required String title,
+    @JsonKey(fromJson: JsonUtils.dateTimeFromJson, toJson: JsonUtils.dateTimeToJson)
     required DateTime startTime,
+    @JsonKey(fromJson: JsonUtils.dateTimeFromJson, toJson: JsonUtils.dateTimeToJson)
     required DateTime endTime,
     String? location,
     required int order,

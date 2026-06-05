@@ -20,15 +20,13 @@ abstract final class SnackBarHelper {
   }
 
   /// Shows an error snackbar using the theme's error color.
-  static void showError(BuildContext context, String message, {String title = 'Terjadi Kesalahan'}) {
+  static void showError(
+    BuildContext context,
+    String message, {
+    String title = 'Terjadi Kesalahan',
+  }) {
     final colorScheme = Theme.of(context).colorScheme;
-    _show(
-      context,
-      title: title,
-      message: message,
-      icon: Icons.close,
-      typeColor: colorScheme.error,
-    );
+    _show(context, title: title, message: message, icon: Icons.close, typeColor: colorScheme.error);
   }
 
   /// Shows a warning snackbar (e.g. missing required selection).
@@ -69,7 +67,7 @@ abstract final class SnackBarHelper {
     Duration duration = const Duration(seconds: 4),
   }) {
     if (!context.mounted) return;
-    
+
     // Hapus overlay sebelumnya jika masih ada
     _currentOverlay?.remove();
     _currentOverlay = null;
@@ -101,10 +99,7 @@ abstract final class SnackBarHelper {
                   decoration: BoxDecoration(
                     color: colorScheme.surface,
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                      color: typeColor.withValues(alpha: 0.2),
-                      width: 1.5,
-                    ),
+                    border: Border.all(color: typeColor.withValues(alpha: 0.2), width: 1.5),
                     boxShadow: [
                       BoxShadow(
                         color: typeColor.withValues(alpha: 0.15),

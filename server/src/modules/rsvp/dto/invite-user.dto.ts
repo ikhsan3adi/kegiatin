@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsUUID } from 'class-validator';
 
 export class InviteUserDto {
-  @IsUUID(4, { message: 'userId harus berupa UUID v4 yang valid' })
+  @IsUUID('all', { message: 'userId harus berupa UUID yang valid' })
   @IsNotEmpty({ message: 'userId tidak boleh kosong' })
   userId!: string;
 }

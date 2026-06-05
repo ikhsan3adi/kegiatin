@@ -6,10 +6,10 @@ import 'package:kegiatin/domain/entities/session_input.dart';
 import 'package:kegiatin/domain/enums/event_status.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
 import 'package:kegiatin/domain/usecases/session/update_session_usecase.dart';
+import 'package:kegiatin/presentation/controllers/event/event_detail_controller.dart';
 import 'package:kegiatin/presentation/controllers/session/add_session_controller.dart';
 import 'package:kegiatin/presentation/controllers/session/delete_session_controller.dart';
 import 'package:kegiatin/presentation/controllers/session/update_session_controller.dart';
-import 'package:kegiatin/presentation/controllers/event/event_detail_controller.dart';
 
 class SessionManagementSection extends ConsumerWidget {
   const SessionManagementSection({super.key, required this.event});
@@ -44,7 +44,7 @@ class SessionManagementSection extends ConsumerWidget {
             children: [
               Icon(Icons.event_note_outlined, size: 20, color: colorScheme.onSurfaceVariant),
               const SizedBox(width: 12),
-              Text('Sesi', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+              Text('Sesi', style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
               const Spacer(),
               if (_canManage && event.type == EventType.series)
                 TextButton.icon(
@@ -75,210 +75,315 @@ class SessionManagementSection extends ConsumerWidget {
   }
 
   Future<void> _showAddSessionDialog(BuildContext context, WidgetRef ref) async {
+    final container = ProviderScope.containerOf(context);
     final titleController = TextEditingController();
     final locationController = TextEditingController();
     DateTime? startDate;
     TimeOfDay? startTime;
     DateTime? endDate;
     TimeOfDay? endTime;
+    bool isSaving = false;
 
     await showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDialogState) => AlertDialog(
-          title: const Text('Tambah Sesi'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: titleController,
-                  decoration: const InputDecoration(labelText: 'Nama Sesi'),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: locationController,
-                  decoration: const InputDecoration(labelText: 'Lokasi'),
-                ),
-                const SizedBox(height: 8),
-                _DatePickerField(
-                  label: 'Tanggal Mulai',
-                  value: startDate,
-                  onPicked: (d) => setDialogState(() => startDate = d),
-                ),
-                const SizedBox(height: 8),
-                _TimePickerField(
-                  label: 'Jam Mulai',
-                  value: startTime,
-                  onPicked: (t) => setDialogState(() => startTime = t),
-                ),
-                const SizedBox(height: 8),
-                _DatePickerField(
-                  label: 'Tanggal Selesai',
-                  value: endDate,
-                  onPicked: (d) => setDialogState(() => endDate = d),
-                ),
-                const SizedBox(height: 8),
-                _TimePickerField(
-                  label: 'Jam Selesai',
-                  value: endTime,
-                  onPicked: (t) => setDialogState(() => endTime = t),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
-            FilledButton(
-              onPressed: () async {
-                if (titleController.text.isEmpty ||
-                    startDate == null ||
-                    startTime == null ||
-                    endDate == null ||
-                    endTime == null) {
-                  return;
-                }
-                final start = DateTime(
-                  startDate!.year,
-                  startDate!.month,
-                  startDate!.day,
-                  startTime!.hour,
-                  startTime!.minute,
-                );
-                final end = DateTime(
-                  endDate!.year,
-                  endDate!.month,
-                  endDate!.day,
-                  endTime!.hour,
-                  endTime!.minute,
-                );
-                Navigator.pop(ctx);
-                await ref
-                    .read(addSessionControllerProvider.notifier)
-                    .addSession(
-                      event.id,
-                      SessionInput(
-                        title: titleController.text.trim(),
-                        startTime: start,
-                        endTime: end,
-                        location: locationController.text.trim().isEmpty
-                            ? null
-                            : locationController.text.trim(),
-                      ),
-                    );
-                ref.invalidate(eventDetailControllerProvider(event.id));
-              },
-              child: const Text('Simpan'),
-            ),
-          ],
-        ),
+        builder: (ctx, setDialogState) {
+          return AlertDialog(
+            title: const Text('Tambah Sesi'),
+            content: isSaving
+                ? const SizedBox(height: 100, child: Center(child: CircularProgressIndicator()))
+                : SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextField(
+                          controller: titleController,
+                          decoration: const InputDecoration(labelText: 'Nama Sesi'),
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: locationController,
+                          decoration: const InputDecoration(labelText: 'Lokasi'),
+                        ),
+                        const SizedBox(height: 8),
+                        _DatePickerField(
+                          label: 'Tanggal Mulai',
+                          value: startDate,
+                          onPicked: (d) => setDialogState(() => startDate = d),
+                        ),
+                        const SizedBox(height: 8),
+                        _TimePickerField(
+                          label: 'Jam Mulai',
+                          value: startTime,
+                          onPicked: (t) => setDialogState(() => startTime = t),
+                        ),
+                        const SizedBox(height: 8),
+                        _DatePickerField(
+                          label: 'Tanggal Selesai',
+                          value: endDate,
+                          onPicked: (d) => setDialogState(() => endDate = d),
+                        ),
+                        const SizedBox(height: 8),
+                        _TimePickerField(
+                          label: 'Jam Selesai',
+                          value: endTime,
+                          onPicked: (t) => setDialogState(() => endTime = t),
+                        ),
+                      ],
+                    ),
+                  ),
+            actions: isSaving
+                ? []
+                : [
+                    TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
+                    FilledButton(
+                      onPressed: () async {
+                        if (titleController.text.isEmpty ||
+                            startDate == null ||
+                            startTime == null ||
+                            endDate == null ||
+                            endTime == null) {
+                          return;
+                        }
+                        setDialogState(() => isSaving = true);
+                        final start = DateTime(
+                          startDate!.year,
+                          startDate!.month,
+                          startDate!.day,
+                          startTime!.hour,
+                          startTime!.minute,
+                        );
+                        final end = DateTime(
+                          endDate!.year,
+                          endDate!.month,
+                          endDate!.day,
+                          endTime!.hour,
+                          endTime!.minute,
+                        );
+                        try {
+                          await container
+                              .read(addSessionControllerProvider.notifier)
+                              .addSession(
+                                event.id,
+                                SessionInput(
+                                  title: titleController.text.trim(),
+                                  startTime: start,
+                                  endTime: end,
+                                  location: locationController.text.trim().isEmpty
+                                      ? null
+                                      : locationController.text.trim(),
+                                ),
+                              );
+                          final state = container.read(addSessionControllerProvider);
+                          if (state.hasError) {
+                            setDialogState(() => isSaving = false);
+                            if (ctx.mounted) {
+                              ScaffoldMessenger.of(
+                                ctx,
+                              ).showSnackBar(SnackBar(content: Text('Gagal: ${state.error}')));
+                            }
+                          } else {
+                            container.invalidate(eventDetailControllerProvider(event.id));
+                            if (ctx.mounted) Navigator.pop(ctx);
+                          }
+                        } catch (e) {
+                          setDialogState(() => isSaving = false);
+                          if (ctx.mounted) {
+                            ScaffoldMessenger.of(
+                              ctx,
+                            ).showSnackBar(SnackBar(content: Text('Gagal: $e')));
+                          }
+                        }
+                      },
+                      child: const Text('Simpan'),
+                    ),
+                  ],
+          );
+        },
       ),
     );
   }
 
   Future<void> _showEditSessionDialog(BuildContext context, WidgetRef ref, Session session) async {
+    final container = ProviderScope.containerOf(context);
     final titleController = TextEditingController(text: session.title);
     final locationController = TextEditingController(text: session.location ?? '');
     var startDate = session.startTime;
     var startTime = TimeOfDay.fromDateTime(session.startTime);
     var endDate = session.endTime;
     var endTime = TimeOfDay.fromDateTime(session.endTime);
+    bool isSaving = false;
 
     await showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
           title: const Text('Edit Sesi'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: titleController,
-                  decoration: const InputDecoration(labelText: 'Nama Sesi'),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: locationController,
-                  decoration: const InputDecoration(labelText: 'Lokasi'),
-                ),
-                const SizedBox(height: 8),
-                _DatePickerField(
-                  label: 'Tanggal Mulai',
-                  value: startDate,
-                  onPicked: (d) => setDialogState(() => startDate = d),
-                ),
-                const SizedBox(height: 8),
-                _TimePickerField(
-                  label: 'Jam Mulai',
-                  value: startTime,
-                  onPicked: (t) => setDialogState(() => startTime = t),
-                ),
-                const SizedBox(height: 8),
-                _DatePickerField(
-                  label: 'Tanggal Selesai',
-                  value: endDate,
-                  onPicked: (d) => setDialogState(() => endDate = d),
-                ),
-                const SizedBox(height: 8),
-                _TimePickerField(
-                  label: 'Jam Selesai',
-                  value: endTime,
-                  onPicked: (t) => setDialogState(() => endTime = t),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
-            FilledButton(
-              onPressed: () async {
-                if (titleController.text.isEmpty) return;
-                Navigator.pop(ctx);
-                await ref
-                    .read(updateSessionControllerProvider.notifier)
-                    .updateSession(
-                      session.id,
-                      UpdateSessionParams(
-                        id: session.id,
-                        title: titleController.text.trim(),
-                        startTime: startDate,
-                        endTime: endDate,
-                        location: locationController.text.trim().isEmpty
-                            ? null
-                            : locationController.text.trim(),
+          content: isSaving
+              ? const SizedBox(height: 100, child: Center(child: CircularProgressIndicator()))
+              : SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextField(
+                        controller: titleController,
+                        decoration: const InputDecoration(labelText: 'Nama Sesi'),
                       ),
-                    );
-                ref.invalidate(eventDetailControllerProvider(event.id));
-              },
-              child: const Text('Simpan'),
-            ),
-          ],
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: locationController,
+                        decoration: const InputDecoration(labelText: 'Lokasi'),
+                      ),
+                      const SizedBox(height: 8),
+                      _DatePickerField(
+                        label: 'Tanggal Mulai',
+                        value: startDate,
+                        onPicked: (d) => setDialogState(() => startDate = d),
+                      ),
+                      const SizedBox(height: 8),
+                      _TimePickerField(
+                        label: 'Jam Mulai',
+                        value: startTime,
+                        onPicked: (t) => setDialogState(() => startTime = t),
+                      ),
+                      const SizedBox(height: 8),
+                      _DatePickerField(
+                        label: 'Tanggal Selesai',
+                        value: endDate,
+                        onPicked: (d) => setDialogState(() => endDate = d),
+                      ),
+                      const SizedBox(height: 8),
+                      _TimePickerField(
+                        label: 'Jam Selesai',
+                        value: endTime,
+                        onPicked: (t) => setDialogState(() => endTime = t),
+                      ),
+                    ],
+                  ),
+                ),
+          actions: isSaving
+              ? []
+              : [
+                  TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
+                  FilledButton(
+                    onPressed: () async {
+                      if (titleController.text.isEmpty) return;
+                      setDialogState(() => isSaving = true);
+
+                      final start = DateTime(
+                        startDate.year,
+                        startDate.month,
+                        startDate.day,
+                        startTime.hour,
+                        startTime.minute,
+                      );
+                      final end = DateTime(
+                        endDate.year,
+                        endDate.month,
+                        endDate.day,
+                        endTime.hour,
+                        endTime.minute,
+                      );
+
+                      try {
+                        await container
+                            .read(updateSessionControllerProvider.notifier)
+                            .updateSession(
+                              session.id,
+                              UpdateSessionParams(
+                                id: session.id,
+                                title: titleController.text.trim(),
+                                startTime: start,
+                                endTime: end,
+                                location: locationController.text.trim().isEmpty
+                                    ? null
+                                    : locationController.text.trim(),
+                              ),
+                            );
+                        final state = container.read(updateSessionControllerProvider);
+                        if (state.hasError) {
+                          setDialogState(() => isSaving = false);
+                          if (ctx.mounted) {
+                            ScaffoldMessenger.of(
+                              ctx,
+                            ).showSnackBar(SnackBar(content: Text('Gagal: ${state.error}')));
+                          }
+                        } else {
+                          container.invalidate(eventDetailControllerProvider(event.id));
+                          if (ctx.mounted) Navigator.pop(ctx);
+                        }
+                      } catch (e) {
+                        setDialogState(() => isSaving = false);
+                        if (ctx.mounted) {
+                          ScaffoldMessenger.of(
+                            ctx,
+                          ).showSnackBar(SnackBar(content: Text('Gagal: $e')));
+                        }
+                      }
+                    },
+                    child: const Text('Simpan'),
+                  ),
+                ],
         ),
       ),
     );
   }
 
   Future<void> _confirmDeleteSession(BuildContext context, WidgetRef ref, Session session) async {
-    final confirmed = await showDialog<bool>(
+    final container = ProviderScope.containerOf(context);
+    bool isDeleting = false;
+    await showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Hapus Sesi'),
-        content: Text('Hapus "${session.title}"?'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Batal')),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.error),
-            child: const Text('Hapus'),
-          ),
-        ],
+      barrierDismissible: false,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: const Text('Hapus Sesi'),
+          content: isDeleting
+              ? const SizedBox(height: 100, child: Center(child: CircularProgressIndicator()))
+              : Text('Hapus "${session.title}"?'),
+          actions: isDeleting
+              ? []
+              : [
+                  TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
+                  FilledButton(
+                    onPressed: () async {
+                      setDialogState(() => isDeleting = true);
+                      try {
+                        await container
+                            .read(deleteSessionControllerProvider.notifier)
+                            .deleteSession(session.id);
+                        final state = container.read(deleteSessionControllerProvider);
+                        if (state.hasError) {
+                          setDialogState(() => isDeleting = false);
+                          if (ctx.mounted) {
+                            ScaffoldMessenger.of(
+                              ctx,
+                            ).showSnackBar(SnackBar(content: Text('Gagal: ${state.error}')));
+                          }
+                        } else {
+                          container.invalidate(eventDetailControllerProvider(event.id));
+                          if (ctx.mounted) Navigator.pop(ctx);
+                        }
+                      } catch (e) {
+                        setDialogState(() => isDeleting = false);
+                        if (ctx.mounted) {
+                          ScaffoldMessenger.of(
+                            ctx,
+                          ).showSnackBar(SnackBar(content: Text('Gagal: $e')));
+                        }
+                      }
+                    },
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.error,
+                    ),
+                    child: const Text('Hapus'),
+                  ),
+                ],
+        ),
       ),
     );
-    if (confirmed == true) {
-      await ref.read(deleteSessionControllerProvider.notifier).deleteSession(session.id);
-      ref.invalidate(eventDetailControllerProvider(event.id));
-    }
   }
 }
 

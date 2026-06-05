@@ -20,62 +20,72 @@ class EventStats {
 }
 
 @riverpod
-Future<EventStats> eventStatsController(Ref ref) async {
-  final getEventsUseCase = ref.watch(getEventsUseCaseProvider);
+class EventStatsController extends _$EventStatsController {
+  @override
+  FutureOr<EventStats> build() async {
+    return _fetchStats(forceRefresh: false);
+  }
 
-  final eventsResult = await getEventsUseCase.call(
-    const GetEventsUseCaseParams(page: 1, limit: 1000),
-  );
+  Future<EventStats> _fetchStats({bool forceRefresh = false}) async {
+    final getEventsUseCase = ref.watch(getEventsUseCaseProvider);
 
-  final stats = eventsResult.fold(
-    (failure) => const EventStats(
-      eventsThisWeek: 0,
-      eventsThisMonth: 0,
-      incompleteEvents: 0,
-      totalAttendances: 0,
-    ),
-    (paginatedResult) {
-      final events = paginatedResult.data;
-      final now = DateTime.now();
-      final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
-      final endOfWeek = startOfWeek.add(const Duration(days: 6));
-      final startOfMonth = DateTime(now.year, now.month, 1);
-      final endOfMonth = DateTime(now.year, now.month + 1, 0);
+    final eventsResult = await getEventsUseCase.call(
+      GetEventsUseCaseParams(page: 1, limit: 1000, forceRefresh: forceRefresh),
+    );
 
-      int eventsThisWeek = 0;
-      for (final event in events) {
-        for (final session in event.sessions) {
-          if (session.startTime.isAfter(startOfWeek) &&
-              session.startTime.isBefore(endOfWeek.add(const Duration(days: 1)))) {
-            eventsThisWeek++;
-            break;
+    return eventsResult.fold(
+      (failure) => const EventStats(
+        eventsThisWeek: 0,
+        eventsThisMonth: 0,
+        incompleteEvents: 0,
+        totalAttendances: 0,
+      ),
+      (paginatedResult) {
+        final events = paginatedResult.data;
+        final now = DateTime.now();
+        final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+        final endOfWeek = startOfWeek.add(const Duration(days: 6));
+        final startOfMonth = DateTime(now.year, now.month, 1);
+        final endOfMonth = DateTime(now.year, now.month + 1, 0);
+
+        int eventsThisWeek = 0;
+        for (final event in events) {
+          for (final session in event.sessions) {
+            if (session.startTime.isAfter(startOfWeek) &&
+                session.startTime.isBefore(endOfWeek.add(const Duration(days: 1)))) {
+              eventsThisWeek++;
+              break;
+            }
           }
         }
-      }
 
-      int eventsThisMonth = 0;
-      for (final event in events) {
-        for (final session in event.sessions) {
-          if (session.startTime.isAfter(startOfMonth) &&
-              session.startTime.isBefore(endOfMonth.add(const Duration(days: 1)))) {
-            eventsThisMonth++;
-            break; // Count each event once
+        int eventsThisMonth = 0;
+        for (final event in events) {
+          for (final session in event.sessions) {
+            if (session.startTime.isAfter(startOfMonth) &&
+                session.startTime.isBefore(endOfMonth.add(const Duration(days: 1)))) {
+              eventsThisMonth++;
+              break; // Count each event once
+            }
           }
         }
-      }
 
-      final incompleteEvents = events.where((e) => e.status == EventStatus.draft).length;
+        final incompleteEvents = events.where((e) => e.status == EventStatus.draft).length;
 
-      const totalAttendances = 0;
+        const totalAttendances = 0;
 
-      return EventStats(
-        eventsThisWeek: eventsThisWeek,
-        eventsThisMonth: eventsThisMonth,
-        incompleteEvents: incompleteEvents,
-        totalAttendances: totalAttendances,
-      );
-    },
-  );
+        return EventStats(
+          eventsThisWeek: eventsThisWeek,
+          eventsThisMonth: eventsThisMonth,
+          incompleteEvents: incompleteEvents,
+          totalAttendances: totalAttendances,
+        );
+      },
+    );
+  }
 
-  return stats;
+  Future<void> refresh() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() => _fetchStats(forceRefresh: true));
+  }
 }

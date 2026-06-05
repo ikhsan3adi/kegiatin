@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:kegiatin/core/utils/json_utils.dart';
 import 'package:kegiatin/domain/entities/rsvp.dart';
 import 'package:kegiatin/domain/enums/rsvp_status.dart';
 
@@ -15,6 +16,7 @@ abstract class RsvpModel with _$RsvpModel implements Rsvp {
     required String eventId,
     required String qrToken,
     required RsvpStatus status,
+    @JsonKey(fromJson: JsonUtils.dateTimeFromJson, toJson: JsonUtils.dateTimeToJson)
     required DateTime createdAt,
   }) = _RsvpModel;
 

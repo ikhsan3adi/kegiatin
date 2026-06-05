@@ -13,10 +13,10 @@ import 'package:path_provider/path_provider.dart';
 
 class PcdRepositoryImpl implements PcdRepository {
   @override
-  Future<CaptureResult?> captureDocument({int pageLimit = 1}) async {
+  Future<List<CaptureResult>?> captureDocument({int pageLimit = 1}) async {
     final options = DocumentScannerOptions(
       documentFormats: const {DocumentFormat.jpeg},
-      mode: ScannerMode.filter,
+      mode: ScannerMode.base,
       pageLimit: pageLimit,
       isGalleryImport: true,
     );
@@ -28,11 +28,14 @@ class PcdRepositoryImpl implements PcdRepository {
       final images = result.images;
       if (images == null || images.isEmpty) return null;
 
-      final imagePath = images.first;
-      final file = File(imagePath);
-      final bytes = await file.readAsBytes();
+      final List<CaptureResult> captureResults = [];
+      for (final imagePath in images) {
+        final file = File(imagePath);
+        final bytes = await file.readAsBytes();
+        captureResults.add(CaptureResult(imageBytes: bytes));
+      }
 
-      return CaptureResult(imageBytes: bytes);
+      return captureResults;
     } on PlatformException {
       return null;
     } finally {

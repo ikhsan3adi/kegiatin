@@ -1,0 +1,144 @@
+stages:
+  - build
+  - deploy
+  - migration
+
+workflow:
+  rules:
+    - if: $CI_COMMIT_TAG
+      variables:
+        STAGE: production
+        IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+        LATEST_IMAGE_TAG: $CI_REGISTRY_IMAGE:latest
+        BUILD_VERSION: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == "master"
+      variables:
+        STAGE: development
+        IMAGE_TAG: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}.${CI_COMMIT_SHORT_SHA}
+        LATEST_IMAGE_TAG: $CI_REGISTRY_IMAGE:latest
+        BUILD_VERSION: ${CI_COMMIT_REF_SLUG}.${CI_COMMIT_SHORT_SHA}
+    - when: never
+
+.kubectl-template: &kubectl-template
+  image:
+    name: alpine/kubectl
+    entrypoint: [""]
+  tags:
+    - supermm4
+  environment:
+    name: $STAGE
+    url: $CI_ENVIRONMENT_URL
+  variables:
+    GIT_STRATEGY: none
+  before_script:
+    - test -n "$KUBECONFIG" && echo "KUBECONFIG VAR OK" || (echo "KUBECONFIG EMPTY" && exit 1)
+    - echo "$KUBECONFIG" | base64 -d > kubeconfig
+    - test -s kubeconfig && echo "KUBECONFIG FILE OK" || (echo "KUBECONFIG FILE EMPTY" && exit 1)
+
+.build-template:
+  stage: build
+  image: docker:latest
+  tags:
+    - supermm4
+  environment:
+    name: $STAGE
+  variables:
+    DOCKER_HOST: unix:///var/run/docker.sock
+    DOCKER_TLS_CERTDIR: ""
+  before_script:
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+
+build:
+  extends: .build-template
+  script:
+    - cd server/
+    - |
+      docker buildx build \
+        --platform linux/amd64 \
+        --provenance=false \
+        --target production \
+        --build-arg CI_REGISTRY_IMAGE="$CI_REGISTRY_IMAGE" \
+        --build-arg BUILD_VERSION="$BUILD_VERSION" \
+        --build-arg NODE_ENV="$STAGE" \
+        --cache-from type=registry,ref=$LATEST_IMAGE_TAG \
+        --cache-to type=inline \
+        -t "$IMAGE_TAG" -t "$LATEST_IMAGE_TAG" \
+        --push .
+  rules:
+    - if: $CI_COMMIT_TAG || $CI_COMMIT_BRANCH == "master"
+
+build-migration:
+  extends: .build-template
+  script:
+    - cd server/
+    - |
+      docker buildx build \
+        --platform linux/amd64 \
+        --provenance=false \
+        --target migration \
+        --build-arg CI_REGISTRY_IMAGE="$CI_REGISTRY_IMAGE" \
+        --build-arg BUILD_VERSION="$BUILD_VERSION" \
+        --build-arg NODE_ENV="$STAGE" \
+        --cache-from type=registry,ref=$LATEST_IMAGE_TAG \
+        --cache-to type=inline \
+        -t "${IMAGE_TAG}-migration" \
+        --push .
+  # rules:
+  #   - if: $CI_COMMIT_TAG || $CI_COMMIT_BRANCH == "master"
+  #     changes:
+  #       - server/drizzle/*
+
+deploy-env:
+  stage: deploy
+  <<: *kubectl-template
+  needs:
+    - build
+  script:
+    - |
+      kubectl --kubeconfig="$(pwd)/kubeconfig" \
+        create secret generic "${DEPLOYMENT_NAME}-${STAGE}" \
+        --from-env-file="${ENV}" \
+        --dry-run=client -o yaml | \
+      kubectl --kubeconfig="$(pwd)/kubeconfig" apply -f -
+
+deploy:
+  stage: deploy
+  <<: *kubectl-template
+  needs:
+    - deploy-env
+  script:
+    - kubectl --kubeconfig=$(pwd)/kubeconfig set image deployment/${DEPLOYMENT_NAME}-${STAGE} app=$IMAGE_TAG
+    - kubectl --kubeconfig=$(pwd)/kubeconfig rollout status deployment/${DEPLOYMENT_NAME}-${STAGE}
+    - kubectl --kubeconfig=$(pwd)/kubeconfig describe deployment/${DEPLOYMENT_NAME}-${STAGE}
+  after_script:
+  - |
+    kubectl --kubeconfig=$(pwd)/kubeconfig delete \
+      job/${DEPLOYMENT_NAME}-${STAGE}-migrate-${CI_PIPELINE_ID}
+  - rm -r {MIGRATION_JOB}
+  - rm -r kubeconfig
+  rules:
+    - if: $CI_COMMIT_TAG
+
+migration:
+  stage: migration
+  <<: *kubectl-template
+  needs:
+    - build-migration
+    - deploy-env
+  script:
+    - cat ${MIGRATION_JOB} > migration-job.yaml
+    - kubectl --kubeconfig=$(pwd)/kubeconfig apply -f migration-job.yaml
+    - |
+      kubectl --kubeconfig=$(pwd)/kubeconfig wait \
+        --for=condition=complete \
+        job/${DEPLOYMENT_NAME}-${STAGE}-migrate-${CI_PIPELINE_ID} \
+        --timeout=300s
+    - |
+      kubectl --kubeconfig=$(pwd)/kubeconfig logs \
+        job/${DEPLOYMENT_NAME}-${STAGE}-migrate-${CI_PIPELINE_ID}
+  after_script:
+  - |
+    kubectl --kubeconfig=$(pwd)/kubeconfig delete \
+      job/${DEPLOYMENT_NAME}-${STAGE}-migrate-${CI_PIPELINE_ID}
+  - rm -r migration-job.yaml
+  - rm -r kubeconfig

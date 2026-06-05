@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:kegiatin/core/utils/json_utils.dart';
 import 'package:kegiatin/domain/entities/archive_item.dart';
 import 'package:kegiatin/domain/enums/archive_type.dart';
 
@@ -15,6 +16,7 @@ abstract class ArchiveModel with _$ArchiveModel implements ArchiveItem {
     required String title,
     required ArchiveType type,
     required String fileUrl,
+    @JsonKey(fromJson: JsonUtils.dateTimeFromJson, toJson: JsonUtils.dateTimeToJson)
     required DateTime createdAt,
   }) = _ArchiveModel;
 

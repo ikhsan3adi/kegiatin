@@ -14,4 +14,3 @@ abstract class ProfileRepository {
     bool forceRefresh = false,
   });
 }
-

@@ -16,7 +16,7 @@ class AdminEventDetailHeader extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     final firstSession = event.sessions.isNotEmpty ? event.sessions.first : null;
-    final startTime = firstSession?.startTime;
+    final startTime = firstSession?.startTime.toLocal();
     final dateStr = startTime != null
         ? "${startTime.year}-${startTime.month.toString().padLeft(2, '0')}-${startTime.day.toString().padLeft(2, '0')} . ${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}"
         : 'Waktu belum ditentukan';
@@ -59,10 +59,7 @@ class AdminEventDetailHeader extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             event.title,
-            style: textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: colorScheme.onPrimary,
-            ),
+            style: textTheme.headlineLarge?.copyWith(color: colorScheme.onPrimary),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),

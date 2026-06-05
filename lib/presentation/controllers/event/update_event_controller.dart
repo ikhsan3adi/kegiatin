@@ -1,6 +1,7 @@
 import 'package:kegiatin/domain/entities/update_event_input.dart';
 import 'package:kegiatin/domain/usecases/event/update_event_usecase.dart';
 import 'package:kegiatin/presentation/providers/event_providers.dart';
+import 'package:kegiatin/presentation/controllers/event/event_detail_controller.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'update_event_controller.g.dart';
@@ -23,6 +24,7 @@ class UpdateEventController extends _$UpdateEventController {
       (_) {
         state = const AsyncValue.data(null);
         // Refresh detail and list
+        ref.invalidate(eventDetailControllerProvider(eventId));
         ref.invalidate(getEventByIdUseCaseProvider);
         ref.invalidate(getEventsUseCaseProvider);
         return null;

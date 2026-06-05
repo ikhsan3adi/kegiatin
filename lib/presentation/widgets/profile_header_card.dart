@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:kegiatin/core/constants/api_constants.dart';
 import 'package:kegiatin/core/theme/custom.dart';
 import 'package:kegiatin/domain/enums/user_role.dart';
+import 'package:shimmer/shimmer.dart';
 
 /// Card header profil — menampilkan avatar, nama, NPA, dan badge peran.
 ///
@@ -51,10 +53,7 @@ class ProfileHeaderCard extends StatelessWidget {
               children: [
                 Text(
                   displayName,
-                  style: textTheme.titleMedium?.copyWith(
-                    color: KegiatinCustomTheme.onGradient,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: textTheme.titleLarge?.copyWith(color: KegiatinCustomTheme.onGradient),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -101,16 +100,38 @@ class _Avatar extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: KegiatinCustomTheme.glassElement,
-        border: Border.all(color: KegiatinCustomTheme.glassElementBorder, width: 1.5),
+        border: Border.all(
+          color: KegiatinCustomTheme.glassElementBorder,
+          width: 1.5,
+          strokeAlign: BorderSide.strokeAlignOutside,
+        ),
       ),
       clipBehavior: Clip.antiAlias,
       child: photoUrl != null && photoUrl!.isNotEmpty
-          ? Image.network(
-              ApiConstants.resolveImageUrl(photoUrl!),
+          ? CachedNetworkImage(
+              imageUrl: ApiConstants.resolveImageUrl(photoUrl!),
               fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => _InitialsFallback(_initials),
+              placeholder: (context, url) => const _AvatarShimmer(),
+              errorWidget: (context, url, error) => _InitialsFallback(_initials),
             )
           : _InitialsFallback(_initials),
+    );
+  }
+}
+
+class _AvatarShimmer extends StatelessWidget {
+  const _AvatarShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: Colors.white.withValues(alpha: 0.15),
+      highlightColor: Colors.white.withValues(alpha: 0.35),
+      child: Container(
+        width: 52,
+        height: 52,
+        decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+      ),
     );
   }
 }

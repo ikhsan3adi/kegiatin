@@ -12,13 +12,13 @@ class ScanDocumentUseCase extends UseCase<ProcessedImage, EnhancementMode> {
 
   @override
   Future<Either<Failure, ProcessedImage>> call(EnhancementMode mode) async {
-    final captureResult = await repository.captureDocument();
-    if (captureResult == null) {
+    final captureResults = await repository.captureDocument();
+    if (captureResults == null || captureResults.isEmpty) {
       return const Left(CacheFailure('Scan dibatalkan atau gagal'));
     }
 
     return repository.enhanceAndSave(
-      imageBytes: captureResult.imageBytes,
+      imageBytes: captureResults.first.imageBytes,
       mode: mode,
       isDocumentScan: true,
     );

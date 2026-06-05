@@ -15,6 +15,7 @@ class DateFormatter {
   ];
 
   static String formatDateShort(DateTime dt) {
-    return '${dt.day} ${abbreviatedMonths[dt.month - 1]} ${dt.year}';
+    final local = dt.toLocal();
+    return '${local.day} ${abbreviatedMonths[local.month - 1]} ${local.year}';
   }
 }

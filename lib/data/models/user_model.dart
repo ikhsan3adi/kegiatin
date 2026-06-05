@@ -19,6 +19,7 @@ abstract class UserModel with _$UserModel implements User {
     String? cabang,
     String? photoUrl,
     @Default(false) bool emailVerified,
+    @JsonKey(fromJson: JsonUtils.dateTimeFromJson, toJson: JsonUtils.dateTimeToJson)
     required DateTime createdAt,
   }) = _UserModel;
 

@@ -123,8 +123,8 @@ class EventRemoteDataSourceImpl implements EventRemoteDataSource {
             .map(
               (s) => {
                 'title': s.title,
-                'startTime': s.startTime.toIso8601String(),
-                'endTime': s.endTime.toIso8601String(),
+                'startTime': s.startTime.toUtc().toIso8601String(),
+                'endTime': s.endTime.toUtc().toIso8601String(),
                 'location': s.location,
                 'capacity': s.capacity,
               },
