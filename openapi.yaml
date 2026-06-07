@@ -149,6 +149,12 @@ components:
           format: email
         password:
           type: string
+    GoogleLoginDto:
+      type: object
+      required: [idToken]
+      properties:
+        idToken:
+          type: string
     AuthTokens:
       type: object
       properties:
@@ -616,6 +622,39 @@ paths:
                             $ref: "#/components/schemas/AuthTokens"
         "401":
           description: Kredensial salah
+
+  /auth/google:
+    post:
+      tags: [Auth]
+      summary: Login atau registrasi dengan Google ID Token
+      description: |
+        Memverifikasi Google ID Token. Jika user dengan Google ID tersebut sudah terdaftar, login berhasil.
+        Jika belum terdaftar tapi ada user dengan email yang sama, hubungkan (auto-link) akun tersebut dengan Google ID lalu login.
+        Jika email belum terdaftar sama sekali, buat user baru dengan role MEMBER dan default local password null.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GoogleLoginDto"
+      responses:
+        "200":
+          description: Login/registrasi berhasil
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ApiResponse"
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          user:
+                            $ref: "#/components/schemas/UserResponse"
+                          tokens:
+                            $ref: "#/components/schemas/AuthTokens"
+        "401":
+          description: Token Google tidak valid atau kedaluwarsa
 
   /auth/refresh:
     post:
