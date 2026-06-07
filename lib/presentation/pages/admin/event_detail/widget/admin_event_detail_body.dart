@@ -20,7 +20,7 @@ import 'package:kegiatin/presentation/pages/admin/event_detail/widget/admin_part
 import 'package:kegiatin/presentation/pages/admin/event_detail/widget/session_management_section.dart';
 import 'package:kegiatin/presentation/pages/admin/widget/upload_materi_bottom_sheet.dart';
 import 'package:kegiatin/presentation/pages/fullscreen_image_page.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:kegiatin/presentation/widgets/archive_item_row.dart';
 
 class AdminEventDetailBody extends ConsumerWidget {
   const AdminEventDetailBody({super.key, required this.event});
@@ -324,97 +324,44 @@ class _SessionArchiveSection extends ConsumerWidget {
                   style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
                 );
               }
-              return Column(children: list.map((a) => _ArchiveRow(archive: a)).toList());
+              return Column(
+                children: list.map((a) {
+                  return ArchiveItemRow(
+                    archive: a,
+                    isAccessible: true,
+                    onDelete: () async {
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: const Text('Hapus Materi'),
+                          content: Text('Apakah Anda yakin ingin menghapus materi "${a.title}"?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text('Batal'),
+                            ),
+                            FilledButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              style: FilledButton.styleFrom(
+                                backgroundColor: colorScheme.error,
+                                foregroundColor: colorScheme.onError,
+                              ),
+                              child: const Text('Hapus'),
+                            ),
+                          ],
+                        ),
+                      );
+                      if (confirm == true) {
+                        await ref.read(deleteArchiveControllerProvider.notifier).delete(a.id);
+                        ref.invalidate(sessionArchivesControllerProvider(a.sessionId));
+                      }
+                    },
+                  );
+                }).toList(),
+              );
             },
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _ArchiveRow extends ConsumerWidget {
-  const _ArchiveRow({required this.archive});
-
-  final ArchiveItem archive;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final isImg = _isImageFile(archive.fileUrl);
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: InkWell(
-        onTap: () async {
-          if (isImg) {
-            await Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => FullscreenImagePage(imageUrl: archive.fileUrl)),
-            );
-          } else {
-            final uri = Uri.parse(archive.fileUrl);
-            if (await canLaunchUrl(uri)) {
-              await launchUrl(uri, mode: LaunchMode.inAppWebView);
-            }
-          }
-        },
-        borderRadius: BorderRadius.circular(8),
-        child: Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Row(
-            children: [
-              _buildMaterialThumbnail(context, archive.fileUrl),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  archive.title,
-                  style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurface),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              Icon(
-                isImg ? Icons.photo_outlined : Icons.open_in_new,
-                size: 16,
-                color: colorScheme.primary,
-              ),
-              const SizedBox(width: 8),
-              IconButton(
-                icon: Icon(Icons.delete_outline, size: 16, color: colorScheme.error),
-                visualDensity: VisualDensity.compact,
-                onPressed: () async {
-                  final confirm = await showDialog<bool>(
-                    context: context,
-                    builder: (_) => AlertDialog(
-                      title: const Text('Hapus Materi'),
-                      content: Text('Apakah Anda yakin ingin menghapus materi "${archive.title}"?'),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context, false),
-                          child: const Text('Batal'),
-                        ),
-                        FilledButton(
-                          onPressed: () => Navigator.pop(context, true),
-                          style: FilledButton.styleFrom(
-                            backgroundColor: colorScheme.error,
-                            foregroundColor: colorScheme.onError,
-                          ),
-                          child: const Text('Hapus'),
-                        ),
-                      ],
-                    ),
-                  );
-                  if (confirm == true) {
-                    await ref.read(deleteArchiveControllerProvider.notifier).delete(archive.id);
-                    ref.invalidate(sessionArchivesControllerProvider(archive.sessionId));
-                  }
-                },
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
@@ -804,88 +751,4 @@ class _DetailRow extends StatelessWidget {
       ],
     );
   }
-}
-
-String _getFileExtension(String url) {
-  try {
-    final path = Uri.parse(url).path;
-    final dotIndex = path.lastIndexOf('.');
-    if (dotIndex != -1) {
-      return path.substring(dotIndex + 1).toLowerCase();
-    }
-  } catch (_) {}
-  return '';
-}
-
-bool _isImageFile(String url) {
-  final ext = _getFileExtension(url);
-  return ext == 'jpg' ||
-      ext == 'jpeg' ||
-      ext == 'png' ||
-      ext == 'gif' ||
-      ext == 'webp' ||
-      ext == 'bmp';
-}
-
-Widget _buildMaterialThumbnail(BuildContext context, String fileUrl) {
-  final colorScheme = Theme.of(context).colorScheme;
-  if (_isImageFile(fileUrl)) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: CachedNetworkImage(
-        imageUrl: ApiConstants.resolveImageUrl(fileUrl),
-        width: 40,
-        height: 40,
-        fit: BoxFit.cover,
-        placeholder: (context, url) => Container(
-          width: 40,
-          height: 40,
-          color: colorScheme.surfaceContainerHighest,
-          child: const Center(
-            child: SizedBox(
-              width: 16,
-              height: 16,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
-          ),
-        ),
-        errorWidget: (context, url, error) => Container(
-          width: 40,
-          height: 40,
-          color: colorScheme.errorContainer,
-          child: Icon(Icons.broken_image, size: 20, color: colorScheme.error),
-        ),
-      ),
-    );
-  }
-
-  final ext = _getFileExtension(fileUrl);
-  IconData iconData = Icons.description_outlined;
-  Color iconColor = colorScheme.primary;
-  Color bgColor = colorScheme.primaryContainer.withValues(alpha: 0.3);
-
-  if (ext == 'pdf') {
-    iconData = Icons.picture_as_pdf_outlined;
-    iconColor = colorScheme.error;
-    bgColor = colorScheme.errorContainer.withValues(alpha: 0.3);
-  } else if (ext == 'xlsx' || ext == 'xls' || ext == 'csv') {
-    iconData = Icons.table_chart_outlined;
-    iconColor = Colors.green;
-    bgColor = Colors.green.withValues(alpha: 0.15);
-  } else if (ext == 'docx' || ext == 'doc' || ext == 'txt') {
-    iconData = Icons.article_outlined;
-    iconColor = colorScheme.primary;
-    bgColor = colorScheme.primaryContainer.withValues(alpha: 0.3);
-  } else if (fileUrl.startsWith('http') && !fileUrl.contains('.')) {
-    iconData = Icons.link;
-    iconColor = colorScheme.secondary;
-    bgColor = colorScheme.secondaryContainer.withValues(alpha: 0.3);
-  }
-
-  return Container(
-    width: 40,
-    height: 40,
-    decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(8)),
-    child: Icon(iconData, color: iconColor, size: 20),
-  );
 }

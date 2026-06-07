@@ -18,6 +18,7 @@ abstract class ArchiveModel with _$ArchiveModel implements ArchiveItem {
     required String fileUrl,
     @JsonKey(fromJson: JsonUtils.dateTimeFromJson, toJson: JsonUtils.dateTimeToJson)
     required DateTime createdAt,
+    String? localFilePath,
   }) = _ArchiveModel;
 
   factory ArchiveModel.fromJson(Map<String, dynamic> json) => _$ArchiveModelFromJson(json);

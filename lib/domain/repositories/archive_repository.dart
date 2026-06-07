@@ -13,4 +13,5 @@ abstract class ArchiveRepository {
   Future<Either<Failure, List<ArchiveItem>>> getArchives(String sessionId);
   Future<Either<Failure, String>> uploadImage(String filePath);
   Future<Either<Failure, void>> deleteArchive(String id);
+  Future<Either<Failure, ArchiveItem>> downloadArchive(ArchiveItem item);
 }

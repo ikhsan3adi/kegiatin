@@ -7,6 +7,7 @@ class ArchiveItem {
   final ArchiveType type;
   final String fileUrl;
   final DateTime createdAt;
+  final String? localFilePath;
 
   const ArchiveItem({
     required this.id,
@@ -15,5 +16,6 @@ class ArchiveItem {
     required this.type,
     required this.fileUrl,
     required this.createdAt,
+    this.localFilePath,
   });
 }
