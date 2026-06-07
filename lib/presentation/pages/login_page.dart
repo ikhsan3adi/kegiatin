@@ -41,6 +41,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     // Router redirect will handle navigation to home when auth state changes
   }
 
+  Future<void> _handleGoogleLogin() async {
+    final error = await ref.read(authControllerProvider.notifier).loginWithGoogle();
+
+    if (!mounted) return;
+
+    if (error != null) {
+      SnackBarHelper.showError(context, error);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);
@@ -224,6 +234,44 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                         : const Text('LOGIN'),
                                   ),
                                   const SizedBox(height: 16),
+                                  Row(
+                                    children: [
+                                      Expanded(child: Divider(color: colorScheme.outlineVariant)),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                                        child: Text(
+                                          'ATAU',
+                                          style: textTheme.labelMedium?.copyWith(
+                                            color: colorScheme.onSurfaceVariant,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(child: Divider(color: colorScheme.outlineVariant)),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+                                  OutlinedButton(
+                                    onPressed: authState.isLoading ? null : _handleGoogleLogin,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        const Text(
+                                          'G  ',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Masuk dengan Google',
+                                          style: textTheme.labelLarge?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                   const SizedBox(height: 24),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,

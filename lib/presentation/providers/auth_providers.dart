@@ -5,6 +5,7 @@ import 'package:kegiatin/domain/usecases/get_current_user_usecase.dart';
 import 'package:kegiatin/domain/usecases/login_usecase.dart';
 import 'package:kegiatin/domain/usecases/logout_usecase.dart';
 import 'package:kegiatin/domain/usecases/register_usecase.dart';
+import 'package:kegiatin/domain/usecases/google_login_usecase.dart';
 import 'package:kegiatin/presentation/providers/core_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -25,6 +26,10 @@ AuthRepository authRepository(Ref ref) => AuthRepositoryImpl(
 
 @Riverpod(keepAlive: true)
 LoginUseCase loginUseCase(Ref ref) => LoginUseCase(ref.watch(authRepositoryProvider));
+
+@Riverpod(keepAlive: true)
+GoogleLoginUseCase googleLoginUseCase(Ref ref) =>
+    GoogleLoginUseCase(ref.watch(authRepositoryProvider));
 
 @Riverpod(keepAlive: true)
 RegisterUseCase registerUseCase(Ref ref) => RegisterUseCase(ref.watch(authRepositoryProvider));

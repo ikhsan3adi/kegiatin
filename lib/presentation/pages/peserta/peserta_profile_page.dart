@@ -78,7 +78,8 @@ class PesertaProfilePage extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      if (user != null) ProfileCard(email: user.email, joinedAt: user.createdAt.toLocal()),
+                      if (user != null)
+                        ProfileCard(email: user.email, joinedAt: user.createdAt.toLocal()),
                       const SizedBox(height: 16),
                       SettingsCard(
                         items: [
