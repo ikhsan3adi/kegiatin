@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kegiatin/core/theme/custom.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -40,7 +41,7 @@ class _QrScannerTabState extends State<QrScannerTab> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    final bool isDesktop = Platform.isWindows || Platform.isMacOS || Platform.isLinux;
+    final bool isDesktop = !kIsWeb && (Platform.isWindows || Platform.isMacOS || Platform.isLinux);
 
     return Column(
       children: [
