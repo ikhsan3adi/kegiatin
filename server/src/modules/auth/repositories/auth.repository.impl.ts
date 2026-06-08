@@ -5,7 +5,7 @@ import { DRIZZLE } from '../../../database/drizzle.provider';
 import type { DrizzleDB } from '../../../database/drizzle.provider';
 import { users } from '../../../database/schema';
 import { IAuthRepository } from '../domain/auth.repository';
-import { ICreateUserData, IUser } from '../domain/user.types';
+import { ICreateGoogleUserData, ICreateUserData, IUser } from '../domain/user.types';
 
 @Injectable()
 export class DrizzleAuthRepository extends IAuthRepository {
@@ -31,6 +31,15 @@ export class DrizzleAuthRepository extends IAuthRepository {
     return rows[0] ? this.toDomain(rows[0]) : null;
   }
 
+  async findByGoogleId(googleId: string): Promise<IUser | null> {
+    const rows = await this.db
+      .select()
+      .from(users)
+      .where(eq(users.googleId, googleId))
+      .limit(1);
+    return rows[0] ? this.toDomain(rows[0]) : null;
+  }
+
   async create(data: ICreateUserData): Promise<IUser> {
     const [row] = await this.db
       .insert(users)
@@ -47,6 +56,36 @@ export class DrizzleAuthRepository extends IAuthRepository {
     return this.toDomain(row);
   }
 
+  async createGoogleUser(data: ICreateGoogleUserData): Promise<IUser> {
+    const [row] = await this.db
+      .insert(users)
+      .values({
+        id: uuidv7(),
+        email: data.email.toLowerCase(),
+        password: null,
+        googleId: data.googleId,
+        authProvider: 'google',
+        displayName: data.displayName,
+        photoUrl: data.photoUrl ?? null,
+        role: data.role,
+        emailVerified: true,
+      })
+      .returning();
+    return this.toDomain(row);
+  }
+
+  async linkGoogleId(userId: string, googleId: string): Promise<void> {
+    await this.db
+      .update(users)
+      .set({
+        googleId,
+        authProvider: 'google',
+        emailVerified: true,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId));
+  }
+
   async updateRefreshTokenHash(
     userId: string,
     hash: string | null,
@@ -61,7 +100,9 @@ export class DrizzleAuthRepository extends IAuthRepository {
     return {
       id: row.id,
       email: row.email,
-      password: row.password,
+      password: row.password ?? null,
+      googleId: row.googleId ?? null,
+      authProvider: row.authProvider,
       displayName: row.displayName,
       role: row.role as IUser['role'],
       npa: row.npa ?? null,

@@ -41,6 +41,26 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<Either<Failure, AuthResponse>> loginWithGoogle(String idToken) async {
+    if (!await networkInfo.isConnected) {
+      return const Left(NetworkFailure());
+    }
+
+    try {
+      final response = await remoteDataSource.loginWithGoogle(idToken);
+      await localDataSource.saveTokens(response.accessToken, response.refreshToken);
+      await localDataSource.saveUser(response.user);
+      return Right(response);
+    } on UnauthorizedException catch (e) {
+      return Left(AuthFailure(e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, statusCode: e.statusCode));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, User>> register(RegisterInput input) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure());

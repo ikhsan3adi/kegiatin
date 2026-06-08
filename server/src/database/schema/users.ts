@@ -10,7 +10,9 @@ import { userRoleEnum } from './enums';
 export const users = pgTable('users', {
   id: uuid('id').primaryKey(),
   email: varchar('email', { length: 255 }).notNull().unique(),
-  password: varchar('password', { length: 255 }).notNull(),
+  password: varchar('password', { length: 255 }),
+  googleId: varchar('google_id', { length: 255 }).unique(),
+  authProvider: varchar('auth_provider', { length: 50 }).notNull().default('local'),
   displayName: varchar('display_name', { length: 255 }).notNull(),
   role: userRoleEnum('role').notNull().default('MEMBER'),
   npa: varchar('npa', { length: 100 }),

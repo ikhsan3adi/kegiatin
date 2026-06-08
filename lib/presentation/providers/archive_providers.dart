@@ -3,6 +3,7 @@ import 'package:kegiatin/data/datasources/remote/uploads_remote_datasource.dart'
 import 'package:kegiatin/data/repositories/archive_repository_impl.dart';
 import 'package:kegiatin/domain/repositories/archive_repository.dart';
 import 'package:kegiatin/domain/usecases/archive/delete_archive_usecase.dart';
+import 'package:kegiatin/domain/usecases/archive/download_archive_usecase.dart';
 import 'package:kegiatin/domain/usecases/archive/get_archives_usecase.dart';
 import 'package:kegiatin/domain/usecases/archive/upload_materi_usecase.dart';
 import 'package:kegiatin/presentation/providers/core_providers.dart';
@@ -24,6 +25,7 @@ ArchiveRepository archiveRepository(Ref ref) => ArchiveRepositoryImpl(
   uploadsRemoteDataSource: ref.watch(uploadsRemoteDataSourceProvider),
   localDataSource: ref.watch(archiveLocalDataSourceProvider),
   networkInfo: ref.watch(networkInfoProvider),
+  dio: ref.watch(dioClientProvider).dio,
 );
 
 @riverpod
@@ -37,3 +39,7 @@ GetArchivesUseCase getArchivesUseCase(Ref ref) =>
 @riverpod
 DeleteArchiveUseCase deleteArchiveUseCase(Ref ref) =>
     DeleteArchiveUseCase(ref.watch(archiveRepositoryProvider));
+
+@riverpod
+DownloadArchiveUseCase downloadArchiveUseCase(Ref ref) =>
+    DownloadArchiveUseCase(ref.watch(archiveRepositoryProvider));

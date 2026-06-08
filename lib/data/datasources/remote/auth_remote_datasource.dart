@@ -7,6 +7,7 @@ import 'package:kegiatin/domain/entities/register_input.dart';
 
 abstract class AuthRemoteDataSource {
   Future<AuthResponseModel> login(String email, String password);
+  Future<AuthResponseModel> loginWithGoogle(String idToken);
   Future<UserModel> register(RegisterInput input);
   Future<UserModel> getCurrentUser();
   Future<String> refreshToken(String refreshToken);
@@ -39,6 +40,30 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final data = e.response?.data;
       final message = (data is Map<String, dynamic>) ? data['message'] : null;
       throw ServerException(message ?? 'Gagal login', statusCode: e.response?.statusCode);
+    }
+  }
+
+  @override
+  Future<AuthResponseModel> loginWithGoogle(String idToken) async {
+    try {
+      final response = await dio.post(ApiConstants.googleLogin, data: {'idToken': idToken});
+      final responseData = response.data as Map<String, dynamic>;
+      final payload = responseData['data'] as Map<String, dynamic>;
+      return AuthResponseModel(
+        user: UserModel.fromJson(payload['user'] as Map<String, dynamic>),
+        accessToken: (payload['tokens'] as Map<String, dynamic>)['accessToken'] as String,
+        refreshToken: (payload['tokens'] as Map<String, dynamic>)['refreshToken'] as String,
+      );
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        throw const UnauthorizedException('Token Google tidak valid');
+      }
+      final data = e.response?.data;
+      final message = (data is Map<String, dynamic>) ? data['message'] : null;
+      throw ServerException(
+        message ?? 'Gagal login dengan Google',
+        statusCode: e.response?.statusCode,
+      );
     }
   }
 

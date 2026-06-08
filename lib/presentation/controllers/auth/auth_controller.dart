@@ -1,3 +1,5 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kegiatin/core/errors/failures.dart';
 import 'package:kegiatin/domain/entities/login_input.dart';
 import 'package:kegiatin/domain/entities/register_input.dart';
@@ -27,13 +29,22 @@ class AuthController extends _$AuthController {
     return result.fold((failure) async {
       if (failure is AuthFailure) {
         // Token definitively rejected by server — force re-login.
-        await localDS.clearAll();
+        await _clearAllCaches();
         return null;
       }
       // Network/server error — stay logged in with cached user.
       final cached = await localDS.getCachedUser();
       return cached;
     }, (user) => user);
+  }
+
+  Future<void> _clearAllCaches() async {
+    await ref.read(authLocalDataSourceProvider).clearAll();
+    await ref.read(eventLocalDataSourceProvider).clearAll();
+    await ref.read(rsvpLocalDataSourceProvider).clearAll();
+    await ref.read(attendanceLocalDataSourceProvider).clearAll();
+    await ref.read(archiveLocalDataSourceProvider).clearAll();
+    await ref.read(historyLocalDataSourceProvider).clearAll();
   }
 
   Future<String?> login(LoginInput input) async {
@@ -49,6 +60,39 @@ class AuthController extends _$AuthController {
         return null;
       },
     );
+  }
+
+  Future<String?> loginWithGoogle() async {
+    state = const AsyncLoading();
+    try {
+      final serverClientId = dotenv.env['GOOGLE_SERVER_CLIENT_ID'];
+      final googleSignIn = GoogleSignIn(serverClientId: serverClientId);
+      final account = await googleSignIn.signIn();
+      if (account == null) {
+        state = const AsyncData(null);
+        return null;
+      }
+      final auth = await account.authentication;
+      final idToken = auth.idToken;
+      if (idToken == null) {
+        state = AsyncError('Gagal mendapatkan token', StackTrace.current);
+        return 'Gagal mendapatkan token dari Google';
+      }
+      final result = await ref.read(googleLoginUseCaseProvider).call(idToken);
+      return result.fold(
+        (failure) {
+          state = AsyncError(failure, StackTrace.current);
+          return failure.message;
+        },
+        (authResponse) {
+          state = AsyncData(authResponse.user);
+          return null;
+        },
+      );
+    } catch (e) {
+      state = AsyncError(e, StackTrace.current);
+      return 'Gagal login dengan Google';
+    }
   }
 
   Future<String?> register(RegisterInput input) async {
@@ -68,6 +112,7 @@ class AuthController extends _$AuthController {
 
   Future<void> logout() async {
     await ref.read(logoutUseCaseProvider).call(NoInput.instance);
+    await _clearAllCaches();
     state = const AsyncData(null);
   }
 }

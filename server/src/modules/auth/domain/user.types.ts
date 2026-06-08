@@ -6,7 +6,9 @@ export enum UserRole {
 export interface IUser {
   id: string;
   email: string;
-  password: string;
+  password: string | null;
+  googleId: string | null;
+  authProvider: string;
   displayName: string;
   role: UserRole;
   npa: string | null;
@@ -17,6 +19,15 @@ export interface IUser {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface ICreateGoogleUserData {
+  email: string;
+  googleId: string;
+  displayName: string;
+  photoUrl: string | null;
+  role: UserRole;
+}
+
 
 export interface IUserProfile {
   id: string;
