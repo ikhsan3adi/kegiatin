@@ -99,28 +99,30 @@ class _SplashPageState extends ConsumerState<SplashPage> {
                           fit: BoxFit.contain,
                         ),
                         SizedBox(height: h * 0.02),
-                        IntrinsicWidth(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: Text(
-                                  'KEGIATIN',
-                                  maxLines: 1,
-                                  softWrap: false,
-                                  textAlign: TextAlign.center,
-                                  style: textTheme.displayMedium?.copyWith(
-                                    fontSize: fontSize,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: 2.5,
-                                    color: brandColor,
-                                  ),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Container(
+                            padding: const EdgeInsets.only(bottom: 4),
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: brandColor,
+                                  width: 3.0,
                                 ),
                               ),
-                              const SizedBox(height: 8),
-                              Divider(color: brandColor, thickness: 3, height: 3),
-                            ],
+                            ),
+                            child: Text(
+                              'KEGIATIN',
+                              maxLines: 1,
+                              softWrap: false,
+                              textAlign: TextAlign.center,
+                              style: textTheme.displayMedium?.copyWith(
+                                fontSize: fontSize,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 2.5,
+                                color: brandColor,
+                              ),
+                            ),
                           ),
                         ),
                       ],
