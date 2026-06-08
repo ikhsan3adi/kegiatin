@@ -18,6 +18,7 @@ Future<void> main() async {
   final attendanceBox = await Hive.openBox(DbConstants.attendanceBox);
   final archiveBox = await Hive.openBox(DbConstants.archiveBox);
   final profileBox = await Hive.openBox(DbConstants.profileBox);
+  final notificationBox = await Hive.openBox(DbConstants.notificationBox);
   final sharedPreferences = await SharedPreferences.getInstance();
 
   runApp(
@@ -30,6 +31,7 @@ Future<void> main() async {
         attendanceBoxProvider.overrideWithValue(attendanceBox),
         archiveBoxProvider.overrideWithValue(archiveBox),
         profileBoxProvider.overrideWithValue(profileBox),
+        notificationBoxProvider.overrideWithValue(notificationBox),
       ],
       child: const MyApp(),
     ),

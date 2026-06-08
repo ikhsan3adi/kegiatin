@@ -15,6 +15,7 @@ import 'package:kegiatin/presentation/pages/login_page.dart';
 import 'package:kegiatin/presentation/pages/onboarding_page.dart';
 import 'package:kegiatin/presentation/pages/register_page.dart';
 import 'package:kegiatin/presentation/pages/splash_page.dart';
+import 'package:kegiatin/presentation/pages/notification_page.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_router.g.dart';
@@ -100,6 +101,7 @@ GoRouter appRouter(Ref ref) {
           ),
           GoRoute(path: 'scan', builder: (_, _) => const QrScanPage()),
           GoRoute(path: 'edit-profile', builder: (_, _) => const EditProfilePage()),
+          GoRoute(path: 'notifications', builder: (_, _) => const NotificationPage()),
         ],
       ),
       GoRoute(
@@ -112,6 +114,7 @@ GoRouter appRouter(Ref ref) {
                 PesertaEventDetailPage(eventId: state.pathParameters['eventId']!),
           ),
           GoRoute(path: 'edit-profile', builder: (_, _) => const EditProfilePage()),
+          GoRoute(path: 'notifications', builder: (_, _) => const NotificationPage()),
           GoRoute(
             path: 'qr/:eventId',
             builder: (context, state) =>

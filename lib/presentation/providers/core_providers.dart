@@ -43,6 +43,9 @@ Box<dynamic> profileBox(Ref ref) => throw UnimplementedError('Override di Provid
 Box<dynamic> attendanceBox(Ref ref) => throw UnimplementedError('Override di ProviderScope');
 
 @Riverpod(keepAlive: true)
+Box<dynamic> notificationBox(Ref ref) => throw UnimplementedError('Override di ProviderScope');
+
+@Riverpod(keepAlive: true)
 ArchiveLocalDataSource archiveLocalDataSource(Ref ref) =>
     ArchiveLocalDataSourceImpl(archiveBox: ref.watch(archiveBoxProvider));
 
