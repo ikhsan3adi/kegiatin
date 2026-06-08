@@ -151,7 +151,8 @@ abstract final class SnackBarHelper {
                             Text(
                               title,
                               textAlign: TextAlign.center,
-                              style: textTheme.titleLarge?.copyWith(
+                              style: textTheme.bodyLarge?.copyWith(
+                                fontSize: 18,
                                 fontWeight: FontWeight.w800,
                                 letterSpacing: -0.5,
                                 color: colorScheme.onSurface,
@@ -162,7 +163,7 @@ abstract final class SnackBarHelper {
                             Text(
                               message,
                               textAlign: TextAlign.center,
-                              style: textTheme.bodyLarge?.copyWith(
+                              style: textTheme.bodyMedium?.copyWith(
                                 color: colorScheme.onSurfaceVariant,
                                 height: 1.5,
                               ),
@@ -182,12 +183,13 @@ abstract final class SnackBarHelper {
                                   elevation: 0,
                                 ),
                                 onPressed: dismiss,
-                                child: const Text(
+                                child: Text(
                                   'Mengerti',
-                                  style: TextStyle(
+                                  style: textTheme.labelLarge?.copyWith(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
                                     letterSpacing: 0.2,
+                                    color: KegiatinCustomTheme.onGradient,
                                   ),
                                 ),
                               ),
