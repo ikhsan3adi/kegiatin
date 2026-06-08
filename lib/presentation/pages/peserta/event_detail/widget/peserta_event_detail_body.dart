@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,6 +22,8 @@ import 'package:kegiatin/presentation/controllers/rsvp/my_rsvp_controller.dart';
 import 'package:kegiatin/presentation/pages/fullscreen_image_page.dart';
 import 'package:kegiatin/presentation/pages/peserta/peserta_riwayat_page.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:kegiatin/presentation/widgets/archive_item_row.dart';
+import 'package:kegiatin/presentation/providers/core_providers.dart';
 
 /// Konten scrollable halaman detail event peserta.
 ///
@@ -693,7 +696,7 @@ class _PesertaSessionArchiveSection extends ConsumerWidget {
               }
               return Column(
                 children: list.map((a) {
-                  return _PesertaArchiveRow(archive: a, isAccessible: isPresentOrLate);
+                  return ArchiveItemRow(archive: a, isAccessible: isPresentOrLate);
                 }).toList(),
               );
             },
@@ -702,173 +705,4 @@ class _PesertaSessionArchiveSection extends ConsumerWidget {
       ),
     );
   }
-}
-
-class _PesertaArchiveRow extends StatelessWidget {
-  const _PesertaArchiveRow({required this.archive, required this.isAccessible});
-
-  final ArchiveItem archive;
-  final bool isAccessible;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final isImg = _isImageFile(archive.fileUrl);
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: InkWell(
-        onTap: () async {
-          if (!isAccessible) {
-            SnackBarHelper.showWarning(
-              context,
-              'Akses materi hanya untuk peserta yang hadir/terlambat pada sesi ini',
-            );
-            return;
-          }
-          if (isImg) {
-            await Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => FullscreenImagePage(imageUrl: archive.fileUrl)),
-            );
-          } else {
-            final uri = Uri.parse(archive.fileUrl);
-            if (await canLaunchUrl(uri)) {
-              await launchUrl(uri, mode: LaunchMode.inAppWebView);
-            }
-          }
-        },
-        borderRadius: BorderRadius.circular(8),
-        child: Opacity(
-          opacity: isAccessible ? 1.0 : 0.45,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-            child: Row(
-              children: [
-                if (isAccessible)
-                  _buildMaterialThumbnail(context, archive.fileUrl)
-                else
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: colorScheme.outlineVariant.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      Icons.lock_outline_rounded,
-                      color: colorScheme.onSurfaceVariant,
-                      size: 20,
-                    ),
-                  ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    archive.title,
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurface,
-                      fontWeight: isAccessible ? FontWeight.w500 : FontWeight.normal,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                if (isAccessible)
-                  Icon(
-                    isImg ? Icons.photo_outlined : Icons.open_in_new,
-                    size: 14,
-                    color: colorScheme.primary,
-                  ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-String _getFileExtension(String url) {
-  try {
-    final path = Uri.parse(url).path;
-    final dotIndex = path.lastIndexOf('.');
-    if (dotIndex != -1) {
-      return path.substring(dotIndex + 1).toLowerCase();
-    }
-  } catch (_) {}
-  return '';
-}
-
-bool _isImageFile(String url) {
-  final ext = _getFileExtension(url);
-  return ext == 'jpg' ||
-      ext == 'jpeg' ||
-      ext == 'png' ||
-      ext == 'gif' ||
-      ext == 'webp' ||
-      ext == 'bmp';
-}
-
-Widget _buildMaterialThumbnail(BuildContext context, String fileUrl) {
-  final colorScheme = Theme.of(context).colorScheme;
-  if (_isImageFile(fileUrl)) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: CachedNetworkImage(
-        imageUrl: ApiConstants.resolveImageUrl(fileUrl),
-        width: 40,
-        height: 40,
-        fit: BoxFit.cover,
-        placeholder: (context, url) => Container(
-          width: 40,
-          height: 40,
-          color: colorScheme.surfaceContainerHighest,
-          child: const Center(
-            child: SizedBox(
-              width: 16,
-              height: 16,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
-          ),
-        ),
-        errorWidget: (context, url, error) => Container(
-          width: 40,
-          height: 40,
-          color: colorScheme.errorContainer,
-          child: Icon(Icons.broken_image, size: 20, color: colorScheme.error),
-        ),
-      ),
-    );
-  }
-
-  final ext = _getFileExtension(fileUrl);
-  IconData iconData = Icons.description_outlined;
-  Color iconColor = colorScheme.primary;
-  Color bgColor = colorScheme.primaryContainer.withValues(alpha: 0.3);
-
-  if (ext == 'pdf') {
-    iconData = Icons.picture_as_pdf_outlined;
-    iconColor = colorScheme.error;
-    bgColor = colorScheme.errorContainer.withValues(alpha: 0.3);
-  } else if (ext == 'xlsx' || ext == 'xls' || ext == 'csv') {
-    iconData = Icons.table_chart_outlined;
-    iconColor = Colors.green;
-    bgColor = Colors.green.withValues(alpha: 0.15);
-  } else if (ext == 'docx' || ext == 'doc' || ext == 'txt') {
-    iconData = Icons.article_outlined;
-    iconColor = colorScheme.primary;
-    bgColor = colorScheme.primaryContainer.withValues(alpha: 0.3);
-  } else if (fileUrl.startsWith('http') && !fileUrl.contains('.')) {
-    iconData = Icons.link;
-    iconColor = colorScheme.secondary;
-    bgColor = colorScheme.secondaryContainer.withValues(alpha: 0.3);
-  }
-
-  return Container(
-    width: 40,
-    height: 40,
-    decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(8)),
-    child: Icon(iconData, color: iconColor, size: 20),
-  );
 }

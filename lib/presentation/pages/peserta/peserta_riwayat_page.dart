@@ -66,8 +66,9 @@ class _PesertaRiwayatPageState extends ConsumerState<PesertaRiwayatPage> {
     String? statusValue,
     ColorScheme colorScheme,
     TextTheme textTheme,
+    String? activeStatus,
   ) {
-    final isSelected = _selectedStatus == statusValue;
+    final isSelected = activeStatus == statusValue;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeInOut,
@@ -122,13 +123,14 @@ class _PesertaRiwayatPageState extends ConsumerState<PesertaRiwayatPage> {
     final textTheme = Theme.of(context).textTheme;
     final historyAsync = ref.watch(historyControllerProvider);
 
-    // Set dynamic default status if not initialized
-    historyAsync.whenData((list) {
-      if (_selectedStatus == 'INITIAL') {
-        final hasOngoing = list.any((r) => r.event.status == EventStatus.ongoing);
-        _selectedStatus = hasOngoing ? 'ONGOING' : 'PUBLISHED';
-      }
-    });
+    // Compute dynamic default status if not initialized, without causing side effects in the build phase
+    final activeStatus = _selectedStatus == 'INITIAL'
+        ? historyAsync.maybeWhen(
+            data: (list) =>
+                list.any((r) => r.event.status == EventStatus.ongoing) ? 'ONGOING' : 'PUBLISHED',
+            orElse: () => 'PUBLISHED',
+          )
+        : _selectedStatus;
 
     final filteredHistoryAsync = historyAsync.whenData((list) {
       // 1. Sort by closest registered event date
@@ -141,7 +143,7 @@ class _PesertaRiwayatPageState extends ConsumerState<PesertaRiwayatPage> {
             ? b.event.createdAt
             : b.event.sessions.map((s) => s.startTime).reduce((x, y) => x.isBefore(y) ? x : y);
 
-        if (_selectedStatus == 'COMPLETED') {
+        if (activeStatus == 'COMPLETED') {
           return dateB.compareTo(dateA); // Descending (newest first)
         }
         return dateA.compareTo(dateB); // Ascending (closest first)
@@ -149,10 +151,10 @@ class _PesertaRiwayatPageState extends ConsumerState<PesertaRiwayatPage> {
 
       // 2. Filter by status
       var result = sortedList;
-      if (_selectedStatus != 'INITIAL' && _selectedStatus != null) {
-        final statusEnum = _selectedStatus == 'ONGOING'
+      if (activeStatus != null) {
+        final statusEnum = activeStatus == 'ONGOING'
             ? EventStatus.ongoing
-            : _selectedStatus == 'PUBLISHED'
+            : activeStatus == 'PUBLISHED'
             ? EventStatus.published
             : EventStatus.completed;
         result = result.where((r) => r.event.status == statusEnum).toList();
@@ -244,13 +246,31 @@ class _PesertaRiwayatPageState extends ConsumerState<PesertaRiwayatPage> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      _buildFilterChip('Berlangsung', 'ONGOING', colorScheme, textTheme),
+                      _buildFilterChip(
+                        'Berlangsung',
+                        'ONGOING',
+                        colorScheme,
+                        textTheme,
+                        activeStatus,
+                      ),
                       const SizedBox(width: 8),
-                      _buildFilterChip('Akan Datang', 'PUBLISHED', colorScheme, textTheme),
+                      _buildFilterChip(
+                        'Akan Datang',
+                        'PUBLISHED',
+                        colorScheme,
+                        textTheme,
+                        activeStatus,
+                      ),
                       const SizedBox(width: 8),
-                      _buildFilterChip('Selesai', 'COMPLETED', colorScheme, textTheme),
+                      _buildFilterChip(
+                        'Selesai',
+                        'COMPLETED',
+                        colorScheme,
+                        textTheme,
+                        activeStatus,
+                      ),
                       const SizedBox(width: 8),
-                      _buildFilterChip('Semua', null, colorScheme, textTheme),
+                      _buildFilterChip('Semua', null, colorScheme, textTheme, activeStatus),
                     ],
                   ),
                 ),

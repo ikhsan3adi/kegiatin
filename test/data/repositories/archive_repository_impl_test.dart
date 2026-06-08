@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:kegiatin/core/errors/failures.dart';
@@ -10,14 +12,23 @@ import '../../helpers/fallback_values.dart';
 import '../../helpers/mock_definitions.dart';
 import '../../helpers/test_fixtures.dart';
 
+class MockDio extends Mock implements Dio {}
+
 void main() {
   late MockArchiveRemoteDataSource archiveRemoteDataSource;
   late MockUploadsRemoteDataSource uploadsRemoteDataSource;
   late MockArchiveLocalDataSource localDataSource;
   late MockNetworkInfo networkInfo;
+  late MockDio mockDio;
   late ArchiveRepositoryImpl repository;
 
   setUpAll(() {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    const MethodChannel('plugins.flutter.io/path_provider').setMockMethodCallHandler((
+      MethodCall methodCall,
+    ) async {
+      return '.';
+    });
     registerUseCaseFallbackValues();
     registerRepoFallbackValues();
   });
@@ -27,11 +38,13 @@ void main() {
     uploadsRemoteDataSource = MockUploadsRemoteDataSource();
     localDataSource = MockArchiveLocalDataSource();
     networkInfo = MockNetworkInfo();
+    mockDio = MockDio();
     repository = ArchiveRepositoryImpl(
       archiveRemoteDataSource: archiveRemoteDataSource,
       uploadsRemoteDataSource: uploadsRemoteDataSource,
       localDataSource: localDataSource,
       networkInfo: networkInfo,
+      dio: mockDio,
     );
   });
 
@@ -99,6 +112,7 @@ void main() {
         createdAt: entity.createdAt,
       );
       when(() => archiveRemoteDataSource.getArchives(any())).thenAnswer((_) async => [model]);
+      when(() => localDataSource.getCachedArchives(any())).thenAnswer((_) async => []);
       when(() => localDataSource.cacheArchives(any(), any())).thenAnswer((_) async {});
 
       final result = await repository.getArchives('session-1');
