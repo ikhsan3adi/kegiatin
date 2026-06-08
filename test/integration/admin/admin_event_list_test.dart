@@ -41,14 +41,16 @@ void main() {
       tEvent(id: '3', title: 'Kegiatan C', status: EventStatus.ongoing),
     ];
 
-    when(() => mocks.eventRepository.getEvents(
-      page: any(named: 'page'),
-      limit: any(named: 'limit'),
-      status: EventStatus.ongoing,
-      type: any(named: 'type'),
-      search: any(named: 'search'),
-      forceRefresh: any(named: 'forceRefresh'),
-    )).thenAnswer((_) async => Right(tPaginatedResult(events)));
+    when(
+      () => mocks.eventRepository.getEvents(
+        page: any(named: 'page'),
+        limit: any(named: 'limit'),
+        status: EventStatus.ongoing,
+        type: any(named: 'type'),
+        search: any(named: 'search'),
+        forceRefresh: any(named: 'forceRefresh'),
+      ),
+    ).thenAnswer((_) async => Right(tPaginatedResult(events)));
 
     await tester.pumpApp(const AdminEventPage(), overrides: overrides);
     await tester.pumpAndSettle();
@@ -61,24 +63,28 @@ void main() {
 
   testWidgets('IT-ADMIN-05: Event list — filter chip \'Draft\' memfilter event', (tester) async {
     // Initial ONGOING fetch stub
-    when(() => mocks.eventRepository.getEvents(
-      page: any(named: 'page'),
-      limit: any(named: 'limit'),
-      status: EventStatus.ongoing,
-      type: any(named: 'type'),
-      search: any(named: 'search'),
-      forceRefresh: any(named: 'forceRefresh'),
-    )).thenAnswer((_) async => Right(tPaginatedResult([])));
+    when(
+      () => mocks.eventRepository.getEvents(
+        page: any(named: 'page'),
+        limit: any(named: 'limit'),
+        status: EventStatus.ongoing,
+        type: any(named: 'type'),
+        search: any(named: 'search'),
+        forceRefresh: any(named: 'forceRefresh'),
+      ),
+    ).thenAnswer((_) async => Right(tPaginatedResult([])));
 
     // DRAFT fetch stub
-    when(() => mocks.eventRepository.getEvents(
-      page: any(named: 'page'),
-      limit: any(named: 'limit'),
-      status: EventStatus.draft,
-      type: any(named: 'type'),
-      search: any(named: 'search'),
-      forceRefresh: any(named: 'forceRefresh'),
-    )).thenAnswer((_) async => Right(tPaginatedResult([])));
+    when(
+      () => mocks.eventRepository.getEvents(
+        page: any(named: 'page'),
+        limit: any(named: 'limit'),
+        status: EventStatus.draft,
+        type: any(named: 'type'),
+        search: any(named: 'search'),
+        forceRefresh: any(named: 'forceRefresh'),
+      ),
+    ).thenAnswer((_) async => Right(tPaginatedResult([])));
 
     await tester.pumpApp(const AdminEventPage(), overrides: overrides);
     await tester.pumpAndSettle();
@@ -89,25 +95,29 @@ void main() {
     await tester.pumpAndSettle();
 
     // Verify DRAFT filter was passed to repository
-    verify(() => mocks.eventRepository.getEvents(
-      page: any(named: 'page'),
-      limit: any(named: 'limit'),
-      status: EventStatus.draft,
-      type: any(named: 'type'),
-      search: any(named: 'search'),
-      forceRefresh: any(named: 'forceRefresh'),
-    )).called(greaterThanOrEqualTo(1));
+    verify(
+      () => mocks.eventRepository.getEvents(
+        page: any(named: 'page'),
+        limit: any(named: 'limit'),
+        status: EventStatus.draft,
+        type: any(named: 'type'),
+        search: any(named: 'search'),
+        forceRefresh: any(named: 'forceRefresh'),
+      ),
+    ).called(greaterThanOrEqualTo(1));
   });
 
   testWidgets('IT-ADMIN-06: Event list — search memfilter event (debounce)', (tester) async {
-    when(() => mocks.eventRepository.getEvents(
-      page: any(named: 'page'),
-      limit: any(named: 'limit'),
-      status: EventStatus.ongoing,
-      type: any(named: 'type'),
-      search: any(named: 'search'),
-      forceRefresh: any(named: 'forceRefresh'),
-    )).thenAnswer((_) async => Right(tPaginatedResult([])));
+    when(
+      () => mocks.eventRepository.getEvents(
+        page: any(named: 'page'),
+        limit: any(named: 'limit'),
+        status: EventStatus.ongoing,
+        type: any(named: 'type'),
+        search: any(named: 'search'),
+        forceRefresh: any(named: 'forceRefresh'),
+      ),
+    ).thenAnswer((_) async => Right(tPaginatedResult([])));
 
     await tester.pumpApp(const AdminEventPage(), overrides: overrides);
     await tester.pumpAndSettle();
@@ -115,45 +125,50 @@ void main() {
     // Enter query 'Kajian' in search field
     final searchField = find.byType(TextField);
     await tester.enterText(searchField, 'Kajian');
-    
+
     // Pump immediately — should not trigger call because of 500ms debounce
     await tester.pump();
-    verifyNever(() => mocks.eventRepository.getEvents(
-      page: any(named: 'page'),
-      limit: any(named: 'limit'),
-      status: EventStatus.ongoing,
-      type: any(named: 'type'),
-      search: 'Kajian',
-      forceRefresh: any(named: 'forceRefresh'),
-    ));
+    verifyNever(
+      () => mocks.eventRepository.getEvents(
+        page: any(named: 'page'),
+        limit: any(named: 'limit'),
+        status: EventStatus.ongoing,
+        type: any(named: 'type'),
+        search: 'Kajian',
+        forceRefresh: any(named: 'forceRefresh'),
+      ),
+    );
 
     // Wait for 500ms debounce + fetch settling
     await tester.pumpAndSettle(const Duration(milliseconds: 600));
 
-    verify(() => mocks.eventRepository.getEvents(
-      page: any(named: 'page'),
-      limit: any(named: 'limit'),
-      status: EventStatus.ongoing,
-      type: any(named: 'type'),
-      search: 'Kajian',
-      forceRefresh: any(named: 'forceRefresh'),
-    )).called(greaterThanOrEqualTo(1));
+    verify(
+      () => mocks.eventRepository.getEvents(
+        page: any(named: 'page'),
+        limit: any(named: 'limit'),
+        status: EventStatus.ongoing,
+        type: any(named: 'type'),
+        search: 'Kajian',
+        forceRefresh: any(named: 'forceRefresh'),
+      ),
+    ).called(greaterThanOrEqualTo(1));
   });
 
   testWidgets('IT-ADMIN-07: Event list kosong menampilkan empty state', (tester) async {
-    when(() => mocks.eventRepository.getEvents(
-      page: any(named: 'page'),
-      limit: any(named: 'limit'),
-      status: EventStatus.ongoing,
-      type: any(named: 'type'),
-      search: any(named: 'search'),
-      forceRefresh: any(named: 'forceRefresh'),
-    )).thenAnswer((_) async => Right(tPaginatedResult([])));
+    when(
+      () => mocks.eventRepository.getEvents(
+        page: any(named: 'page'),
+        limit: any(named: 'limit'),
+        status: EventStatus.ongoing,
+        type: any(named: 'type'),
+        search: any(named: 'search'),
+        forceRefresh: any(named: 'forceRefresh'),
+      ),
+    ).thenAnswer((_) async => Right(tPaginatedResult([])));
 
     await tester.pumpApp(const AdminEventPage(), overrides: overrides);
     await tester.pumpAndSettle();
 
     expect(find.text('Belum ada kegiatan'), findsOneWidget);
   });
-
 }

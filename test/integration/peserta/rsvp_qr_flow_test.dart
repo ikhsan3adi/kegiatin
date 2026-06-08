@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:fpdart/fpdart.dart';
@@ -41,22 +40,23 @@ void main() {
     ];
 
     // Default stubs
-    when(() => mocks.eventRepository.getEventById('event-1'))
-        .thenAnswer((_) async => Right(event));
-    when(() => mocks.profileRepository.getHistory())
-        .thenAnswer((_) async => const Right([]));
+    when(() => mocks.eventRepository.getEventById('event-1')).thenAnswer((_) async => Right(event));
+    when(() => mocks.profileRepository.getHistory()).thenAnswer((_) async => const Right([]));
   });
 
   testWidgets('IT-RSVP-01: RSVP berhasil → status CONFIRMED', (tester) async {
     // Return no RSVP at first
-    when(() => mocks.rsvpRepository.getMyRsvps(
-      page: any(named: 'page'),
-      limit: any(named: 'limit'),
-    )).thenAnswer((_) async => Right(tPaginatedResult([])));
+    when(
+      () => mocks.rsvpRepository.getMyRsvps(
+        page: any(named: 'page'),
+        limit: any(named: 'limit'),
+      ),
+    ).thenAnswer((_) async => Right(tPaginatedResult([])));
 
     // RSVP creation returns success
-    when(() => mocks.rsvpRepository.createRsvp('event-1'))
-        .thenAnswer((_) async => Right(tRsvp(eventId: 'event-1', status: RsvpStatus.confirmed)));
+    when(
+      () => mocks.rsvpRepository.createRsvp('event-1'),
+    ).thenAnswer((_) async => Right(tRsvp(eventId: 'event-1', status: RsvpStatus.confirmed)));
 
     await tester.pumpApp(const PesertaEventDetailPage(eventId: 'event-1'), overrides: overrides);
     await tester.pumpAndSettle();
@@ -70,23 +70,26 @@ void main() {
     // Confirm dialog should appear
     expect(find.text('Konfirmasi RSVP'), findsOneWidget);
     final yesButton = find.text('Ya, Daftar');
-    
+
     // Stub updated getMyRsvps to return the newly created RSVP so UI updates
-    when(() => mocks.rsvpRepository.getMyRsvps(
-      page: any(named: 'page'),
-      limit: any(named: 'limit'),
-    )).thenAnswer((_) async => Right(tPaginatedResult([
-      tRsvp(eventId: 'event-1', status: RsvpStatus.confirmed)
-    ])));
+    when(
+      () => mocks.rsvpRepository.getMyRsvps(
+        page: any(named: 'page'),
+        limit: any(named: 'limit'),
+      ),
+    ).thenAnswer(
+      (_) async =>
+          Right(tPaginatedResult([tRsvp(eventId: 'event-1', status: RsvpStatus.confirmed)])),
+    );
 
     await tester.tap(yesButton);
     await tester.pumpAndSettle();
 
     verify(() => mocks.rsvpRepository.createRsvp('event-1')).called(1);
-    
+
     // Button should switch to "Lihat QR"
     expect(find.text('Lihat QR'), findsOneWidget);
-    
+
     // Cleanup snackbar
     await tester.tap(find.text('Mengerti'));
     await tester.pumpAndSettle();
@@ -94,14 +97,17 @@ void main() {
   });
 
   testWidgets('IT-RSVP-02: RSVP gagal — sudah terdaftar', (tester) async {
-    when(() => mocks.rsvpRepository.getMyRsvps(
-      page: any(named: 'page'),
-      limit: any(named: 'limit'),
-    )).thenAnswer((_) async => Right(tPaginatedResult([])));
+    when(
+      () => mocks.rsvpRepository.getMyRsvps(
+        page: any(named: 'page'),
+        limit: any(named: 'limit'),
+      ),
+    ).thenAnswer((_) async => Right(tPaginatedResult([])));
 
     // RSVP creation returns error
-    when(() => mocks.rsvpRepository.createRsvp('event-1'))
-        .thenAnswer((_) async => const Left(ServerFailure('Already registered')));
+    when(
+      () => mocks.rsvpRepository.createRsvp('event-1'),
+    ).thenAnswer((_) async => const Left(ServerFailure('Already registered')));
 
     await tester.pumpApp(const PesertaEventDetailPage(eventId: 'event-1'), overrides: overrides);
     await tester.pumpAndSettle();
@@ -123,10 +129,12 @@ void main() {
 
   testWidgets('IT-RSVP-03: QR Display — menampilkan QR code dari RSVP token', (tester) async {
     final rsvp = tRsvp(eventId: 'event-1', qrToken: 'qr-token-123', status: RsvpStatus.confirmed);
-    when(() => mocks.rsvpRepository.getMyRsvps(
-      page: any(named: 'page'),
-      limit: any(named: 'limit'),
-    )).thenAnswer((_) async => Right(tPaginatedResult([rsvp])));
+    when(
+      () => mocks.rsvpRepository.getMyRsvps(
+        page: any(named: 'page'),
+        limit: any(named: 'limit'),
+      ),
+    ).thenAnswer((_) async => Right(tPaginatedResult([rsvp])));
 
     await tester.pumpApp(const PesertaQrDisplayPage(eventId: 'event-1'), overrides: overrides);
     await tester.pumpAndSettle();

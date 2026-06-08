@@ -4,7 +4,6 @@ import 'package:mocktail/mocktail.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kegiatin/core/errors/failures.dart';
-import 'package:kegiatin/presentation/pages/register_page.dart';
 import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
 import '../../helpers/pump_app.dart';
 import '../../helpers/test_fixtures.dart';
@@ -37,8 +36,7 @@ void main() {
 
   testWidgets('IT-REG-01: Register berhasil sebagai Umum → redirect ke Login', (tester) async {
     final memberUser = tMemberUser();
-    when(() => mocks.authRepository.register(any()))
-        .thenAnswer((_) async => Right(memberUser));
+    when(() => mocks.authRepository.register(any())).thenAnswer((_) async => Right(memberUser));
 
     final router = await tester.pumpRouterApp(overrides: overrides, initialLocation: '/register');
 
@@ -63,7 +61,7 @@ void main() {
   });
 
   testWidgets('IT-REG-02: Register sebagai Anggota — field NPA dan Cabang muncul', (tester) async {
-    final router = await tester.pumpRouterApp(overrides: overrides, initialLocation: '/register');
+    await tester.pumpRouterApp(overrides: overrides, initialLocation: '/register');
 
     // Initially, NPA and Cabang should not be in the widget tree (General/Umum mode)
     expect(find.widgetWithText(TextFormField, 'NPA'), findsNothing);
@@ -80,7 +78,7 @@ void main() {
   });
 
   testWidgets('IT-REG-03: Register Anggota — NPA wajib diisi', (tester) async {
-    final router = await tester.pumpRouterApp(overrides: overrides, initialLocation: '/register');
+    await tester.pumpRouterApp(overrides: overrides, initialLocation: '/register');
 
     // Select 'Anggota' segment
     await tester.tap(find.text('Anggota'));
@@ -103,8 +101,9 @@ void main() {
   });
 
   testWidgets('IT-REG-04: Register gagal — server error', (tester) async {
-    when(() => mocks.authRepository.register(any()))
-        .thenAnswer((_) async => const Left(ServerFailure('Email already exists')));
+    when(
+      () => mocks.authRepository.register(any()),
+    ).thenAnswer((_) async => const Left(ServerFailure('Email already exists')));
 
     final router = await tester.pumpRouterApp(overrides: overrides, initialLocation: '/register');
 

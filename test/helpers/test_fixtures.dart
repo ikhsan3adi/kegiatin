@@ -84,14 +84,15 @@ Session tSession({
   capacity: 50,
 );
 
-Rsvp tRsvp({String? id, String? userId, String? eventId, String? qrToken, RsvpStatus? status}) => Rsvp(
-  id: id ?? 'rsvp-1',
-  userId: userId ?? 'user-1',
-  eventId: eventId ?? 'event-1',
-  qrToken: qrToken ?? 'qr-token-1',
-  status: status ?? RsvpStatus.confirmed,
-  createdAt: tFixedDate,
-);
+Rsvp tRsvp({String? id, String? userId, String? eventId, String? qrToken, RsvpStatus? status}) =>
+    Rsvp(
+      id: id ?? 'rsvp-1',
+      userId: userId ?? 'user-1',
+      eventId: eventId ?? 'event-1',
+      qrToken: qrToken ?? 'qr-token-1',
+      status: status ?? RsvpStatus.confirmed,
+      createdAt: tFixedDate,
+    );
 
 Attendance tAttendance({
   String? id,
@@ -186,7 +187,6 @@ CreateEventInput tCreateEventInput({List<SessionInput>? sessions}) => CreateEven
 UpdateEventInput tUpdateEventInput() =>
     const UpdateEventInput(title: 'Updated Event', description: 'Updated description');
 
-
 SessionInput tSessionInput() => SessionInput(
   title: 'Sesi 1',
   startTime: tFixedDate,
@@ -204,8 +204,10 @@ PaginatedResult<T> tPaginatedResult<T>(
   int limit = 10,
 }) => PaginatedResult<T>(data: data, total: total, page: page, limit: limit);
 
-User tAdminUser() => tUser(role: UserRole.admin, displayName: 'Admin Test', email: 'admin@test.com');
-User tMemberUser() => tUser(role: UserRole.member, displayName: 'Member Test', email: 'member@test.com');
+User tAdminUser() =>
+    tUser(role: UserRole.admin, displayName: 'Admin Test', email: 'admin@test.com');
+User tMemberUser() =>
+    tUser(role: UserRole.member, displayName: 'Member Test', email: 'member@test.com');
 
 List<Event> tEventList() => [
   tEvent(id: 'event-1', title: 'Kajian Rutin A', status: EventStatus.published),
@@ -213,4 +215,3 @@ List<Event> tEventList() => [
   tEvent(id: 'event-3', title: 'Seminar Pemuda', status: EventStatus.ongoing),
   tEvent(id: 'event-4', title: 'Event Selesai', status: EventStatus.completed),
 ];
-

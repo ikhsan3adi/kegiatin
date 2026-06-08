@@ -87,4 +87,3 @@ class MockBox<T> extends Mock implements Box<T> {}
 class MockSharedPreferences extends Mock implements SharedPreferences {}
 
 class MockGoRouter extends Mock implements GoRouter {}
-

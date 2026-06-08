@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:fpdart/fpdart.dart';
@@ -10,7 +9,6 @@ import 'package:kegiatin/presentation/pages/admin/widget/dashboard_card.dart';
 import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
 import '../../helpers/pump_app.dart';
 import '../../helpers/test_fixtures.dart';
-import '../auth/login_flow_test.dart';
 
 void main() {
   setUpAll(() {
@@ -24,14 +22,14 @@ void main() {
 
   setUp(() {
     mocks = TestAppMocks();
-    
+
     // Stub local storage for logged-in admin state
     when(() => mocks.sharedPreferences.getString(any())).thenReturn('token');
     when(() => mocks.sharedPreferences.getBool(any())).thenReturn(true);
     when(() => mocks.authBox.get(any())).thenReturn(null);
 
     final adminUser = tAdminUser();
-    
+
     overrides = [
       ...createProviderOverrides(mocks),
       authControllerProvider.overrideWith(() => FakeAuthController(initialUser: adminUser)),
@@ -40,14 +38,16 @@ void main() {
 
   testWidgets('IT-ADMIN-01: Dashboard menampilkan nama user yang login', (tester) async {
     // Mock getEvents to return some events
-    when(() => mocks.eventRepository.getEvents(
-      page: any(named: 'page'),
-      limit: any(named: 'limit'),
-      status: any(named: 'status'),
-      type: any(named: 'type'),
-      search: any(named: 'search'),
-      forceRefresh: any(named: 'forceRefresh'),
-    )).thenAnswer((_) async => Right(tPaginatedResult(tEventList())));
+    when(
+      () => mocks.eventRepository.getEvents(
+        page: any(named: 'page'),
+        limit: any(named: 'limit'),
+        status: any(named: 'status'),
+        type: any(named: 'type'),
+        search: any(named: 'search'),
+        forceRefresh: any(named: 'forceRefresh'),
+      ),
+    ).thenAnswer((_) async => Right(tPaginatedResult(tEventList())));
 
     await tester.pumpApp(const AdminDashboardPage(), overrides: overrides);
     await tester.pumpAndSettle();
@@ -64,29 +64,27 @@ void main() {
         id: '1',
         title: 'Event A',
         status: EventStatus.published,
-        sessions: [
-          tSession(startTime: now, endTime: now.add(const Duration(hours: 1))),
-        ],
+        sessions: [tSession(startTime: now, endTime: now.add(const Duration(hours: 1)))],
       ),
       // 1 event this month, status draft (counts as incomplete)
       tEvent(
         id: '2',
         title: 'Event B',
         status: EventStatus.draft,
-        sessions: [
-          tSession(startTime: now, endTime: now.add(const Duration(hours: 1))),
-        ],
+        sessions: [tSession(startTime: now, endTime: now.add(const Duration(hours: 1)))],
       ),
     ];
 
-    when(() => mocks.eventRepository.getEvents(
-      page: any(named: 'page'),
-      limit: any(named: 'limit'),
-      status: any(named: 'status'),
-      type: any(named: 'type'),
-      search: any(named: 'search'),
-      forceRefresh: any(named: 'forceRefresh'),
-    )).thenAnswer((_) async => Right(tPaginatedResult(events)));
+    when(
+      () => mocks.eventRepository.getEvents(
+        page: any(named: 'page'),
+        limit: any(named: 'limit'),
+        status: any(named: 'status'),
+        type: any(named: 'type'),
+        search: any(named: 'search'),
+        forceRefresh: any(named: 'forceRefresh'),
+      ),
+    ).thenAnswer((_) async => Right(tPaginatedResult(events)));
 
     await tester.pumpApp(const AdminDashboardPage(), overrides: overrides);
     await tester.pumpAndSettle();
@@ -94,5 +92,4 @@ void main() {
     // Verify stats cards are rendered (4 cards total)
     expect(find.byType(DashboardCard), findsNWidgets(4));
   });
-
 }

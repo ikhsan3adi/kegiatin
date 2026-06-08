@@ -90,10 +90,7 @@ List<Override> createProviderOverrides(TestAppMocks mocks) {
 
 extension PumpApp on WidgetTester {
   /// Pumps a widget inside a MaterialApp with custom overrides.
-  Future<void> pumpApp(
-    Widget widget, {
-    required List<Override> overrides,
-  }) async {
+  Future<void> pumpApp(Widget widget, {required List<Override> overrides}) async {
     view.physicalSize = const Size(1080, 1920);
     view.devicePixelRatio = 1.0;
     addTearDown(() {

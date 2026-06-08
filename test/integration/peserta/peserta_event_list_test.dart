@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:fpdart/fpdart.dart';
@@ -40,14 +39,16 @@ void main() {
       tEvent(id: '2', title: 'Kegiatan B', status: EventStatus.ongoing),
     ];
 
-    when(() => mocks.eventRepository.getEvents(
-      page: any(named: 'page'),
-      limit: any(named: 'limit'),
-      status: EventStatus.ongoing,
-      type: any(named: 'type'),
-      search: any(named: 'search'),
-      forceRefresh: any(named: 'forceRefresh'),
-    )).thenAnswer((_) async => Right(tPaginatedResult(events)));
+    when(
+      () => mocks.eventRepository.getEvents(
+        page: any(named: 'page'),
+        limit: any(named: 'limit'),
+        status: EventStatus.ongoing,
+        type: any(named: 'type'),
+        search: any(named: 'search'),
+        forceRefresh: any(named: 'forceRefresh'),
+      ),
+    ).thenAnswer((_) async => Right(tPaginatedResult(events)));
 
     await tester.pumpApp(const PesertaEventPage(), overrides: overrides);
     await tester.pumpAndSettle();
@@ -59,24 +60,28 @@ void main() {
 
   testWidgets('IT-PST-05: Event list — filter chip berfungsi', (tester) async {
     // ONGOING stub
-    when(() => mocks.eventRepository.getEvents(
-      page: any(named: 'page'),
-      limit: any(named: 'limit'),
-      status: EventStatus.ongoing,
-      type: any(named: 'type'),
-      search: any(named: 'search'),
-      forceRefresh: any(named: 'forceRefresh'),
-    )).thenAnswer((_) async => Right(tPaginatedResult([])));
+    when(
+      () => mocks.eventRepository.getEvents(
+        page: any(named: 'page'),
+        limit: any(named: 'limit'),
+        status: EventStatus.ongoing,
+        type: any(named: 'type'),
+        search: any(named: 'search'),
+        forceRefresh: any(named: 'forceRefresh'),
+      ),
+    ).thenAnswer((_) async => Right(tPaginatedResult([])));
 
     // COMPLETED stub
-    when(() => mocks.eventRepository.getEvents(
-      page: any(named: 'page'),
-      limit: any(named: 'limit'),
-      status: EventStatus.completed,
-      type: any(named: 'type'),
-      search: any(named: 'search'),
-      forceRefresh: any(named: 'forceRefresh'),
-    )).thenAnswer((_) async => Right(tPaginatedResult([])));
+    when(
+      () => mocks.eventRepository.getEvents(
+        page: any(named: 'page'),
+        limit: any(named: 'limit'),
+        status: EventStatus.completed,
+        type: any(named: 'type'),
+        search: any(named: 'search'),
+        forceRefresh: any(named: 'forceRefresh'),
+      ),
+    ).thenAnswer((_) async => Right(tPaginatedResult([])));
 
     await tester.pumpApp(const PesertaEventPage(), overrides: overrides);
     await tester.pumpAndSettle();
@@ -85,14 +90,15 @@ void main() {
     await tester.tap(find.text('Selesai'));
     await tester.pumpAndSettle();
 
-    verify(() => mocks.eventRepository.getEvents(
-      page: any(named: 'page'),
-      limit: any(named: 'limit'),
-      status: EventStatus.completed,
-      type: any(named: 'type'),
-      search: any(named: 'search'),
-      forceRefresh: any(named: 'forceRefresh'),
-    )).called(greaterThanOrEqualTo(1));
+    verify(
+      () => mocks.eventRepository.getEvents(
+        page: any(named: 'page'),
+        limit: any(named: 'limit'),
+        status: EventStatus.completed,
+        type: any(named: 'type'),
+        search: any(named: 'search'),
+        forceRefresh: any(named: 'forceRefresh'),
+      ),
+    ).called(greaterThanOrEqualTo(1));
   });
-
 }

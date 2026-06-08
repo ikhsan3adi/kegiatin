@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:fpdart/fpdart.dart';
@@ -10,7 +9,6 @@ import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
 import 'package:kegiatin/presentation/widgets/event_list_card.dart';
 import '../../helpers/pump_app.dart';
 import '../../helpers/test_fixtures.dart';
-import '../auth/login_flow_test.dart';
 
 void main() {
   setUpAll(() {
@@ -39,14 +37,16 @@ void main() {
   });
 
   testWidgets('IT-PST-01: Dashboard menampilkan nama peserta', (tester) async {
-    when(() => mocks.eventRepository.getEvents(
-      page: any(named: 'page'),
-      limit: any(named: 'limit'),
-      status: any(named: 'status'),
-      type: any(named: 'type'),
-      search: any(named: 'search'),
-      forceRefresh: any(named: 'forceRefresh'),
-    )).thenAnswer((_) async => Right(tPaginatedResult([])));
+    when(
+      () => mocks.eventRepository.getEvents(
+        page: any(named: 'page'),
+        limit: any(named: 'limit'),
+        status: any(named: 'status'),
+        type: any(named: 'type'),
+        search: any(named: 'search'),
+        forceRefresh: any(named: 'forceRefresh'),
+      ),
+    ).thenAnswer((_) async => Right(tPaginatedResult([])));
 
     await tester.pumpApp(const PesertaDashboardPage(), overrides: overrides);
     await tester.pumpAndSettle();
@@ -55,7 +55,9 @@ void main() {
     expect(find.text('Selamat Datang'), findsOneWidget);
   });
 
-  testWidgets('IT-PST-02: Dashboard menampilkan kegiatan terkini (ONGOING + PUBLISHED)', (tester) async {
+  testWidgets('IT-PST-02: Dashboard menampilkan kegiatan terkini (ONGOING + PUBLISHED)', (
+    tester,
+  ) async {
     final events = [
       tEvent(id: '1', title: 'Ongoing Event', status: EventStatus.ongoing),
       tEvent(id: '2', title: 'Published Event', status: EventStatus.published),
@@ -63,14 +65,16 @@ void main() {
       tEvent(id: '4', title: 'Completed Event', status: EventStatus.completed),
     ];
 
-    when(() => mocks.eventRepository.getEvents(
-      page: any(named: 'page'),
-      limit: any(named: 'limit'),
-      status: any(named: 'status'),
-      type: any(named: 'type'),
-      search: any(named: 'search'),
-      forceRefresh: any(named: 'forceRefresh'),
-    )).thenAnswer((_) async => Right(tPaginatedResult(events)));
+    when(
+      () => mocks.eventRepository.getEvents(
+        page: any(named: 'page'),
+        limit: any(named: 'limit'),
+        status: any(named: 'status'),
+        type: any(named: 'type'),
+        search: any(named: 'search'),
+        forceRefresh: any(named: 'forceRefresh'),
+      ),
+    ).thenAnswer((_) async => Right(tPaginatedResult(events)));
 
     await tester.pumpApp(const PesertaDashboardPage(), overrides: overrides);
     await tester.pumpAndSettle();
@@ -84,18 +88,18 @@ void main() {
   });
 
   testWidgets('IT-PST-03: Dashboard — empty state saat tidak ada kegiatan terbaru', (tester) async {
-    final events = [
-      tEvent(id: '1', title: 'Completed Event', status: EventStatus.completed),
-    ];
+    final events = [tEvent(id: '1', title: 'Completed Event', status: EventStatus.completed)];
 
-    when(() => mocks.eventRepository.getEvents(
-      page: any(named: 'page'),
-      limit: any(named: 'limit'),
-      status: any(named: 'status'),
-      type: any(named: 'type'),
-      search: any(named: 'search'),
-      forceRefresh: any(named: 'forceRefresh'),
-    )).thenAnswer((_) async => Right(tPaginatedResult(events)));
+    when(
+      () => mocks.eventRepository.getEvents(
+        page: any(named: 'page'),
+        limit: any(named: 'limit'),
+        status: any(named: 'status'),
+        type: any(named: 'type'),
+        search: any(named: 'search'),
+        forceRefresh: any(named: 'forceRefresh'),
+      ),
+    ).thenAnswer((_) async => Right(tPaginatedResult(events)));
 
     await tester.pumpApp(const PesertaDashboardPage(), overrides: overrides);
     await tester.pumpAndSettle();

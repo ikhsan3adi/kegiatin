@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:fpdart/fpdart.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kegiatin/domain/enums/event_status.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
-import 'package:kegiatin/domain/enums/event_visibility.dart';
-import 'package:kegiatin/presentation/pages/admin/create_event/create_event_page.dart';
 import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
-import 'package:kegiatin/core/errors/failures.dart';
 import '../../helpers/pump_app.dart';
 import '../../helpers/test_fixtures.dart';
 

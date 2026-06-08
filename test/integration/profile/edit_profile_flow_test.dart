@@ -3,12 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:kegiatin/presentation/pages/edit_profile_page.dart';
 import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
-import 'package:kegiatin/domain/enums/user_role.dart';
 import '../../helpers/pump_app.dart';
 import '../../helpers/test_fixtures.dart';
-import '../auth/login_flow_test.dart';
 
 void main() {
   setUpAll(() {
@@ -37,8 +34,9 @@ void main() {
 
   testWidgets('IT-PROF-01: Edit profile — update nama berhasil', (tester) async {
     final updatedUser = tUser(displayName: 'Updated Name');
-    when(() => mocks.profileRepository.updateProfile(any()))
-        .thenAnswer((_) async => Right(updatedUser));
+    when(
+      () => mocks.profileRepository.updateProfile(any()),
+    ).thenAnswer((_) async => Right(updatedUser));
 
     final router = await tester.pumpRouterApp(overrides: overrides, initialLocation: '/peserta');
 
@@ -48,10 +46,10 @@ void main() {
 
     final nameField = find.widgetWithText(TextFormField, 'Nama Tampilan');
     expect(nameField, findsOneWidget);
-    
+
     // Clear and enter new text
     await tester.enterText(nameField, 'Updated Name');
-    
+
     // Tap Save Changes
     final saveButton = find.widgetWithText(FilledButton, 'Simpan Perubahan');
     await tester.tap(saveButton);
@@ -75,7 +73,7 @@ void main() {
 
     final nameField = find.widgetWithText(TextFormField, 'Nama Tampilan');
     await tester.enterText(nameField, '');
-    
+
     final saveButton = find.widgetWithText(FilledButton, 'Simpan Perubahan');
     await tester.tap(saveButton);
     await tester.pumpAndSettle();

@@ -4,10 +4,6 @@ import 'package:mocktail/mocktail.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kegiatin/core/errors/failures.dart';
-import 'package:kegiatin/core/constants/db_constants.dart';
-import 'package:kegiatin/domain/enums/user_role.dart';
-import 'package:kegiatin/presentation/pages/login_page.dart';
-import 'package:kegiatin/presentation/pages/register_page.dart';
 import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
 import '../../helpers/pump_app.dart';
 import '../../helpers/test_fixtures.dart';
@@ -41,8 +37,7 @@ void main() {
     final adminUser = tAdminUser();
     final authResp = tAuthResponse(user: adminUser);
 
-    when(() => mocks.authRepository.login(any(), any()))
-        .thenAnswer((_) async => Right(authResp));
+    when(() => mocks.authRepository.login(any(), any())).thenAnswer((_) async => Right(authResp));
 
     final router = await tester.pumpRouterApp(overrides: overrides, initialLocation: '/login');
 
@@ -63,8 +58,7 @@ void main() {
     final memberUser = tMemberUser();
     final authResp = tAuthResponse(user: memberUser);
 
-    when(() => mocks.authRepository.login(any(), any()))
-        .thenAnswer((_) async => Right(authResp));
+    when(() => mocks.authRepository.login(any(), any())).thenAnswer((_) async => Right(authResp));
 
     final router = await tester.pumpRouterApp(overrides: overrides, initialLocation: '/login');
 
@@ -82,10 +76,11 @@ void main() {
   });
 
   testWidgets('IT-AUTH-03: Login gagal — credential salah', (tester) async {
-    when(() => mocks.authRepository.login(any(), any()))
-        .thenAnswer((_) async => const Left(AuthFailure('Invalid credentials')));
+    when(
+      () => mocks.authRepository.login(any(), any()),
+    ).thenAnswer((_) async => const Left(AuthFailure('Invalid credentials')));
 
-    final router = await tester.pumpRouterApp(overrides: overrides, initialLocation: '/login');
+    await tester.pumpRouterApp(overrides: overrides, initialLocation: '/login');
 
     final emailField = find.widgetWithText(TextFormField, 'Email');
     final passwordField = find.widgetWithText(TextFormField, 'Password');
@@ -105,7 +100,7 @@ void main() {
   });
 
   testWidgets('IT-AUTH-04: Login — validasi form: email kosong', (tester) async {
-    final router = await tester.pumpRouterApp(overrides: overrides, initialLocation: '/login');
+    await tester.pumpRouterApp(overrides: overrides, initialLocation: '/login');
 
     final passwordField = find.widgetWithText(TextFormField, 'Password');
     final loginButton = find.widgetWithText(FilledButton, 'LOGIN');
@@ -119,7 +114,7 @@ void main() {
   });
 
   testWidgets('IT-AUTH-05: Login — validasi form: password < 6 karakter', (tester) async {
-    final router = await tester.pumpRouterApp(overrides: overrides, initialLocation: '/login');
+    await tester.pumpRouterApp(overrides: overrides, initialLocation: '/login');
 
     final emailField = find.widgetWithText(TextFormField, 'Email');
     final passwordField = find.widgetWithText(TextFormField, 'Password');
@@ -136,13 +131,12 @@ void main() {
 
   testWidgets('IT-AUTH-06: Login — tombol disabled saat loading', (tester) async {
     // We mock login returning a delay so it stays in loading state
-    when(() => mocks.authRepository.login(any(), any()))
-        .thenAnswer((_) async {
-          await Future.delayed(const Duration(seconds: 2));
-          return const Left(AuthFailure('Timeout'));
-        });
+    when(() => mocks.authRepository.login(any(), any())).thenAnswer((_) async {
+      await Future.delayed(const Duration(seconds: 2));
+      return const Left(AuthFailure('Timeout'));
+    });
 
-    final router = await tester.pumpRouterApp(overrides: overrides, initialLocation: '/login');
+    await tester.pumpRouterApp(overrides: overrides, initialLocation: '/login');
 
     final emailField = find.widgetWithText(TextFormField, 'Email');
     final passwordField = find.widgetWithText(TextFormField, 'Password');
@@ -151,7 +145,7 @@ void main() {
     await tester.enterText(emailField, 'test@test.com');
     await tester.enterText(passwordField, 'password123');
     await tester.tap(loginButton);
-    
+
     // Pump a frame immediately (no delay) to assert loading state
     await tester.pump();
 
@@ -170,30 +164,25 @@ void main() {
     await tester.pump(const Duration(seconds: 5));
   });
   testWidgets('IT-AUTH-07: Login — toggle password visibility', (tester) async {
-    final router = await tester.pumpRouterApp(overrides: overrides, initialLocation: '/login');
+    await tester.pumpRouterApp(overrides: overrides, initialLocation: '/login');
 
     final passwordField = find.widgetWithText(TextFormField, 'Password');
-    final passwordTextField = tester.widget<TextField>(find.descendant(
-      of: passwordField,
-      matching: find.byType(TextField),
-    ));
+    final passwordTextField = tester.widget<TextField>(
+      find.descendant(of: passwordField, matching: find.byType(TextField)),
+    );
 
     // Initially obscured
     expect(passwordTextField.obscureText, isTrue);
 
     // Find visibility icon button and tap it
-    final visibilityToggle = find.descendant(
-      of: passwordField,
-      matching: find.byType(IconButton),
-    );
+    final visibilityToggle = find.descendant(of: passwordField, matching: find.byType(IconButton));
     await tester.tap(visibilityToggle);
     await tester.pumpAndSettle();
 
     // Obscure text should now be false
-    final updatedTextField = tester.widget<TextField>(find.descendant(
-      of: passwordField,
-      matching: find.byType(TextField),
-    ));
+    final updatedTextField = tester.widget<TextField>(
+      find.descendant(of: passwordField, matching: find.byType(TextField)),
+    );
     expect(updatedTextField.obscureText, isFalse);
   });
 
