@@ -65,23 +65,30 @@ Event tEvent({
   updatedAt: tFixedDate,
 );
 
-Session tSession({String? id, String? eventId, String? title, SessionStatus? status}) => Session(
+Session tSession({
+  String? id,
+  String? eventId,
+  String? title,
+  DateTime? startTime,
+  DateTime? endTime,
+  SessionStatus? status,
+}) => Session(
   id: id ?? 'session-1',
   eventId: eventId ?? 'event-1',
   title: title ?? 'Sesi 1',
-  startTime: tFixedDate,
-  endTime: tFixedDate.add(const Duration(hours: 2)),
+  startTime: startTime ?? tFixedDate,
+  endTime: endTime ?? (startTime ?? tFixedDate).add(const Duration(hours: 2)),
   location: 'Room A',
   order: 1,
   status: status ?? SessionStatus.scheduled,
   capacity: 50,
 );
 
-Rsvp tRsvp({String? id, String? userId, String? eventId, RsvpStatus? status}) => Rsvp(
+Rsvp tRsvp({String? id, String? userId, String? eventId, String? qrToken, RsvpStatus? status}) => Rsvp(
   id: id ?? 'rsvp-1',
   userId: userId ?? 'user-1',
   eventId: eventId ?? 'event-1',
-  qrToken: 'qr-token-1',
+  qrToken: qrToken ?? 'qr-token-1',
   status: status ?? RsvpStatus.confirmed,
   createdAt: tFixedDate,
 );
@@ -165,7 +172,6 @@ RegisterInput tRegisterInput() => const RegisterInput(
   npa: '12345',
   cabang: 'Kab. Bandung',
 );
-
 CreateEventInput tCreateEventInput({List<SessionInput>? sessions}) => CreateEventInput(
   title: 'Test Event',
   description: 'Test description',
@@ -179,6 +185,7 @@ CreateEventInput tCreateEventInput({List<SessionInput>? sessions}) => CreateEven
 
 UpdateEventInput tUpdateEventInput() =>
     const UpdateEventInput(title: 'Updated Event', description: 'Updated description');
+
 
 SessionInput tSessionInput() => SessionInput(
   title: 'Sesi 1',
@@ -196,3 +203,14 @@ PaginatedResult<T> tPaginatedResult<T>(
   int page = 1,
   int limit = 10,
 }) => PaginatedResult<T>(data: data, total: total, page: page, limit: limit);
+
+User tAdminUser() => tUser(role: UserRole.admin, displayName: 'Admin Test', email: 'admin@test.com');
+User tMemberUser() => tUser(role: UserRole.member, displayName: 'Member Test', email: 'member@test.com');
+
+List<Event> tEventList() => [
+  tEvent(id: 'event-1', title: 'Kajian Rutin A', status: EventStatus.published),
+  tEvent(id: 'event-2', title: 'Kajian Rutin B', status: EventStatus.draft),
+  tEvent(id: 'event-3', title: 'Seminar Pemuda', status: EventStatus.ongoing),
+  tEvent(id: 'event-4', title: 'Event Selesai', status: EventStatus.completed),
+];
+
