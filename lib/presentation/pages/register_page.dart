@@ -59,6 +59,16 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     }
   }
 
+  Future<void> _handleGoogleLogin() async {
+    final error = await ref.read(authControllerProvider.notifier).loginWithGoogle();
+
+    if (!mounted) return;
+
+    if (error != null) {
+      SnackBarHelper.showError(context, error);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);
@@ -184,12 +194,18 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             const SizedBox(height: 16),
             _buildDivider(colorScheme, textTheme),
             const SizedBox(height: 16),
-            OutlinedButton.icon(
-              onPressed: () {
-                /* TODO: Implement Google Sign In */
-              },
-              icon: const Icon(Icons.g_mobiledata),
-              label: const Text('Sign in with Google'),
+            OutlinedButton(
+              onPressed: authState.isLoading ? null : _handleGoogleLogin,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('G  ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                  Text(
+                    'Masuk dengan Google',
+                    style: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 24),
             _buildLoginLink(colorScheme),
@@ -326,7 +342,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Text(
-            'OR',
+            'ATAU',
             style: textTheme.labelMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.bold,

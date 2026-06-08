@@ -6,6 +6,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
+import { OAuth2Client } from 'google-auth-library';
 import { IAuthRepository } from './domain/auth.repository';
 import {
   IAuthTokens,
@@ -19,6 +20,8 @@ import { JwtPayload } from './strategies/jwt.strategy';
 
 @Injectable()
 export class AuthService {
+  private readonly googleClient = new OAuth2Client();
+
   constructor(
     private readonly authRepo: IAuthRepository,
     private readonly jwtService: JwtService,
@@ -46,13 +49,67 @@ export class AuthService {
 
   async login(email: string, password: string): Promise<ILoginResult> {
     const user = await this.authRepo.findByEmail(email);
-    if (!user) {
+    if (!user || !user.password) {
       throw new UnauthorizedException('Email atau password salah');
     }
 
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) {
       throw new UnauthorizedException('Email atau password salah');
+    }
+
+    const tokens = await this.generateTokens(user);
+    const hash = await bcrypt.hash(tokens.refreshToken, 10);
+    await this.authRepo.updateRefreshTokenHash(user.id, hash);
+
+    return { user: this.toProfile(user), tokens };
+  }
+
+  async googleLogin(idToken: string): Promise<ILoginResult> {
+    let payload;
+    try {
+      const clientId = this.configService.get<string>('GOOGLE_CLIENT_ID');
+      const ticket = await this.googleClient.verifyIdToken({
+        idToken,
+        ...(clientId ? { audience: clientId } : {}),
+      });
+      payload = ticket.getPayload();
+    } catch (error) {
+      throw new UnauthorizedException('Token Google tidak valid');
+    }
+
+    if (!payload) {
+      throw new UnauthorizedException('Token Google tidak valid');
+    }
+
+    const { sub: googleId, email, name: displayName, picture: photoUrl } = payload;
+    if (!email) {
+      throw new UnauthorizedException('Email Google tidak ditemukan');
+    }
+
+    let user = await this.authRepo.findByGoogleId(googleId);
+
+    if (!user) {
+      // Check if user exists with the same email
+      const existingUser = await this.authRepo.findByEmail(email);
+      if (existingUser) {
+        // Auto-link account
+        await this.authRepo.linkGoogleId(existingUser.id, googleId);
+        user = {
+          ...existingUser,
+          googleId,
+          authProvider: 'google',
+        };
+      } else {
+        // Create new Google user
+        user = await this.authRepo.createGoogleUser({
+          email,
+          googleId,
+          displayName: displayName || email.split('@')[0],
+          photoUrl: photoUrl || null,
+          role: UserRole.MEMBER,
+        });
+      }
     }
 
     const tokens = await this.generateTokens(user);

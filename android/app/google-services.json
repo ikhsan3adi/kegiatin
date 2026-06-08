@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "801795879663",
+    "project_id": "kegiatin-dev",
+    "storage_bucket": "kegiatin-dev.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:801795879663:android:bda1f2ea0f7f3352bca11a",
+        "android_client_info": {
+          "package_name": "id.or.persis.kegiatin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "801795879663-89kk6jke8o66com1es168rrkn0nsl8b2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "id.or.persis.kegiatin",
+            "certificate_hash": "cff372182ad071ceb2e0595b87859a3c204f1c32"
+          }
+        },
+        {
+          "client_id": "801795879663-9g1vket8hc2gqc3ru0qk50md1cto69ei.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCm8dgWHJEnfkJrW0dtpxTTmQYjbm95w3I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "801795879663-9g1vket8hc2gqc3ru0qk50md1cto69ei.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
