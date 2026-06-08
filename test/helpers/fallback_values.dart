@@ -12,6 +12,7 @@ import 'package:kegiatin/domain/entities/create_event_input.dart';
 import 'package:kegiatin/domain/entities/register_input.dart';
 import 'package:kegiatin/domain/entities/session_input.dart';
 import 'package:kegiatin/domain/entities/update_event_input.dart';
+import 'package:kegiatin/domain/entities/login_input.dart';
 import 'package:kegiatin/domain/entities/update_profile_input.dart';
 import 'package:kegiatin/domain/enums/archive_type.dart';
 import 'package:kegiatin/domain/enums/attendance_status.dart';
@@ -21,6 +22,8 @@ import 'package:kegiatin/domain/enums/event_visibility.dart';
 import 'package:kegiatin/domain/enums/rsvp_status.dart';
 import 'package:kegiatin/domain/enums/sync_status.dart';
 import 'package:kegiatin/domain/enums/user_role.dart';
+import 'package:kegiatin/domain/usecases/attendance/record_attendance_usecase.dart';
+import 'package:kegiatin/domain/usecases/base_usecase.dart';
 
 void registerUseCaseFallbackValues() {
   registerFallbackValue(
@@ -45,6 +48,9 @@ void registerUseCaseFallbackValues() {
   registerFallbackValue(Uint8List(0));
   registerFallbackValue(EnhancementMode.auto);
   registerFallbackValue(ArchiveType.material);
+  registerFallbackValue(const LoginInput(email: '', password: ''));
+  registerFallbackValue(const RecordAttendanceParams(qrToken: '', sessionId: ''));
+  registerFallbackValue(NoInput.instance);
 }
 
 void registerRepoFallbackValues() {
