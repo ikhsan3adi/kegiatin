@@ -11,4 +11,5 @@ class DbConstants {
   static const String attendanceBox = 'attendance_box';
   static const String archiveBox = 'archive_box';
   static const String profileBox = 'profile_box';
+  static const String notificationBox = 'notification_box';
 }

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
 import 'package:kegiatin/presentation/controllers/event/event_list_controller.dart';
 import 'package:kegiatin/presentation/controllers/event/event_stats_controller.dart';
+import 'package:kegiatin/presentation/controllers/notification/unread_count_controller.dart';
 import 'package:kegiatin/presentation/pages/admin/widget/dashboard_card.dart';
 import 'package:kegiatin/presentation/widgets/calender_card.dart';
 import 'package:kegiatin/presentation/widgets/kegiatin_app_bar.dart';
@@ -81,16 +83,47 @@ class _AdminDashboardPageState extends ConsumerState<AdminDashboardPage> {
                             ),
                           ],
                         ),
-                        IconButton(
-                          onPressed: () {
-                            // TODO: navigasi ke halaman notifikasi
-                          },
-                          icon: Icon(
-                            Icons.notifications_outlined,
-                            color: colorScheme.onPrimary,
-                            size: 26,
-                          ),
-                          tooltip: 'Notifikasi',
+                        Stack(
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                context.push('/admin/notifications');
+                              },
+                              icon: Icon(
+                                Icons.notifications_outlined,
+                                color: colorScheme.onPrimary,
+                                size: 26,
+                              ),
+                              tooltip: 'Notifikasi',
+                            ),
+                            Consumer(
+                              builder: (context, ref, child) {
+                                final unreadCount = ref.watch(unreadCountControllerProvider).value ?? 0;
+                                if (unreadCount > 0) {
+                                  return Positioned(
+                                    right: 8,
+                                    top: 8,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(4),
+                                      decoration: BoxDecoration(
+                                        color: colorScheme.error,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Text(
+                                        unreadCount > 99 ? '99+' : unreadCount.toString(),
+                                        style: textTheme.labelSmall?.copyWith(
+                                          color: colorScheme.onError,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+                                return const SizedBox.shrink();
+                              },
+                            ),
+                          ],
                         ),
                       ],
                     ),

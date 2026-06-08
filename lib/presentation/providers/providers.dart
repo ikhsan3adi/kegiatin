@@ -13,6 +13,7 @@ export 'auth_providers.dart';
 export 'core_providers.dart';
 export 'event_providers.dart';
 export 'history_providers.dart';
+export 'notification_providers.dart';
 export 'pcd_providers.dart';
 export 'rsvp_providers.dart';
 export 'session_providers.dart';

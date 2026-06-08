@@ -1,7 +1,5 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kegiatin/domain/enums/user_role.dart';
-import 'package:kegiatin/presentation/controllers/auth/auth_controller.dart';
 import 'package:kegiatin/presentation/pages/admin/event_detail/admin_event_detail_page.dart';
 import 'package:kegiatin/presentation/pages/admin/create_event/create_event_page.dart';
 import 'package:kegiatin/presentation/pages/admin/edit_event/edit_event_page.dart';
@@ -15,71 +13,28 @@ import 'package:kegiatin/presentation/pages/login_page.dart';
 import 'package:kegiatin/presentation/pages/onboarding_page.dart';
 import 'package:kegiatin/presentation/pages/register_page.dart';
 import 'package:kegiatin/presentation/pages/splash_page.dart';
-import 'package:kegiatin/presentation/pages/notification_page.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'app_router.g.dart';
+class TestNavigatorObserver extends NavigatorObserver {
+  final List<Route<dynamic>> pushedRoutes = [];
 
-@Riverpod(keepAlive: true)
-GoRouter appRouter(Ref ref) {
-  final refreshNotifier = ValueNotifier<int>(0);
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    pushedRoutes.add(route);
+    super.didPush(route, previousRoute);
+  }
+}
 
-  ref.listen(authControllerProvider, (_, _) {
-    refreshNotifier.value++;
-  });
-
+/// Helper to construct a GoRouter instance that mirrors the production routes
+/// but can be injected with custom redirect logic or observers for testing.
+GoRouter createTestRouter({
+  String initialLocation = '/',
+  GoRouterRedirect? redirect,
+  List<NavigatorObserver>? observers,
+}) {
   return GoRouter(
-    initialLocation: '/',
-    refreshListenable: refreshNotifier,
-    redirect: (context, state) {
-      final authState = ref.read(authControllerProvider);
-      final location = state.matchedLocation;
-
-      final isLoading = authState.isLoading;
-      final isLoggedIn = authState.value != null;
-
-      final isSplash = location == '/';
-      final isAuth = location == '/login' || location == '/register';
-      final isOnboarding = location == '/onboarding';
-
-      if (isLoading) {
-        if (isSplash || isAuth || isOnboarding) return null;
-        return '/';
-      }
-
-      // Auth resolved, user is logged in
-      if (isLoggedIn) {
-        final role = authState.value?.role;
-        final isAdmin = role == UserRole.admin;
-        final isPeserta = role == UserRole.member;
-
-        // Redirect away from guest-only pages based on role
-        if (isSplash || isAuth || isOnboarding) {
-          if (isAdmin) return '/admin';
-          if (isPeserta) return '/peserta';
-          return null; // Fallback
-        }
-
-        // Guard routes: Prevent Peserta from accessing Admin routes and vice-versa
-        if (isAdmin && location.startsWith('/peserta')) {
-          return '/admin';
-        }
-        if (isPeserta && location.startsWith('/admin')) {
-          return '/peserta';
-        }
-      }
-
-      if (!isLoggedIn && (isAuth || isOnboarding)) return null;
-
-      // Blok kode pengecekan "hasSeenOnboarding" saat di splash DIHAPUS
-      // dan dipindahkan ke dalam logic splash_page.dart agar bisa menunggu 3 detik.
-
-      // Auth resolved, not logged in, trying to access protected route
-      // (Tambahkan pengecualian isSplash agar tetap bisa diam di halaman splash)
-      if (!isLoggedIn && !isSplash) return '/login';
-
-      return null;
-    },
+    initialLocation: initialLocation,
+    redirect: redirect,
+    observers: observers,
     routes: [
       GoRoute(path: '/', builder: (_, _) => const SplashPage()),
       GoRoute(path: '/onboarding', builder: (_, _) => const OnboardingPage()),
@@ -101,7 +56,6 @@ GoRouter appRouter(Ref ref) {
           ),
           GoRoute(path: 'scan', builder: (_, _) => const QrScanPage()),
           GoRoute(path: 'edit-profile', builder: (_, _) => const EditProfilePage()),
-          GoRoute(path: 'notifications', builder: (_, _) => const NotificationPage()),
         ],
       ),
       GoRoute(
@@ -114,7 +68,6 @@ GoRouter appRouter(Ref ref) {
                 PesertaEventDetailPage(eventId: state.pathParameters['eventId']!),
           ),
           GoRoute(path: 'edit-profile', builder: (_, _) => const EditProfilePage()),
-          GoRoute(path: 'notifications', builder: (_, _) => const NotificationPage()),
           GoRoute(
             path: 'qr/:eventId',
             builder: (context, state) =>
