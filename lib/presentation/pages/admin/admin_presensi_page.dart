@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:kegiatin/presentation/widgets/kegiatin_app_bar.dart';
 
-class AdminMateriPage extends StatelessWidget {
-  const AdminMateriPage({super.key});
+class AdminPresensiPage extends StatelessWidget {
+  const AdminPresensiPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +18,7 @@ class AdminMateriPage extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Materi',
+                'Presensi',
                 style: textTheme.headlineLarge?.copyWith(
                   color: colorScheme.onPrimary,
                   fontWeight: FontWeight.bold,
@@ -26,7 +26,7 @@ class AdminMateriPage extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                'Kelola materi kegiatan',
+                'Kelola presensi kegiatan',
                 style: textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onPrimary.withValues(alpha: 0.85),
                 ),
@@ -36,20 +36,20 @@ class AdminMateriPage extends StatelessWidget {
           ),
         ),
 
-        // Konten kosong (belum ada backend materi)
+        // Konten kosong
         Expanded(
           child: Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  Icons.menu_book_rounded,
+                  Icons.qr_code_scanner_rounded,
                   size: 72,
                   color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Belum ada materi',
+                  'Belum ada presensi',
                   style: textTheme.titleLarge?.copyWith(
                     color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                     fontWeight: FontWeight.w600,
@@ -57,7 +57,7 @@ class AdminMateriPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Materi kegiatan dapat dikelola\ndi dalam halaman detail kegiatan.',
+                  'Presensi kegiatan dapat dikelola\ndi dalam halaman detail kegiatan.',
                   textAlign: TextAlign.center,
                   style: textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),

@@ -67,6 +67,7 @@ class AuthController extends _$AuthController {
     try {
       final serverClientId = dotenv.env['GOOGLE_SERVER_CLIENT_ID'];
       final googleSignIn = GoogleSignIn(serverClientId: serverClientId);
+      await googleSignIn.signOut();
       final account = await googleSignIn.signIn();
       if (account == null) {
         state = const AsyncData(null);

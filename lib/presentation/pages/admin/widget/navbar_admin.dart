@@ -6,7 +6,7 @@ import 'package:kegiatin/core/theme/custom.dart';
 import 'package:kegiatin/domain/usecases/base_usecase.dart';
 import 'package:kegiatin/presentation/pages/admin/admin_dashboard_page.dart';
 import 'package:kegiatin/presentation/pages/admin/admin_event_page.dart';
-import 'package:kegiatin/presentation/pages/admin/admin_materi_page.dart';
+import 'package:kegiatin/presentation/pages/admin/admin_presensi_page.dart';
 import 'package:kegiatin/presentation/pages/admin/admin_profile_page.dart';
 import 'package:kegiatin/presentation/providers/providers.dart';
 
@@ -23,11 +23,15 @@ class _NavbarAdminState extends ConsumerState<NavbarAdmin> {
   static const List<Widget> _pages = [
     AdminDashboardPage(),
     AdminEventPage(),
-    AdminMateriPage(),
+    AdminPresensiPage(),
     AdminProfilePage(),
   ];
 
   void _onItemTapped(int index) {
+    if (index == 2) {
+      context.push('/admin/scan');
+      return;
+    }
     setState(() {
       _selectedIndex = index;
     });
@@ -73,53 +77,18 @@ class _NavbarAdminState extends ConsumerState<NavbarAdmin> {
             ),
         ],
       ),
-      // --- Tombol Tengah (Pindai QR) ---
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/admin/scan'),
-        backgroundColor: colorScheme.primaryContainer, // Menggunakan secondary color
-        foregroundColor: colorScheme.onPrimaryContainer, // Warna icon FAB
-        shape: const CircleBorder(), // Memastikan bentuknya bulat sempurna
-        elevation: 4.0,
-        child: const Icon(Icons.qr_code_scanner, size: 28),
-      ),
-
-      // Menempatkan FAB di tengah dan "merapat" ke bawah
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-
       // --- Navigasi Bawah ---
       bottomNavigationBar: BottomAppBar(
         color: colorScheme.primary, // Menggunakan primary color untuk navigasi
-        shape: const CircularNotchedRectangle(), // Membuat efek potongan/lengkungan
-        notchMargin: 8.0, // Jarak antara FAB dan lengkungan navigasi
-        clipBehavior: Clip.antiAlias,
         child: SizedBox(
           height: 70.0,
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              // Kelompok menu sebelah kiri
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildNavItem(Icons.home, 'Dashboard', 0, colorScheme),
-                    _buildNavItem(Icons.calendar_month, 'Kegiatan', 1, colorScheme),
-                  ],
-                ),
-              ),
-
-              // Ruang kosong di tengah untuk memberi tempat bagi FloatingActionButton
-              const SizedBox(width: 48),
-              // Kelompok menu sebelah kanan
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildNavItem(Icons.menu_book, 'Materi', 2, colorScheme),
-                    _buildNavItem(Icons.person, 'Profil', 3, colorScheme),
-                  ],
-                ),
-              ),
+              _buildNavItem(Icons.home, 'Dashboard', 0, colorScheme),
+              _buildNavItem(Icons.calendar_month, 'Kegiatan', 1, colorScheme),
+              _buildNavItem(Icons.qr_code_scanner, 'Presensi', 2, colorScheme),
+              _buildNavItem(Icons.person, 'Profil', 3, colorScheme),
             ],
           ),
         ),
