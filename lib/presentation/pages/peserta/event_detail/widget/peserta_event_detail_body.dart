@@ -1,13 +1,10 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kegiatin/core/constants/api_constants.dart';
-import 'package:kegiatin/core/utils/snackbar_helper.dart';
 import 'package:kegiatin/domain/entities/activity_record.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:kegiatin/domain/entities/archive_item.dart';
 import 'package:kegiatin/domain/entities/attendance.dart';
 import 'package:kegiatin/domain/entities/event.dart';
 import 'package:kegiatin/domain/entities/session.dart';
@@ -21,9 +18,7 @@ import 'package:kegiatin/presentation/controllers/rsvp/create_rsvp_controller.da
 import 'package:kegiatin/presentation/controllers/rsvp/my_rsvp_controller.dart';
 import 'package:kegiatin/presentation/pages/fullscreen_image_page.dart';
 import 'package:kegiatin/presentation/pages/peserta/peserta_riwayat_page.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:kegiatin/presentation/widgets/archive_item_row.dart';
-import 'package:kegiatin/presentation/providers/core_providers.dart';
 
 /// Konten scrollable halaman detail event peserta.
 ///

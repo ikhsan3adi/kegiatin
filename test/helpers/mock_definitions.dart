@@ -1,6 +1,17 @@
 import 'package:mocktail/mocktail.dart';
+import 'package:hive_ce/hive.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kegiatin/core/network/network_info.dart';
+import 'package:kegiatin/domain/usecases/get_current_user_usecase.dart';
+import 'package:kegiatin/domain/usecases/login_usecase.dart';
+import 'package:kegiatin/domain/usecases/google_login_usecase.dart';
+import 'package:kegiatin/domain/usecases/register_usecase.dart';
+import 'package:kegiatin/domain/usecases/logout_usecase.dart';
+import 'package:kegiatin/domain/usecases/attendance/sync_attendance_usecase.dart';
+import 'package:kegiatin/domain/usecases/attendance/record_attendance_usecase.dart';
 import 'package:kegiatin/data/datasources/local/auth_local_datasource.dart';
+
 import 'package:kegiatin/data/datasources/local/archive_local_datasource.dart';
 import 'package:kegiatin/data/datasources/local/attendance_local_datasource.dart';
 import 'package:kegiatin/data/datasources/local/event_local_datasource.dart';
@@ -77,3 +88,9 @@ class MockHistoryRemoteDataSource extends Mock implements HistoryRemoteDataSourc
 class MockHistoryLocalDataSource extends Mock implements HistoryLocalDataSource {}
 
 class MockUserRemoteDataSource extends Mock implements UserRemoteDataSource {}
+
+class MockBox<T> extends Mock implements Box<T> {}
+
+class MockSharedPreferences extends Mock implements SharedPreferences {}
+
+class MockGoRouter extends Mock implements GoRouter {}

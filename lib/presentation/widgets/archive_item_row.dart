@@ -38,7 +38,7 @@ class _ArchiveItemRowState extends ConsumerState<ArchiveItemRow> {
     } else {
       final openResult = await OpenFilex.open(localFilePath);
       if (openResult.type != ResultType.done) {
-        if (context.mounted) {
+        if (mounted) {
           SnackBarHelper.showError(context, 'Gagal membuka file: ${openResult.message}');
         }
       }

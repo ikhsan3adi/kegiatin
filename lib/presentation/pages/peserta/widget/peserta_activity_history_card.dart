@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kegiatin/core/constants/api_constants.dart';
 import 'package:kegiatin/core/utils/date_formatter.dart';
 import 'package:kegiatin/domain/entities/activity_record.dart';
 import 'package:kegiatin/domain/entities/session.dart';
 import 'package:kegiatin/domain/enums/attendance_status.dart';
 import 'package:kegiatin/domain/enums/event_type.dart';
 import 'package:kegiatin/presentation/controllers/archive/session_archives_controller.dart';
-import 'package:kegiatin/presentation/pages/fullscreen_image_page.dart';
 import 'package:kegiatin/presentation/widgets/archive_item_row.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 class PesertaActivityHistoryCard extends ConsumerStatefulWidget {
   const PesertaActivityHistoryCard({super.key, required this.record});
